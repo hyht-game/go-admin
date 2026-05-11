@@ -16,7 +16,7 @@ authn:
       - "key2"
 
 authz:
-  type: "opa" # casbin, opa, zanzibar, noop
+  type: "noop" # casbin, opa, zanzibar, noop
 
   casbin:
 
