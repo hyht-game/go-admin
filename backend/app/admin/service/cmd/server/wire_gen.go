@@ -108,8 +108,7 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	internalMessageRepo := data.NewInternalMessageRepo(context, entClient)
 	internalMessageCategoryRepo := data.NewInternalMessageCategoryRepo(context, entClient)
 	internalMessageRecipientRepo := data.NewInternalMessageRecipientRepo(context, entClient)
-	sseServer := server.NewSseServer(context)
-	internalMessageService := service.NewInternalMessageService(context, internalMessageRepo, internalMessageCategoryRepo, internalMessageRecipientRepo, userRepo, sseServer, authenticator, clientType)
+	internalMessageService := service.NewInternalMessageService(context, internalMessageRepo, internalMessageCategoryRepo, internalMessageRecipientRepo, userRepo, authenticator, clientType)
 	internalMessageCategoryService := service.NewInternalMessageCategoryService(context, internalMessageCategoryRepo)
 	internalMessageRecipientService := service.NewInternalMessageRecipientService(context, internalMessageRepo, internalMessageRecipientRepo)
 	httpServer, err := server.NewRestServer(context, v, authorizerAuthorizer, authenticationService, loginPolicyService, adminPortalService, taskService, fileService, fileTransferService, dictTypeService, dictEntryService, languageService, tenantService, userService, userProfileService, roleService, positionService, orgUnitService, menuService, apiService, permissionService, permissionGroupService, permissionAuditLogService, policyEvaluationLogService, loginAuditLogService, apiAuditLogService, operationAuditLogService, dataAccessAuditLogService, internalMessageService, internalMessageCategoryService, internalMessageRecipientService)
@@ -124,6 +123,7 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	sseServer := server.NewSseServer(context, internalMessageService)
 	app := newApp(context, httpServer, asynqServer, sseServer)
 	return app, func() {
 		cleanup2()

@@ -474,9 +474,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   /**
    * 连接 SSE 服务器
+   * 将 accessToken 注入请求头，不再通过 URL 查询参数传递
    */
   function _connectSSEServer() {
     const targetSseUrl = `${import.meta.env.VITE_GLOB_SSE_URL}?stream=${encodeURIComponent(accessStore.accessToken ?? '')}`;
+
+    const token = accessStore.accessToken ?? '';
+    globalSSEClient.setHeaders({ Authorization: `Bearer ${token}` });
     globalSSEClient.connect(targetSseUrl);
   }
 
