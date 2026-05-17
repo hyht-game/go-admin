@@ -1,4 +1,4 @@
-import { useAuthStore, useAccessStore, useAppStore } from "@/store";
+import { useAuthStore, useAccessStore, useAppStore } from "@/stores";
 import { defaultPreferences } from "@/settings";
 
 import type { HttpResponse, Request } from "./types";

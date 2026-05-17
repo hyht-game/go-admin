@@ -5,7 +5,7 @@ import { startProgress, stopProgress } from "@/utils";
 import { defaultPreferences } from "@/settings";
 
 import { accessRoutes, coreRouteNames } from "@/router/routes";
-import { useAccessStore, useAppUserStore, useAuthStore, useDictStore } from "@/store";
+import { useAccessStore, useAppUserStore, useAuthStore, useDictStore } from "@/stores";
 
 import { generateAccess } from "./access";
 

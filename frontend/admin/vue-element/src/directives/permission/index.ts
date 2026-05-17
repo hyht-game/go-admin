@@ -1,6 +1,6 @@
 import type { Directive, DirectiveBinding } from "vue";
 
-import { useAppUserStore } from "@/store";
+import { useAppUserStore } from "@/stores";
 import { ROLE_ROOT } from "@/constants";
 
 /**

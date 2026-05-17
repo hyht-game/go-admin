@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/stores";
 import type { SupportedLanguagesType } from "@/i18n/types";
 
 defineProps({

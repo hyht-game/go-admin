@@ -5,7 +5,7 @@ import type {
   identityservicev1_ListTenantResponse as ListTenantResponse,
   identityservicev1_ListUserResponse as ListUserResponse,
 } from "@/api/generated/admin/service/v1";
-import { useAppUserStore, useOrgUnitStore, useTenantStore, useUserListStore } from "@/store";
+import { useAppUserStore, useOrgUnitStore, useTenantStore, useUserListStore } from "@/stores";
 
 interface UserViewState {
   loading: boolean; // 加载状态

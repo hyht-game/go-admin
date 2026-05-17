@@ -11,7 +11,7 @@ import "animate.css";
 import { setupDirective } from "@/directives";
 import { setupI18n } from "@/i18n";
 import { setupRouter } from "@/router";
-import { initStores } from "@/store/setup";
+import { initStores } from "@/stores/setup";
 import { registerGlobComp } from "@/registerGlobComp";
 
 import App from "./App.vue";

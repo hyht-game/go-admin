@@ -119,7 +119,7 @@
 </template>
 <script setup lang="ts">
 import type { FormInstance } from "element-plus";
-import { useAuthStore } from "@/store";
+import { useAuthStore } from "@/stores";
 import { router } from "@/router";
 
 const { t } = useI18n();

@@ -66,7 +66,7 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { defaultPreferences } from "@/settings";
 import { DeviceEnum, SidebarColor, ThemeMode, LayoutMode } from "@/enums/settings";
-import { useAppStore, useSettingsStore, useAppUserStore, useAuthStore } from "@/store";
+import { useAppStore, useSettingsStore, useAppUserStore, useAuthStore } from "@/stores";
 
 // 导入子组件
 import CommandPalette from "@/components/CommandPalette/index.vue";
