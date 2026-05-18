@@ -3,7 +3,7 @@
  */
 import { ref, onMounted, onBeforeUnmount, toRaw } from "vue";
 import { RouteRecordRaw, LocationQueryRaw } from "vue-router";
-import router from "@/router";
+import { router } from "@/router";
 import { useAccessStore } from "@/stores";
 import { isExternal } from "@/utils";
 
@@ -157,12 +157,12 @@ export function useCommandPalette() {
 
       if (route.children) {
         loadRoutes(route.children, path);
-      } else if (route.meta?.title) {
+      } else if (route.meta?.title && typeof route.meta.title === "string") {
         menuItems.value.push({
           title: route.meta.title === "dashboard" ? "首页" : route.meta.title,
           path,
           name: typeof route.name === "string" ? route.name : undefined,
-          icon: route.meta.icon,
+          icon: typeof route.meta.icon === "string" ? route.meta.icon : undefined,
           redirect: typeof route.redirect === "string" ? route.redirect : undefined,
           params: route.meta.params
             ? JSON.parse(JSON.stringify(toRaw(route.meta.params)))

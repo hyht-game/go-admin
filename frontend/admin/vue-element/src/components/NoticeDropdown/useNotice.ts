@@ -2,23 +2,25 @@
  * 通知中心逻辑
  */
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import type { NoticeItem, NoticeDetail, NoticeQueryParams } from "@/types/api";
-import NoticeAPI from "@/api/system/notice";
-import { useSse } from "@/composables";
-import router from "@/router";
+import { useInternalMessageStore, useAppUserStore } from "@/stores";
+import { router } from "@/router";
+import type { internal_messageservicev1_InternalMessageRecipient as InternalMessageRecipient } from "@/api/generated/admin/service/v1";
+import { dateUtil } from "@/utils";
+import { globalSSEClient } from "@/transport/sse";
 
 const PAGE_SIZE = 5;
 
 // SSE 事件名称：通知消息
-const NOTICE_EVENT = "notice";
+const NOTICE_EVENT = "notification";
 
 export function useNotice() {
-  const { on, isConnected } = useSse();
+  const internalMessageStore = useInternalMessageStore();
+  const userStore = useAppUserStore();
 
   // 状态
-  const list = ref<NoticeItem[]>([]);
+  const list = ref<InternalMessageRecipient[]>([]);
   const unreadTotal = ref(0);
-  const detail = ref<NoticeDetail | null>(null);
+  const detail = ref<any | null>(null);
   const dialogVisible = ref(false);
 
   let unsubscribe: (() => void) | null = null;
@@ -27,39 +29,156 @@ export function useNotice() {
   // 数据获取
   // ============================================
 
-  async function fetchList(params?: Partial<NoticeQueryParams>) {
-    const query: NoticeQueryParams = {
-      pageNum: 1,
-      pageSize: PAGE_SIZE,
-      isRead: 0,
-      ...params,
-    };
-    const page = await NoticeAPI.getMyNoticePage(query);
-    list.value = page.list || [];
-    unreadTotal.value = page.total ?? 0;
+  async function fetchList(params?: any) {
+    const userId = userStore.userInfo?.id;
+    if (!userId) return;
+
+    const result = await internalMessageStore.listUserInbox(
+      { page: 1, pageSize: PAGE_SIZE },
+      {
+        recipient_user_id: userId.toString(),
+        ...params,
+      },
+      null,
+      ["-created_at"] // 按创建时间倒序
+    );
+    list.value = result.items || [];
+    unreadTotal.value = result.total ?? 0;
   }
 
   async function read(id: string) {
-    detail.value = await NoticeAPI.getDetail(id);
+    const numericId = Number(id);
+    detail.value = await internalMessageStore.getMessage(numericId);
     dialogVisible.value = true;
 
+    // 标记为已读
+    const userId = userStore.userInfo?.id;
+    if (userId) {
+      try {
+        await internalMessageStore.markNotificationAsRead(userId, [numericId]);
+        ElMessage.success("已标记为已读");
+      } catch {
+        ElMessage.error("标记失败");
+      }
+    }
+
     // 从列表中移除已读项
-    const idx = list.value.findIndex((item: NoticeItem) => item.id === id);
-    if (idx >= 0) list.value.splice(idx, 1);
-    if (unreadTotal.value > 0) unreadTotal.value -= 1;
+    const idx = list.value.findIndex((item) => item.id === numericId);
+    if (idx >= 0) {
+      list.value.splice(idx, 1);
+      if (unreadTotal.value > 0) unreadTotal.value -= 1;
+    }
 
     await fetchList();
   }
 
   async function readAll() {
-    await NoticeAPI.readAll();
+    const userId = userStore.userInfo?.id;
+    if (!userId) return;
+
+    // 获取所有未读消息ID
+    const unreadIds = list.value
+      .filter((item) => item.status !== "READ")
+      .map((item) => Number(item.id));
+
+    if (unreadIds.length === 0) {
+      ElMessage.info("没有未读消息");
+      return;
+    }
+
+    try {
+      await internalMessageStore.markNotificationAsRead(userId, unreadIds);
+      ElMessage.success("已全部标记为已读");
+    } catch {
+      ElMessage.error("操作失败");
+      return;
+    }
+
+    // 清空列表并重置计数
     list.value = [];
     unreadTotal.value = 0;
-    ElMessage.success("已全部标记为已读");
   }
 
   function goMore() {
     router.push({ name: "MyNotice" });
+  }
+
+  /**
+   * 检查消息是否已存在
+   */
+  function hasMessage(data: InternalMessageRecipient): boolean {
+    return list.value.some((item) => item.messageId === data.messageId);
+  }
+
+  /**
+   * 转换内部消息为UI数据
+   */
+  function convertInternalMessageRecipient(item: InternalMessageRecipient) {
+    const date = dateUtil(item.createdAt as string).fromNow();
+    return {
+      id: item.id ?? 0,
+      messageId: item.messageId ?? 0,
+      title: item.title || "",
+      content: item.content || "",
+      status: item.status,
+      createdAt: item.createdAt,
+      date,
+      isRead: item.status === "READ",
+    };
+  }
+
+  /**
+   * 处理SSE通知事件
+   */
+  function handleSseNotification(data: InternalMessageRecipient) {
+    try {
+      if (!data.id || !data.messageId) return;
+
+      // 避免重复
+      if (hasMessage(data)) return;
+
+      // 转换数据格式并添加到列表头部
+      const convertedData = convertInternalMessageRecipient(data);
+      list.value.unshift(convertedData);
+
+      // 如果超过页面大小，移除最后一个
+      if (list.value.length > PAGE_SIZE) {
+        list.value.pop();
+      }
+
+      // 更新未读总数
+      unreadTotal.value += 1;
+
+      // 显示桌面通知
+      ElNotification({
+        title: "您收到一条新的通知消息！",
+        message: data.title || "新消息",
+        type: "success",
+        position: "bottom-right",
+      });
+    } catch (e) {
+      console.error("解析通知消息失败", e);
+    }
+  }
+
+  /**
+   * 处理撤回通知事件
+   */
+  function handleSseRevoke(data: any) {
+    try {
+      if (!data.id && !data.messageId) return;
+
+      // 从列表中移除已撤回的通知
+      const idx = list.value.findIndex(
+        (item) => item.id === data.id || item.messageId === data.messageId
+      );
+      if (idx >= 0) {
+        list.value.splice(idx, 1);
+        if (unreadTotal.value > 0) unreadTotal.value -= 1;
+      }
+    } catch (e) {
+      console.error("处理撤回通知失败", e);
+    }
   }
 
   // ============================================
@@ -67,55 +186,11 @@ export function useNotice() {
   // ============================================
 
   function setupSubscription() {
-    if (unsubscribe) return;
-
     // 订阅新通知事件
-    unsubscribe = on(NOTICE_EVENT, (data: any) => {
-      try {
-        if (!data.id) return;
-
-        // 避免重复
-        if (list.value.some((item: NoticeItem) => item.id === data.id)) return;
-
-        unreadTotal.value += 1;
-
-        list.value.unshift({
-          id: data.id,
-          title: data.title,
-          type: data.type,
-          publishTime: data.publishTime,
-        } as NoticeItem);
-
-        if (list.value.length > PAGE_SIZE) {
-          list.value.length = PAGE_SIZE;
-        }
-
-        ElNotification({
-          title: "您收到一条新的通知消息！",
-          message: data.title,
-          type: "success",
-          position: "bottom-right",
-        });
-      } catch (e) {
-        console.error("解析通知消息失败", e);
-      }
-    });
+    globalSSEClient.on<InternalMessageRecipient>(NOTICE_EVENT, handleSseNotification);
 
     // 订阅撤回通知事件
-    on("notice-revoke", (data: any) => {
-      try {
-        if (!data.id) return;
-
-        // 从列表中移除已撤回的通知
-        const idx = list.value.findIndex((item: NoticeItem) => item.id === data.id);
-        if (idx >= 0) {
-          list.value.splice(idx, 1);
-          if (unreadTotal.value > 0) unreadTotal.value -= 1;
-        }
-      } catch (e) {
-        console.error("处理撤回通知失败", e);
-      }
-    });
+    globalSSEClient.on<any>("notification-revoke", handleSseRevoke);
   }
 
   // ============================================

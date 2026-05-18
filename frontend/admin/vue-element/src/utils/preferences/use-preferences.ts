@@ -40,16 +40,18 @@ function usePreferences() {
   });
 
   // Element Plus 语言包映射
-  const elementPlusLocales = {
+  const elementPlusLocales: Record<string, any> = {
     "zh-cn": zhCn,
-    "en-US": en,
+    "en-us": en,
   };
 
   /**
    * 获取 Element Plus 语言包
    */
   const getElementPlusLocale = computed(() => {
-    return elementPlusLocales[preferences.app.locale] || zhCn;
+    // 将 locale 转换为小写以匹配映射
+    const normalizedLocale = preferences.app.locale.toLowerCase();
+    return elementPlusLocales[normalizedLocale] || zhCn;
   });
 
   /**

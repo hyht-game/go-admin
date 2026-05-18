@@ -19,5 +19,6 @@ export * from "./nprogress";
 export * from "./tree";
 export * from "./storage";
 export * from "./inference";
+export * from "./date";
 
 export { default as cloneDeep } from "lodash.clonedeep";
