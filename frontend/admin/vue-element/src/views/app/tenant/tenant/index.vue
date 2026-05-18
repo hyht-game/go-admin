@@ -1,9 +1,9 @@
 <template>
-  <div class="app-container">
+  <div class="app-container h-full flex flex-1 flex-col">
     <!-- 搜索 -->
     <PageSearch
       ref="searchRef"
-      :page-search-config="pageSearchConfig"
+      :search-config="searchConfig"
       @query-click="handleQueryClick"
       @reset-click="handleResetClick"
     />
@@ -11,9 +11,9 @@
     <!-- 列表 -->
     <PageContent
       ref="contentRef"
-      :page-content-config="pageContentConfig"
+      :content-config="contentConfig"
       @add-click="handleAddClick"
-      @edit-click="handleEditClick"
+      @operate-click="handleOperateClick"
     >
       <!-- 类型 -->
       <template #type="{ row }">
@@ -35,50 +35,21 @@
           {{ tenantStatusToName(row.status) }}
         </ElTag>
       </template>
-
-      <!-- 操作 -->
-      <template #action="{ row }">
-        <ElButton link type="primary" :icon="Edit" @click.stop="handleEditClick(row)">
-          {{ $t("ui.button.edit") }}
-        </ElButton>
-        <ElPopconfirm
-          :title="$t('ui.text.do_you_want_delete', { moduleName: $t('routes.tenant.moduleName') })"
-          @confirm="handleDelete(row)"
-        >
-          <template #reference>
-            <ElButton link type="danger" :icon="Delete">
-              {{ $t("ui.button.delete") }}
-            </ElButton>
-          </template>
-        </ElPopconfirm>
-      </template>
     </PageContent>
 
-    <!-- 新增弹窗 -->
-    <PageModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
-      <!-- 分割线 -->
-      <template #divider1>
-        <ElDivider>{{ $t("routes.tenant.adminSetting") }}</ElDivider>
-      </template>
-    </PageModal>
-
-    <!-- 编辑弹窗 -->
-    <PageModal
-      ref="editModalRef"
-      :modal-config="editModalConfig"
-      @submit-click="handleSubmitClick"
-    />
+    <!-- 新增/编辑弹窗 -->
+    <TenantDrawer ref="drawerRef" @success="handleSuccess" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ElTag, ElButton, ElPopconfirm, ElMessage, ElDivider } from "element-plus";
-import { Edit, Delete } from "@element-plus/icons-vue";
+import { ElTag, ElMessage, ElMessageBox } from "element-plus";
 
 import PageContent from "@/components/CURD/PageContent.vue";
 import PageSearch from "@/components/CURD/PageSearch.vue";
-import PageModal from "@/components/CURD/PageModal.vue";
 import usePage from "@/components/CURD/usePage";
+import type { IOperateData } from "@/components/CURD/types";
+import TenantDrawer from "./tenant-drawer.vue";
 
 import {
   tenantAuditStatusList,
@@ -92,26 +63,18 @@ import {
   tenantTypeToName,
   useTenantStore,
 } from "@/stores";
-import type { identityservicev1_Tenant as Tenant } from "@/api/generated/admin/service/v1";
 import { $t } from "@/i18n";
 
 const tenantStore = useTenantStore();
 
 // 使用 CURD hook
-const {
-  searchRef,
-  contentRef,
-  addModalRef,
-  editModalRef,
-  handleQueryClick,
-  handleResetClick,
-  handleAddClick,
-  handleEditClick,
-  handleSubmitClick,
-} = usePage();
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 抽屉引用
+const drawerRef = ref();
 
 // 搜索配置
-const pageSearchConfig = {
+const searchConfig = {
   formItems: [
     {
       type: "input",
@@ -165,7 +128,7 @@ const pageSearchConfig = {
 };
 
 // 表格配置
-const pageContentConfig = {
+const contentConfig = {
   table: {
     border: true,
     stripe: false,
@@ -220,271 +183,61 @@ const pageContentConfig = {
       label: $t("ui.table.action"),
       fixed: "right",
       width: 150,
-      slotName: "action",
+      operat: [
+        {
+          name: "edit",
+          text: $t("ui.button.edit"),
+        },
+        {
+          name: "delete",
+          text: $t("ui.button.delete"),
+          attrs: {
+            type: "danger",
+          },
+        },
+      ],
     },
   ],
 };
 
-// 新增表单配置
-const addModalConfig = {
-  component: "drawer" as const,
-  drawer: {
-    title: $t("ui.modal.create", { moduleName: $t("routes.tenant.moduleName") }),
-    size: "600px",
-  },
-  form: {
-    labelWidth: "120px",
-  },
-  formItems: [
-    {
-      type: "input",
-      label: $t("routes.tenant.name"),
-      prop: "name",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.code"),
-      prop: "code",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-    },
-    {
-      type: "select",
-      label: $t("routes.tenant.type"),
-      prop: "type",
-      initialValue: "PAID",
-      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
-      options: tenantTypeList,
-      attrs: {
-        placeholder: $t("ui.placeholder.select"),
-      },
-    },
-    {
-      type: "select",
-      label: $t("routes.tenant.auditStatus"),
-      prop: "auditStatus",
-      initialValue: "APPROVED",
-      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
-      options: tenantAuditStatusList,
-      attrs: {
-        placeholder: $t("ui.placeholder.select"),
-      },
-    },
-    {
-      type: "select",
-      label: $t("ui.table.status"),
-      prop: "status",
-      initialValue: "ON",
-      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
-      options: tenantStatusList,
-      attrs: {
-        placeholder: $t("ui.placeholder.select"),
-      },
-    },
-    {
-      type: "input",
-      label: $t("ui.table.remark"),
-      prop: "remark",
-      attrs: {
-        type: "textarea",
-        rows: 3,
-        placeholder: $t("ui.placeholder.input"),
-      },
-    },
-    // 管理员设置（仅新增时显示）
-    {
-      type: "custom",
-      label: "",
-      prop: "divider1",
-      slotName: "divider1",
-      hidden: true,
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.adminUserName"),
-      prop: "user.username",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-      hidden: true,
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.adminPassword"),
-      prop: "password",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        type: "password",
-        showPassword: true,
-        placeholder: $t("ui.placeholder.input"),
-      },
-      hidden: true,
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.adminPasswordConfirm"),
-      prop: "passwordConfirm",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        type: "password",
-        showPassword: true,
-        placeholder: $t("ui.placeholder.input"),
-      },
-      hidden: true,
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.adminMobile"),
-      prop: "user.mobile",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-      hidden: true,
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.adminEmail"),
-      prop: "user.email",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-      hidden: true,
-    },
-  ],
-  beforeSubmit: async (data: any) => {
-    // 检查密码和确认密码是否一致
-    if (data.password !== data.passwordConfirm) {
-      ElMessage.error($t("pages.notification.password_mismatch"));
-      throw new Error("Password mismatch");
-    }
+// 处理操作点击
+const handleOperateClick = (data: IOperateData) => {
+  const { name, row } = data;
 
-    // 检查租户编码是否存在
-    try {
-      await tenantStore.tenantExists(data.code, data.name);
-    } catch {
-      ElMessage.error($t("pages.tenant.tenant_code_exists"));
-      throw new Error("Tenant code exists");
-    }
-
-    // 检查用户名是否存在
-    try {
-      // TODO: 需要实现用户存在性检查
-      // await userListStore.userExists(data.user.username);
-    } catch {
-      ElMessage.error($t("pages.tenant.notification.user_username_exists"));
-      throw new Error("User username exists");
-    }
-
-    // 调用创建接口
-    await tenantStore.createTenantWithAdminUser({
-      tenant: {
-        name: data.name,
-        code: data.code,
-        type: data.type,
-        auditStatus: data.auditStatus,
-        status: data.status,
-        remark: data.remark,
-      },
-      user: data.user,
-      password: data.password,
+  if (name === "edit") {
+    // 编辑
+    drawerRef.value?.open(row);
+  } else if (name === "delete") {
+    // 删除
+    ElMessageBox.confirm(
+      $t("ui.text.do_you_want_delete", { moduleName: $t("routes.tenant.moduleName") }),
+      $t("ui.title.confirm"),
+      {
+        confirmButtonText: $t("common.confirm"),
+        cancelButtonText: $t("common.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await tenantStore.deleteTenant(row.id);
+        ElMessage.success($t("ui.notification.delete_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("ui.notification.delete_failed"));
+      }
     });
-  },
-};
-
-// 编辑表单配置
-const editModalConfig = {
-  component: "drawer" as const,
-  drawer: {
-    title: $t("ui.modal.update", { moduleName: $t("routes.tenant.moduleName") }),
-    size: "600px",
-  },
-  form: {
-    labelWidth: "120px",
-  },
-  formItems: [
-    {
-      type: "input",
-      label: $t("routes.tenant.name"),
-      prop: "name",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-    },
-    {
-      type: "input",
-      label: $t("routes.tenant.code"),
-      prop: "code",
-      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
-      attrs: {
-        placeholder: $t("ui.placeholder.input"),
-      },
-    },
-    {
-      type: "select",
-      label: $t("routes.tenant.type"),
-      prop: "type",
-      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
-      options: tenantTypeList,
-      attrs: {
-        placeholder: $t("ui.placeholder.select"),
-      },
-    },
-    {
-      type: "select",
-      label: $t("routes.tenant.auditStatus"),
-      prop: "auditStatus",
-      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
-      options: tenantAuditStatusList,
-      attrs: {
-        placeholder: $t("ui.placeholder.select"),
-      },
-    },
-    {
-      type: "select",
-      label: $t("ui.table.status"),
-      prop: "status",
-      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
-      options: tenantStatusList,
-      attrs: {
-        placeholder: $t("ui.placeholder.select"),
-      },
-    },
-    {
-      type: "input",
-      label: $t("ui.table.remark"),
-      prop: "remark",
-      attrs: {
-        type: "textarea",
-        rows: 3,
-        placeholder: $t("ui.placeholder.input"),
-      },
-    },
-  ],
-  beforeSubmit: async (data: any) => {
-    await tenantStore.updateTenant(data.id, data);
-  },
-};
-
-// 处理删除
-async function handleDelete(row: Tenant) {
-  try {
-    await tenantStore.deleteTenant(row.id);
-    ElMessage.success($t("ui.notification.delete_success"));
-    contentRef.value?.fetchPageData({}, true);
-  } catch {
-    ElMessage.error($t("ui.notification.delete_failed"));
   }
-}
+};
+
+// 处理新增点击
+const handleAddClick = () => {
+  drawerRef.value?.open();
+};
+
+// 处理成功回调
+const handleSuccess = () => {
+  contentRef.value?.fetchPageData({}, true);
+};
 </script>
 
 <style lang="scss" scoped>

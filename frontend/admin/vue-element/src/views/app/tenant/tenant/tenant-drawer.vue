@@ -1,11 +1,140 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="600px"
+    :close-on-click-modal="false"
+    @close="handleClose"
+  >
+    <ElForm :model="formData" label-width="120px">
+      <!-- 基本信息 -->
+      <ElFormItem :label="$t('routes.tenant.name')" required>
+        <ElInput v-model="formData.name" :placeholder="$t('ui.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('routes.tenant.code')" required>
+        <ElInput v-model="formData.code" :placeholder="$t('ui.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('routes.tenant.type')" required>
+        <ElSelect
+          v-model="formData.type"
+          :placeholder="$t('ui.placeholder.select')"
+          filterable
+          class="w-full"
+        >
+          <ElOption
+            v-for="item in tenantTypeList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('routes.tenant.auditStatus')" required>
+        <ElSelect
+          v-model="formData.auditStatus"
+          :placeholder="$t('ui.placeholder.select')"
+          filterable
+          class="w-full"
+        >
+          <ElOption
+            v-for="item in tenantAuditStatusList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('ui.table.status')" required>
+        <ElSelect
+          v-model="formData.status"
+          :placeholder="$t('ui.placeholder.select')"
+          filterable
+          class="w-full"
+        >
+          <ElOption
+            v-for="item in tenantStatusList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('ui.table.remark')">
+        <ElInput
+          v-model="formData.remark"
+          type="textarea"
+          :rows="3"
+          :placeholder="$t('ui.placeholder.input')"
+        />
+      </ElFormItem>
+
+      <!-- 管理员设置（仅创建时显示） -->
+      <ElDivider v-if="isCreate">{{ $t("routes.tenant.adminSetting") }}</ElDivider>
+
+      <ElFormItem v-if="isCreate" :label="$t('routes.tenant.adminUserName')" required>
+        <ElInput
+          v-model="formData.user.username"
+          :placeholder="$t('ui.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem v-if="isCreate" :label="$t('routes.tenant.adminPassword')" required>
+        <ElInput
+          v-model="formData.password"
+          type="password"
+          show-password
+          :placeholder="$t('ui.placeholder.input')"
+        />
+      </ElFormItem>
+
+      <ElFormItem v-if="isCreate" :label="$t('routes.tenant.adminPasswordConfirm')" required>
+        <ElInput
+          v-model="formData.passwordConfirm"
+          type="password"
+          show-password
+          :placeholder="$t('ui.placeholder.input')"
+        />
+      </ElFormItem>
+
+      <ElFormItem v-if="isCreate" :label="$t('routes.tenant.adminMobile')" required>
+        <ElInput
+          v-model="formData.user.mobile"
+          :placeholder="$t('ui.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem v-if="isCreate" :label="$t('routes.tenant.adminEmail')" required>
+        <ElInput
+          v-model="formData.user.email"
+          :placeholder="$t('ui.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="loading" @click="handleSubmit">
+          {{ $t("common.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 
-import { useVbenDrawer } from "@vben/common-ui";
+import { ElMessage } from "element-plus";
 
-import { notification } from "ant-design-vue";
-
-import { useVbenForm } from "@/adapter/form";
 import {
   tenantAuditStatusList,
   tenantStatusList,
@@ -13,357 +142,201 @@ import {
   useTenantStore,
   useUserListStore,
 } from "@/stores";
+import type { identityservicev1_Tenant as Tenant } from "@/api/generated/admin/service/v1";
+import { $t } from "@/i18n";
 
-const { t } = useI18n();
+const emit = defineEmits<{
+  (e: "success"): void;
+}>();
 
 const tenantStore = useTenantStore();
 const userListStore = useUserListStore();
 
-const data = ref();
+// 弹窗可见性
+const visible = ref(false);
+// 加载状态
+const loading = ref(false);
+// 是否为创建模式
+const isCreate = ref(false);
+// 当前编辑的数据
+const currentRow = ref<Tenant | null>(null);
 
-const getTitle = computed(() =>
-  data.value?.create
-    ? $t("ui.modal.create", { moduleName: t("pages.tenant.moduleName") })
-    : $t("ui.modal.update", { moduleName: t("pages.tenant.moduleName") })
-);
-// const isCreate = computed(() => data.value?.create);
-
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  // 所有表单项共用，可单独在表单内覆盖
-  commonConfig: {
-    // 所有表单项
-    componentProps: {
-      class: "w-full",
-    },
+// 表单数据
+const formData = ref({
+  name: "",
+  code: "",
+  type: "PAID",
+  auditStatus: "APPROVED",
+  status: "ON",
+  remark: "",
+  user: {
+    username: "",
+    mobile: "",
+    email: "",
   },
-  schema: [
-    {
-      component: "Input",
-      fieldName: "name",
-      label: t("pages.tenant.name"),
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-      rules: "required",
-    },
-    {
-      component: "Input",
-      fieldName: "code",
-      label: t("pages.tenant.code"),
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-      rules: "required",
-    },
-    {
-      component: "Select",
-      fieldName: "type",
-      label: t("pages.tenant.type"),
-      defaultValue: "PAID",
-      componentProps: {
-        placeholder: $t("ui.placeholder.select"),
-        options: tenantTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-      rules: "selectRequired",
-    },
-    {
-      component: "Select",
-      fieldName: "auditStatus",
-      label: t("pages.tenant.auditStatus"),
-      defaultValue: "APPROVED",
-      componentProps: {
-        placeholder: $t("ui.placeholder.select"),
-        options: tenantAuditStatusList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-      rules: "selectRequired",
-    },
-    {
-      component: "Select",
-      fieldName: "status",
-      defaultValue: "ON",
-      label: $t("ui.table.status"),
-      rules: "selectRequired",
-      componentProps: {
-        options: tenantStatusList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-    },
-    {
-      component: "Textarea",
-      fieldName: "remark",
-      label: $t("ui.table.remark"),
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-    },
-
-    {
-      component: "Divider",
-      fieldName: "divider1",
-      hideLabel: true,
-      dependencies: {
-        show: (_values) => {
-          return data.value?.create;
-        },
-        triggerFields: ["type"],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t("pages.tenant.adminSetting"),
-        };
-      },
-    },
-
-    {
-      component: "Input",
-      fieldName: "user.username",
-      label: t("pages.tenant.adminUserName"),
-      rules: "required",
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (_values) => {
-          return data.value?.create;
-        },
-        triggerFields: ["type"],
-      },
-    },
-
-    {
-      component: "VbenInputPassword",
-      fieldName: "password",
-      label: t("pages.tenant.adminPassword"),
-      rules: "required",
-      componentProps: {
-        passwordStrength: true,
-        placeholder: $t("ui.placeholder.input"),
-      },
-      dependencies: {
-        show: (_values) => {
-          return data.value?.create;
-        },
-        triggerFields: ["type"],
-      },
-    },
-
-    {
-      component: "VbenInputPassword",
-      fieldName: "passwordConfirm",
-      label: t("pages.tenant.adminPasswordConfirm"),
-      rules: "required",
-      componentProps: {
-        passwordStrength: true,
-        placeholder: $t("ui.placeholder.input"),
-      },
-      dependencies: {
-        show: (_values) => {
-          return data.value?.create;
-        },
-        triggerFields: ["type"],
-      },
-    },
-
-    {
-      component: "Input",
-      fieldName: "user.mobile",
-      label: t("pages.tenant.adminMobile"),
-      rules: "required",
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (_values) => {
-          return data.value?.create;
-        },
-        triggerFields: ["type"],
-      },
-    },
-
-    {
-      component: "Input",
-      fieldName: "user.email",
-      label: t("pages.tenant.adminEmail"),
-      rules: "required",
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (_values) => {
-          return data.value?.create;
-        },
-        triggerFields: ["type"],
-      },
-    },
-  ],
+  password: "",
+  passwordConfirm: "",
 });
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
+// 弹窗标题
+const title = computed(() =>
+  isCreate.value
+    ? $t("ui.modal.create", { moduleName: $t("routes.tenant.moduleName") })
+    : $t("ui.modal.update", { moduleName: $t("routes.tenant.moduleName") })
+);
 
-  async onConfirm() {
-    console.log("onConfirm");
+// 打开弹窗
+const open = (row?: Tenant) => {
+  visible.value = true;
 
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
+  if (row) {
+    // 编辑模式
+    isCreate.value = false;
+    currentRow.value = row;
+    formData.value = {
+      name: row.name || "",
+      code: row.code || "",
+      type: row.type || "PAID",
+      auditStatus: row.auditStatus || "APPROVED",
+      status: row.status || "ON",
+      remark: row.remark || "",
+      user: {
+        username: "",
+        mobile: "",
+        email: "",
+      },
+      password: "",
+      passwordConfirm: "",
+    };
+  } else {
+    // 创建模式
+    isCreate.value = true;
+    currentRow.value = null;
+    resetForm();
+  }
+};
+
+// 重置表单
+const resetForm = () => {
+  formData.value = {
+    name: "",
+    code: "",
+    type: "PAID",
+    auditStatus: "APPROVED",
+    status: "ON",
+    remark: "",
+    user: {
+      username: "",
+      mobile: "",
+      email: "",
+    },
+    password: "",
+    passwordConfirm: "",
+  };
+};
+
+// 关闭弹窗
+const handleClose = () => {
+  visible.value = false;
+  resetForm();
+};
+
+// 提交表单
+const handleSubmit = async () => {
+  try {
+    loading.value = true;
+
+    // 验证必填字段
+    if (!formData.value.name || !formData.value.code) {
+      ElMessage.error($t("ui.placeholder.input"));
       return;
     }
 
-    setLoading(true);
-
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-
-    console.log(getTitle.value, values);
-
-    await (data.value?.create ? createTenantWithAdminUser(values) : updateTenant(values));
-  },
-
-  onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      // 获取传入的数据
-      data.value = drawerApi.getData<Record<string, any>>();
-
-      // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
-
-      setLoading(false);
-
-      console.log("onOpenChange", data.value, data.value?.create);
+    if (isCreate.value) {
+      await createTenantWithAdminUser();
+    } else {
+      await updateTenant();
     }
-  },
-});
 
-function setLoading(loading: boolean) {
-  drawerApi.setState({ confirmLoading: loading });
-}
+    // 成功回调
+    emit("success");
+    handleClose();
+  } catch (error) {
+    console.error("Submit error:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 
-// async function createTenant(values: any) {
-//   console.log('createTenant', values);
-//
-//   try {
-//     await tenantStore.createTenant(values);
-//
-//     notification.success({
-//       message: $t('ui.notification.create_success'),
-//     });
-//   } catch {
-//     notification.error({
-//       message: $t('ui.notification.create_failed'),
-//     });
-//   } finally {
-//     // 关闭窗口
-//     drawerApi.close();
-//     setLoading(false);
-//   }
-// }
-
-async function createTenantWithAdminUser(values: any) {
-  console.log("createTenantWithAdminUser", values);
-
+// 创建租户和管理员用户
+async function createTenantWithAdminUser() {
   // 检查密码和确认密码是否一致
-  if (values.password !== values.passwordConfirm) {
-    notification.error({
-      message: t("pages.notification.password_mismatch"),
-    });
-    setLoading(false);
+  if (formData.value.password !== formData.value.passwordConfirm) {
+    ElMessage.error($t("pages.notification.password_mismatch"));
     return;
   }
 
   // 检查租户编码是否存在
   try {
-    await tenantStore.tenantExists(values.code, values.name);
+    await tenantStore.tenantExists(formData.value.code, formData.value.name);
   } catch {
-    notification.error({
-      message: t("pages.tenant.tenant_code_exists"),
-    });
-    setLoading(false);
+    ElMessage.error($t("pages.tenant.tenant_code_exists"));
     return;
   }
 
   // 检查用户名是否存在
   try {
-    await userListStore.userExists(values.user.username);
+    await userListStore.userExists(formData.value.user.username);
   } catch {
-    notification.error({
-      message: t("pages.tenant.notification.user_username_exists"),
-    });
-    setLoading(false);
+    ElMessage.error($t("pages.tenant.notification.user_username_exists"));
     return;
   }
 
-  try {
-    await tenantStore.createTenantWithAdminUser({
-      tenant: {
-        name: values.name,
-        code: values.code,
-        type: values.type,
-        auditStatus: values.auditStatus,
-        status: values.status,
-        remark: values.remark,
-      },
-      user: values.user,
-      password: values.password,
-    });
+  await tenantStore.createTenantWithAdminUser({
+    tenant: {
+      name: formData.value.name,
+      code: formData.value.code,
+      type: formData.value.type,
+      auditStatus: formData.value.auditStatus,
+      status: formData.value.status,
+      remark: formData.value.remark,
+    },
+    user: formData.value.user,
+    password: formData.value.password,
+  });
 
-    notification.success({
-      message: $t("ui.notification.create_success"),
-    });
-  } catch {
-    notification.error({
-      message: $t("ui.notification.create_failed"),
-    });
-  } finally {
-    // 关闭窗口
-    drawerApi.close();
-    setLoading(false);
-  }
+  ElMessage.success($t("ui.notification.create_success"));
 }
 
-async function updateTenant(values: any) {
-  console.log("updateTenant", values);
-
-  try {
-    await tenantStore.updateTenant(data.value.row.id, values);
-
-    notification.success({
-      message: $t("ui.notification.update_success"),
-    });
-  } catch {
-    notification.error({
-      message: $t("ui.notification.update_failed"),
-    });
-  } finally {
-    // 关闭窗口
-    drawerApi.close();
-    setLoading(false);
+// 更新租户
+async function updateTenant() {
+  if (!currentRow.value?.id) {
+    ElMessage.error($t("ui.notification.update_failed"));
+    return;
   }
+
+  await tenantStore.updateTenant(currentRow.value.id, {
+    name: formData.value.name,
+    code: formData.value.code,
+    type: formData.value.type,
+    auditStatus: formData.value.auditStatus,
+    status: formData.value.status,
+    remark: formData.value.remark,
+  });
+
+  ElMessage.success($t("ui.notification.update_success"));
 }
+
+// 暴露方法给父组件
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle">
-    <BaseForm />
-  </Drawer>
-</template>
+<style scoped>
+.drawer-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+</style>
