@@ -1,9 +1,9 @@
 <template>
-  <Fallback status="500" />
+  <Fallback status="offline" />
 </template>
 
 <script lang="ts" setup>
 import Fallback from "./fallback.vue";
 
-defineOptions({ name: "Fallback500" });
+defineOptions({ name: "FallbackOffline" });
 </script>

@@ -68,5 +68,27 @@
     "resetPassword": "重置密码",
     "thinkOfPasswd": "想起密码？",
     "login": "登 录"
+  },
+  "fallback": {
+    "unauthorized": "未授权",
+    "unauthorizedDesc": "抱歉，您的登录已过期，请重新登录",
+    "forbidden": "禁止访问",
+    "forbiddenDesc": "抱歉，您没有权限访问该页面",
+    "pageNotFound": "页面不存在",
+    "pageNotFoundDesc": "抱歉，您访问的页面不存在",
+    "internalError": "服务器错误",
+    "internalErrorDesc": "抱歉，服务器发生错误",
+    "comingSoon": "即将上线",
+    "offlineError": "网络断开",
+    "offlineErrorDesc": "您的网络连接已断开，请检查网络设置",
+    "http": {
+      "networkError": "网络异常，请稍后重试",
+      "requestTimeout": "请求超时，请稍后重试",
+      "badRequest": "请求错误",
+      "unauthorized": "未授权，请重新登录",
+      "forbidden": "禁止访问",
+      "notFound": "资源不存在",
+      "internalServerError": "服务器内部错误"
+    }
   }
 }

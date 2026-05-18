@@ -1,9 +1,7 @@
 <template>
-  <Fallback status="500" />
+  <Fallback status="coming-soon" />
 </template>
 
 <script lang="ts" setup>
 import Fallback from "./fallback.vue";
-
-defineOptions({ name: "Fallback500" });
 </script>

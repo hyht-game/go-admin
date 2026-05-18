@@ -68,5 +68,27 @@
     "resetPassword": "Reset Password",
     "thinkOfPasswd": "Remember your password?",
     "login": "Login"
+  },
+  "fallback": {
+    "unauthorized": "Unauthorized",
+    "unauthorizedDesc": "Sorry, your session has expired, please login again",
+    "forbidden": "Forbidden",
+    "forbiddenDesc": "Sorry, you do not have permission to access this page",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "Sorry, the page you visited does not exist",
+    "internalError": "Internal Server Error",
+    "internalErrorDesc": "Sorry, an unexpected error occurred",
+    "comingSoon": "Coming Soon",
+    "offlineError": "Network Disconnected",
+    "offlineErrorDesc": "Your network connection has been disconnected, please check your network settings",
+    "http": {
+      "networkError": "Network error, please try again later",
+      "requestTimeout": "Request timeout, please try again later",
+      "badRequest": "Bad Request",
+      "unauthorized": "Unauthorized, please login again",
+      "forbidden": "Forbidden",
+      "notFound": "Resource Not Found",
+      "internalServerError": "Internal Server Error"
+    }
   }
 }

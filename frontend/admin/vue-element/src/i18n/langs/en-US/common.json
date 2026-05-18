@@ -53,5 +53,7 @@
     "message": {
       "success": "Language switched successfully"
     }
-  }
+  },
+  "backToHome": "Back to Home",
+  "refresh": "Refresh Page"
 }

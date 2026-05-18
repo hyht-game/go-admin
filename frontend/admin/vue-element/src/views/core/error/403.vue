@@ -1,5 +1,9 @@
-<script setup lang="ts"></script>
+<template>
+  <Fallback status="403" />
+</template>
 
-<template></template>
+<script lang="ts" setup>
+import Fallback from "./fallback.vue";
 
-<style scoped lang="scss"></style>
+defineOptions({ name: "Fallback403" });
+</script>
