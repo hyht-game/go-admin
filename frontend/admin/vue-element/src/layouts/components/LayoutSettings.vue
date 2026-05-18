@@ -167,7 +167,7 @@ import { DocumentCopy, RefreshLeft, Check } from "@element-plus/icons-vue";
 
 const { t } = useI18n();
 import { LayoutMode, PageSwitchingAnimationOptions, SidebarColor, ThemeMode } from "@/constants";
-import { useSettingsStore } from "@/stores";
+import { useSettingsStore, useThemeStore } from "@/stores";
 import { themeColorPresets } from "@/settings";
 
 // 页面切换动画选项
@@ -198,8 +198,9 @@ const layoutOptions: LayoutOption[] = [
 const colorPresets = [...themeColorPresets];
 
 const settingsStore = useSettingsStore();
+const themeStore = useThemeStore();
 
-const isDark = ref<boolean>(settingsStore.theme === ThemeMode.DARK);
+const isDark = ref<boolean>(themeStore.isDark);
 const sidebarColor = ref(settingsStore.sidebarColorScheme);
 
 const selectedThemeColor = computed({
@@ -220,7 +221,8 @@ const drawerVisible = computed({
  * @param isDark 是否启用暗黑模式
  */
 const handleThemeChange = (isDark: string | number | boolean) => {
-  settingsStore.theme = isDark ? ThemeMode.DARK : ThemeMode.LIGHT;
+  const newTheme = isDark ? ThemeMode.DARK : ThemeMode.LIGHT;
+  themeStore.setTheme(newTheme);
 };
 
 /**
@@ -276,9 +278,10 @@ const handleResetSettings = async () => {
 
   try {
     settingsStore.resetSettings();
+    themeStore.resetTheme();
 
     // 同步更新本地状态"
-    isDark.value = settingsStore.theme === ThemeMode.DARK;
+    isDark.value = themeStore.isDark;
     sidebarColor.value = settingsStore.sidebarColorScheme;
 
     ElMessage.success(t("settings.resetSuccess"));
@@ -300,7 +303,7 @@ const generateSettingsCode = (): string => {
     showTagsView: settingsStore.showTagsView,
     showAppLogo: settingsStore.showAppLogo,
     layout: `LayoutMode.${settingsStore.layout.toUpperCase()}`,
-    theme: `ThemeMode.${settingsStore.theme.toUpperCase()}`,
+    theme: `ThemeMode.${themeStore.themeMode.toUpperCase()}`,
     size: "ComponentSize.DEFAULT",
     language: "LanguageEnum.ZH_CN",
     themeColor: `"${settingsStore.themeColor}"`,

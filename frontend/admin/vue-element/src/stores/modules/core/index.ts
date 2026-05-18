@@ -5,3 +5,4 @@ export * from "./tags-view.store";
 export * from "./access.store";
 export * from "./lock.store";
 export * from "./language.store";
+export * from "./theme.store";

@@ -1,6 +1,6 @@
-import { SidebarColor, ThemeMode } from "@/constants";
+import { SidebarColor } from "@/constants";
 import type { LayoutMode } from "@/constants";
-import { applyTheme, generateThemeColors, toggleDarkMode, toggleSidebarColor } from "@/utils/theme";
+import { toggleSidebarColor } from "@/utils/theme";
 import { STORAGE_KEYS } from "@/constants";
 import { defaultPreferences } from "@/settings";
 
@@ -25,23 +25,9 @@ export const useSettingsStore = defineStore("setting", () => {
     defaultPreferences.sidebarColorScheme
   );
 
-  // 主题
-  const theme = useStorage<ThemeMode>(STORAGE_KEYS.THEME, defaultPreferences.theme);
-  const themeColor = useStorage(STORAGE_KEYS.THEME_COLOR, defaultPreferences.themeColor);
-
   // 特殊模式
   const grayMode = useStorage(STORAGE_KEYS.GRAY_MODE, false);
   const colorWeak = useStorage(STORAGE_KEYS.COLOR_WEAK, false);
-
-  // 主题变化监听
-  watch(
-    [theme, themeColor],
-    ([t, c]: [ThemeMode, string]) => {
-      toggleDarkMode(t === ThemeMode.DARK);
-      applyTheme(generateThemeColors(c, t));
-    },
-    { immediate: true }
-  );
 
   watch(sidebarColorScheme, (v) => toggleSidebarColor(v === SidebarColor.CLASSIC_BLUE), {
     immediate: true,
@@ -74,8 +60,6 @@ export const useSettingsStore = defineStore("setting", () => {
     colorWeak.value = false;
     sidebarColorScheme.value = defaultPreferences.sidebarColorScheme;
     layout.value = defaultPreferences.layout as LayoutMode;
-    themeColor.value = defaultPreferences.themeColor;
-    theme.value = defaultPreferences.theme;
   }
 
   return {
@@ -88,8 +72,6 @@ export const useSettingsStore = defineStore("setting", () => {
     colorWeak,
     sidebarColorScheme,
     layout,
-    themeColor,
-    theme,
     resetSettings,
   };
 });

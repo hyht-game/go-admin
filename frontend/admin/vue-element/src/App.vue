@@ -13,13 +13,14 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore, useLanguageStore, useSettingsStore } from "@/stores";
+import { useAppStore, useLanguageStore, useSettingsStore, useThemeStore } from "@/stores";
 import { appConfig } from "@/settings";
-import { ComponentSize, ThemeMode } from "@/constants";
+import { ComponentSize } from "@/constants";
 
 const appStore = useAppStore();
 const languageStore = useLanguageStore();
 const settingsStore = useSettingsStore();
+const themeStore = useThemeStore();
 
 const locale = computed(() => languageStore.getElementPlusLocale);
 const size = computed(() => appStore.size as ComponentSize);
@@ -28,6 +29,6 @@ const watermarkContent = appConfig.name;
 
 // 明亮/暗黑主题水印字体颜色适配
 const fontColor = computed(() => {
-  return settingsStore.theme === ThemeMode.DARK ? "rgba(255, 255, 255, .15)" : "rgba(0, 0, 0, .15)";
+  return themeStore.isDark ? "rgba(255, 255, 255, .15)" : "rgba(0, 0, 0, .15)";
 });
 </script>
