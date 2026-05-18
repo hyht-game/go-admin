@@ -179,6 +179,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         "element-plus/es/components/watermark/style/css",
         "element-plus/es/components/checkbox-button/style/css",
         "element-plus/es/components/space/style/css",
+        // UnoCSS 图标集预加载
+        "@iconify-json/lucide/icons.json",
       ],
     },
     // 构建配置

@@ -62,7 +62,7 @@ export default defineConfig({
         width: "1em",
         height: "1em",
       },
-      // 图标集合配置（使用 collections 同时支持本地 SVG 和 @iconify-json/*）
+      // 图标集合配置
       collections: {
         // svg 是图标集合名称，使用 `i-svg:图标名` 调用
         svg: FileSystemIconLoader(iconsDir, (svg) => {
@@ -70,8 +70,9 @@ export default defineConfig({
           return svg;
         }),
       },
-      // 开启自动加载已安装的 @iconify-json/* 包（如 lucide）
-      autoInstall: true,
+      // 关闭自动安装，避免尝试安装 @iconify-json/svg
+      autoInstall: false,
+      scale: 1.2, // 稍微放大一点图标
     }),
     presetTypography(),
     presetWebFonts({
