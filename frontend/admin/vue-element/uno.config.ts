@@ -66,8 +66,8 @@ export default defineConfig({
       collections: {
         // svg 是图标集合名称，使用 `i-svg:图标名` 调用
         svg: FileSystemIconLoader(iconsDir, (svg) => {
-          // 如果 `fill` 没有定义，则添加 `fill="currentColor"`
-          return svg.includes('fill="') ? svg : svg.replace(/^<svg /, '<svg fill="currentColor" ');
+          // 不修改 SVG 内容，保持原始颜色
+          return svg;
         }),
       },
     }),

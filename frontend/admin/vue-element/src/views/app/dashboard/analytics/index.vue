@@ -1,50 +1,68 @@
 <template>
   <div class="p-5">
     <!-- Overview Cards -->
-    <el-row :gutter="20" class="mb-5">
+    <el-row :gutter="20" class="mb-6">
       <el-col v-for="(item, index) in overviewItems" :key="index" :xs="24" :sm="12" :md="6">
         <el-card shadow="hover" class="overview-card">
-          <div class="overview-content">
-            <div class="overview-icon">
-              <span class="icon-placeholder">{{ item.icon }}</span>
-            </div>
-            <div class="overview-info">
-              <div class="title">{{ item.title }}</div>
-              <div class="value">{{ item.value.toLocaleString() }}</div>
-              <div class="total">{{ item.totalTitle }}: {{ item.totalValue.toLocaleString() }}</div>
-            </div>
+          <div class="overview-header">
+            <div class="title">{{ item.title }}</div>
+            <div :class="item.icon" class="icon-svg" />
+          </div>
+          <div class="value">{{ item.value.toLocaleString() }}</div>
+          <div class="total-row">
+            <span class="total-label">{{ item.totalTitle }}</span>
+            <span class="total-value">{{ item.totalValue.toLocaleString() }}</span>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <!-- Charts Tabs -->
-    <el-card shadow="hover" class="mb-5">
-      <el-tabs v-model="activeTab">
-        <el-tab-pane label="流量趋势" name="trends">
-          <AnalyticsTrends />
-        </el-tab-pane>
-        <el-tab-pane label="月度访问量" name="visits">
-          <AnalyticsVisits />
-        </el-tab-pane>
-      </el-tabs>
+    <!-- Trends Chart -->
+    <el-card shadow="hover" class="mb-6">
+      <template #header>
+        <div class="card-header-tabs">
+          <el-radio-group v-model="activeTab" size="small">
+            <el-radio-button label="trends">访问趋势</el-radio-button>
+            <el-radio-button label="visits">月访问量</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <div class="chart-container chart-container-trend">
+        <AnalyticsTrends v-if="activeTab === 'trends'" />
+        <AnalyticsVisits v-else />
+      </div>
     </el-card>
 
     <!-- Chart Cards Grid -->
     <el-row :gutter="20">
-      <el-col :xs="24" :sm="24" :md="8" class="mb-5">
-        <el-card shadow="hover" :title="t('pages.dashboard.accessCount')">
-          <AnalyticsVisitsData />
+      <el-col :xs="24" :sm="24" :md="8">
+        <el-card shadow="hover">
+          <template #header>
+            <span class="card-title">访问数量</span>
+          </template>
+          <div class="chart-container chart-container-small">
+            <AnalyticsVisitsData />
+          </div>
         </el-card>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="8" class="mb-5">
-        <el-card shadow="hover" :title="t('pages.dashboard.accessSource')">
-          <AnalyticsVisitsSource />
+      <el-col :xs="24" :sm="24" :md="8">
+        <el-card shadow="hover">
+          <template #header>
+            <span class="card-title">访问来源</span>
+          </template>
+          <div class="chart-container chart-container-small">
+            <AnalyticsVisitsSource />
+          </div>
         </el-card>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="8" class="mb-5">
-        <el-card shadow="hover" :title="t('pages.dashboard.salesDistribution')">
-          <AnalyticsVisitsSales />
+      <el-col :xs="24" :sm="24" :md="8">
+        <el-card shadow="hover">
+          <template #header>
+            <span class="card-title">访问来源</span>
+          </template>
+          <div class="chart-container chart-container-small">
+            <AnalyticsVisitsSales />
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -74,28 +92,28 @@ interface OverviewItem {
 
 const overviewItems = ref<OverviewItem[]>([
   {
-    icon: "svg-card",
+    icon: "i-svg:card",
     title: t("pages.dashboard.currentUserCount"),
     totalTitle: t("pages.dashboard.totalUserCount"),
     totalValue: 120_000,
     value: 2000,
   },
   {
-    icon: "svg-cake",
+    icon: "i-svg:cake",
     title: t("pages.dashboard.currentAccessCount"),
     totalTitle: t("pages.dashboard.totalAccessCount"),
     totalValue: 500_000,
     value: 20_000,
   },
   {
-    icon: "svg-download",
+    icon: "i-svg:download",
     title: t("pages.dashboard.currentDownloadCount"),
     totalTitle: t("pages.dashboard.totalDownloadCount"),
     totalValue: 120_000,
     value: 8000,
   },
   {
-    icon: "svg-bell",
+    icon: "i-svg:bell",
     title: t("pages.dashboard.currentUsageCount"),
     totalTitle: t("pages.dashboard.totalUsageCount"),
     totalValue: 50_000,
@@ -104,56 +122,84 @@ const overviewItems = ref<OverviewItem[]>([
 ]);
 
 // 当前激活的标签
-const activeTab = ref("trends");
+const activeTab = ref<"trends" | "visits">("trends");
 </script>
 
 <style lang="scss" scoped>
 .overview-card {
+  height: 160px;
+  border-radius: 4px;
+  transition: all 0.3s;
+
   :deep(.el-card__body) {
-    padding: 20px;
+    padding: 20px 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .overview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
+
+    .icon-svg {
+      width: 28px;
+      height: 28px;
+      font-size: 28px;
+    }
+  }
+
+  .value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--el-text-color-primary);
+    line-height: 1;
+  }
+
+  .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    margin-top: auto;
+
+    .total-value {
+      color: var(--el-text-color-regular);
+    }
   }
 }
 
-.overview-content {
+.card-header-tabs {
   display: flex;
   align-items: center;
-  gap: 16px;
 }
 
-.overview-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .icon-placeholder {
-    font-size: 20px;
-    color: white;
-  }
-}
-
-.overview-info {
-  flex: 1;
-}
-
-.title {
-  font-size: 14px;
-  color: var(--el-text-color-secondary);
-  margin-bottom: 8px;
-}
-
-.value {
-  font-size: 24px;
-  font-weight: bold;
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
   color: var(--el-text-color-primary);
-  margin-bottom: 4px;
 }
 
-.total {
-  font-size: 12px;
-  color: var(--el-text-color-secondary);
+.chart-container {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-container-trend {
+  height: 350px;
+}
+
+.chart-container-small {
+  height: 280px;
 }
 </style>

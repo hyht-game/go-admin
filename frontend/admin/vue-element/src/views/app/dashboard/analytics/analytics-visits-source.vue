@@ -1,5 +1,5 @@
 <template>
-  <ECharts :options="chartOptions" />
+  <ECharts :options="chartOptions" height="100%" />
 </template>
 
 <script lang="ts" setup>

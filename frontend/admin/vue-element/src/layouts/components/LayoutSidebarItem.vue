@@ -149,7 +149,6 @@ function resolvePath(routePath: string) {
     width: 18px;
     height: 18px;
     font-size: 18px;
-    color: currentcolor !important;
   }
 }
 
