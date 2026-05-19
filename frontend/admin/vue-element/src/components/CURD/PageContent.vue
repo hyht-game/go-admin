@@ -1,10 +1,10 @@
 <template>
   <div
-    class="rounded bg-[var(--el-bg-color)] border border-[var(--el-border-color)] p-5 h-full md:flex flex-1 flex-col md:overflow-auto"
+    class="rounded bg-[var(--el-bg-color)] border border-[var(--el-border-color)] px-3 py-2 h-full overflow-auto"
     style="min-width: 0;"
   >
     <!-- 表格工具 -->
-    <div class="flex flex-col md:flex-row justify-between gap-y-2.5 mb-2.5">
+    <div class="flex flex-col md:flex-row justify-between gap-y-2 mb-2">
       <!-- 左侧工具 -->
       <div class="toolbar-left flex gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
         <template v-for="(btn, index) in toolbarLeftBtn" :key="index">
@@ -59,15 +59,11 @@
       :border="contentConfig.table?.border"
       :stripe="contentConfig.table?.stripe"
       :size="contentConfig.table?.size as any"
-      :height="contentConfig.table?.height"
-      :max-height="contentConfig.table?.maxHeight"
       :show-header="contentConfig.table?.showHeader"
       :row-config="{ keyField: pk, isHover: true, isCurrent: true }"
-      :scroll-y="{ enabled: true }"
       :tree-config="contentConfig.table?.treeConfig"
       :data="pageData"
-      class="flex-1"
-      style="overflow: hidden;"
+      class="w-full vxe-table-fixed-header"
       @checkbox-change="handleSelectionChange"
       @checkbox-all="handleSelectionChange"
     >
@@ -230,7 +226,7 @@
     </vxe-table>
 
     <!-- 分页 -->
-    <div v-if="showPagination" class="pagination-container mt-4">
+    <div v-if="showPagination" class="pagination-container">
       <el-pagination
         v-model:current-page="pagination.currentPage"
         v-model:page-size="pagination.pageSize"
@@ -1144,7 +1140,7 @@ defineExpose({ fetchPageData, exportPageData, getFilterParams, getSelectionData,
 
 // 分页容器样式
 .pagination-container {
-  padding: 16px 0;
+  padding: 4px 0 0 0;
   background-color: var(--el-bg-color);
 
   :deep(.el-pagination) {

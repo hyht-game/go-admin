@@ -1,0 +1,580 @@
+/**
+ * 暗黑模式专项优化样式
+ * 
+ * 说明：
+ * - 本文件专门针对暗黑模式下的表单、Drawer、输入框等组件进行优化
+ * - 不会影响其他组件的样式
+ * - 使用 CSS 变量实现，便于维护和调整
+ */
+
+html.dark {
+  // ============================================
+  // CSS 变量定义（暗色模式专用）
+  // ============================================
+  
+  // 1. 核心对比度优化(先解决"看得见"的问题)
+  --dark-bg-primary: #0A0C10;      // 页面主背景(压暗基底,拉开和表格的差距)
+  --dark-bg-table: #14171C;         // 表格容器/输入框背景(比背景亮 2 个灰度层级,模块边界瞬间清晰)
+  --dark-bg-hover: #1E2229;         // 悬浮态/展开态/表头(比输入框再亮一级,突出层级)
+  --dark-border: #23272F;           // 输入框边框/分割线/表格边框(加深边框,弱光环境也能看清边界)
+  
+  // 奇偶行背景色(核心解决生硬割裂问题)
+  --dark-row-odd: #0F1218;          // 奇数行背景(微提亮,和偶数行形成柔和区分,不破坏暗黑基底)
+  --dark-row-even: #161A23;         // 偶数行背景(用深灰替代纯白,既保留奇偶区分,又完全融入暗黑体系)
+  --dark-header: #14171C;           // 表头背景(比奇数行再亮一级,层级更清晰)
+    
+  --dark-text-primary: #E5EAF3;     // 表头主文本/偶数行主文本（从 #B0B8C4 调整，提升表头可读性，满足 WCAG AA 标准）
+  --dark-text-secondary: #9099A7;   // 占位符文本/辅助文本（从 #6E7681 调整，既不抢焦点，又能轻松看清提示文字）
+  --dark-text-placeholder: #9099A7; // 占位符专用色
+  --dark-text-data: #C9CDD4;        // 奇数行主文本（核心数据清晰可见，辅助文本不抢焦点）
+
+  // 2. 色彩体系升级，增加精致感
+  --dark-primary: #409EFF;          // 主色：亮蓝（输入框聚焦态、下拉框高亮态）
+  --dark-secondary: #36CFC9;        // 辅助色：青绿
+  --dark-accent: #F7BA1E;           // 强调色：暖黄
+  --dark-error: #F53F3F;            // 错误态：高饱和红
+  --dark-success: #00B42A;          // 成功态：高饱和绿
+
+  // ============================================
+  // 表单和 Drawer 专项优化
+  // ============================================
+
+  // 搜索区域样式修复
+  .el-card {
+    &.el-card--shadow-never {
+      background-color: var(--dark-bg-table) !important;
+      border-color: var(--dark-border) !important;
+      
+      .el-card__body {
+        background-color: var(--dark-bg-table) !important;
+        padding: 16px !important;
+      }
+    }
+  }
+
+  // 搜索表单样式
+  .el-form--inline {
+    background-color: transparent !important;
+
+    .el-form-item {
+      background-color: transparent !important;
+      border-color: transparent !important;
+
+      .el-form-item__label {
+        color: var(--dark-text-primary) !important;
+        font-weight: 500 !important;
+      }
+
+      // 输入框和选择器
+      .el-input,
+      .el-select,
+      .el-date-editor {
+        .el-input__wrapper {
+          background-color: var(--dark-bg-table) !important;
+          border-color: var(--dark-border) !important;
+          box-shadow: 0 0 0 1px var(--dark-border) inset !important;
+
+          &:hover {
+            border-color: var(--dark-primary) !important;
+          }
+
+          &.is-focus {
+            border-color: var(--dark-primary) !important;
+            box-shadow: 0 0 0 1px var(--dark-primary) inset !important;
+          }
+        }
+      }
+    }
+
+    // 按钮组
+    .button-group {
+      .el-button {
+        // 搜索按钮（主色）
+        &.el-button--primary {
+          background-color: var(--dark-primary) !important;
+          border-color: var(--dark-primary) !important;
+
+          &:hover {
+            background-color: lighten(#409EFF, 10%) !important;
+            border-color: lighten(#409EFF, 10%) !important;
+          }
+        }
+
+        // 重置按钮（默认）
+        &:not(.el-button--primary) {
+          background-color: var(--dark-bg-table) !important;
+          border-color: var(--dark-border) !important;
+          color: var(--dark-text-primary) !important;
+
+          &:hover {
+            background-color: var(--dark-bg-hover) !important;
+            border-color: var(--dark-primary) !important;
+            color: var(--dark-primary) !important;
+          }
+        }
+      }
+
+      // 展开/收起链接
+      .el-link.el-link--primary {
+        color: var(--dark-primary) !important;
+
+        &:hover {
+          color: lighten(#409EFF, 10%) !important;
+        }
+      }
+    }
+  }
+
+  // Drawer/Dialog 主背景
+  .el-drawer,
+  .el-dialog {
+    background-color: var(--dark-bg-primary) !important;
+    border-color: var(--dark-border) !important;
+
+    .el-drawer__header,
+    .el-dialog__header {
+      border-bottom-color: var(--dark-border) !important;
+      
+      // 模块标题：增加字号、字重，用高亮色突出
+      .el-drawer__title,
+      .el-dialog__title {
+        color: var(--dark-text-primary) !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+      }
+    }
+
+    .el-drawer__body,
+    .el-dialog__body {
+      background-color: var(--dark-bg-primary) !important;
+    }
+  }
+
+  // 表单容器（仅针对 Drawer/Dialog 内的表单）
+  .el-drawer .el-form,
+  .el-dialog .el-form {
+    background-color: transparent !important;
+
+    // 表单标签
+    .el-form-item__label {
+      color: var(--dark-text-primary) !important;
+      font-weight: 500 !important;
+
+      // 必填项标签增加轻微高亮，强化核心字段的视觉权重
+      &.is-required::before {
+        color: var(--dark-error) !important;
+      }
+    }
+
+    // 表单项分割线
+    .el-form-item {
+      border-bottom: 1px solid var(--dark-border) !important;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+
+      &:last-child {
+        border-bottom: none !important;
+      }
+    }
+  }
+
+  // 输入框专项优化
+  .el-input,
+  .el-select,
+  .el-textarea,
+  .el-date-editor {
+    .el-input__wrapper,
+    .el-textarea__inner {
+      background-color: var(--dark-bg-table) !important; // 输入框背景比主背景亮 2 个灰度层级
+      border-color: var(--dark-border) !important;       // 加深边框
+      box-shadow: 0 0 0 1px var(--dark-border) inset, 
+                  inset 0 1px 2px rgba(255, 255, 255, 0.05) !important; // 1px 内阴影，替代纯边框，更有"浮起"的层级感
+      color: var(--dark-text-primary) !important;
+
+      // 占位符文本
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--dark-text-placeholder) !important;
+      }
+
+      // hover 态：背景色微亮，提升交互反馈
+      &:hover {
+        border-color: var(--dark-primary) !important;
+        background-color: var(--dark-bg-hover) !important;
+      }
+
+      // 聚焦态：边框用主色高亮，背景色微亮，给用户明确的操作反馈
+      &.is-focus {
+        border-color: var(--dark-primary) !important;
+        box-shadow: 0 0 0 1px var(--dark-primary) inset, 
+                    inset 0 1px 2px rgba(64, 158, 255, 0.1) !important;
+        background-color: var(--dark-bg-hover) !important;
+      }
+
+      // 校验错误态：高饱和红
+      &.is-error {
+        border-color: var(--dark-error) !important;
+        box-shadow: 0 0 0 1px var(--dark-error) inset !important;
+      }
+
+      // 校验成功态：高饱和绿
+      &.is-success {
+        border-color: var(--dark-success) !important;
+        box-shadow: 0 0 0 1px var(--dark-success) inset !important;
+      }
+    }
+
+    // 输入框后缀图标
+    .el-input__suffix,
+    .el-input__prefix {
+      color: var(--dark-text-secondary) !important;
+    }
+  }
+
+  // 下拉选择框展开态
+  .el-select-dropdown {
+    background-color: var(--dark-bg-hover) !important; // 展开态背景比输入框再亮一级
+    border-color: var(--dark-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+
+    .el-select-dropdown__item {
+      color: var(--dark-text-primary) !important;
+
+      &.hover,
+      &:hover {
+        background-color: var(--dark-bg-table) !important;
+      }
+
+      &.selected {
+        color: var(--dark-primary) !important;
+        background-color: rgba(64, 158, 255, 0.15) !important;
+        font-weight: 500 !important;
+      }
+    }
+  }
+
+  // 单选框/复选框
+  .el-radio,
+  .el-checkbox {
+    .el-radio__label,
+    .el-checkbox__label {
+      color: var(--dark-text-primary) !important;
+    }
+
+    .el-radio__inner,
+    .el-checkbox__inner {
+      background-color: var(--dark-bg-table) !important;
+      border-color: var(--dark-border) !important;
+    }
+
+    &.is-checked {
+      .el-radio__inner,
+      .el-checkbox__inner {
+        background-color: var(--dark-primary) !important;
+        border-color: var(--dark-primary) !important;
+      }
+
+      .el-radio__label,
+      .el-checkbox__label {
+        color: var(--dark-primary) !important;
+        font-weight: 500 !important; // 选中态增加字重
+      }
+    }
+  }
+
+  // 按钮样式优化
+  .el-button {
+    // 主按钮
+    &.el-button--primary {
+      background-color: var(--dark-primary) !important;
+      border-color: var(--dark-primary) !important;
+      color: #fff !important;
+
+      // hover 态：亮度微增，强化主操作的交互感
+      &:hover {
+        background-color: lighten(#409EFF, 10%) !important;
+        border-color: lighten(#409EFF, 10%) !important;
+      }
+    }
+
+    // 成功按钮
+    &.el-button--success {
+      background-color: var(--dark-success) !important;
+      border-color: var(--dark-success) !important;
+      color: #fff !important;
+
+      &:hover {
+        background-color: lighten(#00B42A, 10%) !important;
+        border-color: lighten(#00B42A, 10%) !important;
+      }
+    }
+
+    // 警告按钮
+    &.el-button--warning {
+      background-color: var(--dark-accent) !important;
+      border-color: var(--dark-accent) !important;
+      color: #fff !important;
+
+      &:hover {
+        background-color: lighten(#F7BA1E, 10%) !important;
+        border-color: lighten(#F7BA1E, 10%) !important;
+      }
+    }
+
+    // 危险按钮
+    &.el-button--danger {
+      background-color: var(--dark-error) !important;
+      border-color: var(--dark-error) !important;
+      color: #fff !important;
+
+      &:hover {
+        background-color: lighten(#F53F3F, 10%) !important;
+        border-color: lighten(#F53F3F, 10%) !important;
+      }
+    }
+  }
+
+  // ============================================
+  // 表格暗色模式专项适配
+  // ============================================
+
+  // 表格容器
+  .el-table {
+    background-color: var(--dark-bg-table) !important; // 表格容器背景比页面主背景亮 2 个灰度层级
+    border-color: var(--dark-border) !important;       // 加深表格边框
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important; // 内阴影，强化模块边界
+
+    --el-table-border-color: var(--dark-border) !important;
+    --el-table-bg-color: var(--dark-bg-table) !important;
+    --el-table-tr-bg-color: var(--dark-bg-table) !important;
+    --el-table-header-bg-color: var(--dark-header) !important; // 表头背景色微亮，和数据行形成明显区分
+    --el-table-row-hover-bg-color: var(--dark-bg-hover) !important;
+    --el-table-text-color: var(--dark-text-data) !important;
+    --el-table-header-text-color: var(--dark-text-primary) !important;
+
+    // 表头样式优化：固定表头，增加字重，用高亮色突出
+    .el-table__header-wrapper {
+      background-color: var(--dark-header) !important; // 滚动表格时表头清晰可见
+      
+      th.el-table__cell {
+        background-color: var(--dark-header) !important;
+        color: var(--dark-text-primary) !important; // 提升表头可读性，满足 WCAG AA 标准
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        border-color: var(--dark-border) !important;
+      }
+    }
+
+    // 表格数据行
+    .el-table__body-wrapper {
+      .el-table__row {
+        // 奇数行背景
+        &:nth-child(odd) {
+          background-color: var(--dark-row-odd) !important;
+          
+          td {
+            color: var(--dark-text-data) !important; // 奇数行主文本：核心数据清晰可见
+            background-color: var(--dark-row-odd) !important;
+            border-color: var(--dark-border) !important; // 加深边框，弱光环境也能看清列边界
+          }
+        }
+
+        // 偶数行背景
+        &:nth-child(even) {
+          background-color: var(--dark-row-even) !important;
+          
+          td {
+            color: var(--dark-text-primary) !important; // 偶数行主文本：保持高对比度，和整体文字色统一
+            background-color: var(--dark-row-even) !important;
+            border-color: var(--dark-border) !important;
+          }
+        }
+
+        // hover 态：背景色微亮，给用户明确的交互反馈
+        &:hover {
+          background-color: var(--dark-bg-hover) !important;
+          
+          > td {
+            background-color: var(--dark-bg-hover) !important;
+            color: var(--dark-text-primary) !important;
+          }
+        }
+
+        // 选中行：背景色微亮 + 边框高亮，方便用户识别选中内容
+        &.current-row {
+          background-color: var(--dark-bg-hover) !important;
+          outline: 1px solid var(--dark-primary) !important;
+          
+          > td {
+            background-color: var(--dark-bg-hover) !important;
+            color: var(--dark-text-primary) !important;
+          }
+        }
+
+        // 辅助文本（创建时间、排序等）：统一调整，在奇偶行都能清晰可见，又不抢主文本的焦点
+        td.el-table__cell--description {
+          color: var(--dark-text-secondary) !important;
+        }
+      }
+    }
+
+    // 固定列样式
+    .el-table__fixed,
+    .el-table__fixed-right {
+      background-color: var(--dark-bg-table) !important;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3) !important;
+
+      .el-table__row {
+        &:nth-child(odd) > td {
+          background-color: var(--dark-row-odd) !important;
+        }
+
+        &:nth-child(even) > td {
+          background-color: var(--dark-row-even) !important;
+        }
+
+        &:hover > td {
+          background-color: var(--dark-bg-hover) !important;
+        }
+
+        &.current-row > td {
+          background-color: var(--dark-bg-hover) !important;
+        }
+      }
+    }
+  }
+
+  // 分页器优化
+  .pagination-container {
+    background-color: var(--dark-bg-table) !important; // 和表格容器统一，避免模块割裂
+    padding: 16px 0 !important;
+  }
+
+  .el-pagination {
+    background-color: transparent !important; // 分页器本身透明，由容器控制背景色
+    padding: 0 !important;
+    border: none !important;
+
+    // 分页文字
+    .el-pagination__total,
+    .el-pagination__sizes,
+    .el-pagination__jump {
+      color: var(--dark-text-primary) !important;
+      font-weight: 500 !important;
+    }
+
+    // 分页按钮
+    .el-pager li {
+      background-color: var(--dark-bg-table) !important;
+      color: var(--dark-text-primary) !important;
+      border-color: var(--dark-border) !important;
+      min-width: 32px !important; // 增加固定宽度，避免文字挤压重叠
+
+      &:hover {
+        color: var(--dark-primary) !important;
+        background-color: var(--dark-bg-hover) !important;
+        border-color: var(--dark-primary) !important;
+      }
+
+      &.is-active {
+        background-color: var(--dark-primary) !important;
+        color: #fff !important;
+        border-color: var(--dark-primary) !important;
+      }
+    }
+
+    // 上一页/下一页按钮
+    .btn-prev,
+    .btn-next {
+      background-color: var(--dark-bg-table) !important;
+      color: var(--dark-text-primary) !important;
+      border-color: var(--dark-border) !important;
+
+      &:hover {
+        color: var(--dark-primary) !important;
+        border-color: var(--dark-primary) !important;
+      }
+
+      &.is-disabled {
+        color: var(--dark-text-secondary) !important;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  // 操作列按钮 hover 态优化
+  .el-table__body-wrapper {
+    .el-button {
+      // 编辑/删除等操作按钮
+      &.el-button--text {
+        color: var(--dark-text-primary) !important;
+
+        &:hover {
+          color: var(--dark-primary) !important; // 文字颜色高亮，提升交互体验
+        }
+      }
+
+      // 删除按钮
+      &.el-button--danger {
+        color: var(--dark-error) !important;
+
+        &:hover {
+          color: lighten(#F53F3F, 10%) !important;
+        }
+      }
+    }
+  }
+
+  // 状态标签颜色优化（开启/关闭/禁用的色彩区分更明显，在奇偶行都能保持高辨识度）
+  .el-tag {
+    // 成功态（开启）
+    &.el-tag--success {
+      background-color: rgba(0, 180, 42, 0.2) !important;
+      border-color: rgba(0, 180, 42, 0.4) !important;
+      color: #52c41a !important; // 在深色背景上更醒目
+    }
+
+    // 警告态（关闭）
+    &.el-tag--warning {
+      background-color: rgba(247, 186, 30, 0.2) !important;
+      border-color: rgba(247, 186, 30, 0.4) !important;
+      color: #ffc53d !important;
+    }
+
+    // 危险态（禁用）
+    &.el-tag--danger {
+      background-color: rgba(245, 63, 63, 0.2) !important;
+      border-color: rgba(245, 63, 63, 0.4) !important;
+      color: #ff4d4f !important;
+    }
+
+    // 信息态（普通）
+    &.el-tag--info {
+      background-color: rgba(144, 153, 167, 0.2) !important;
+      border-color: rgba(144, 153, 167, 0.4) !important;
+      color: #9099A7 !important;
+    }
+  }
+
+  // 下拉框展开态优化（和暗黑模系统一，不会出现"白底白字"的问题）
+  .el-select-dropdown {
+    background-color: var(--dark-bg-hover) !important;
+    border-color: var(--dark-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+
+    .el-select-dropdown__item {
+      color: var(--dark-text-primary) !important; // 文字对比度提升
+
+      &.hover,
+      &:hover {
+        background-color: var(--dark-bg-table) !important;
+      }
+
+      &.selected {
+        color: var(--dark-primary) !important;
+        background-color: rgba(64, 158, 255, 0.15) !important;
+        font-weight: 500 !important;
+      }
+    }
+  }
+}

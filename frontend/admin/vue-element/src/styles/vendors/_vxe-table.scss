@@ -159,17 +159,17 @@
 // ============================================
 
 html.dark {
-  // vxe-table 暗色主题变量
-  --vxe-table-border-color: #404040 !important;
-  --vxe-ui-table-border-color: #404040 !important;
-  --vxe-table-header-background-color: #2d2d2d !important;
-  --vxe-table-body-background-color: #1a1a1a !important;
-  --vxe-table-row-hover-background-color: #2a2a2a !important;
-  --vxe-table-row-current-background-color: #333333 !important;
-  --vxe-table-row-hover-current-background-color: #333333 !important;
-  --vxe-table-header-font-color: #e0e0e0 !important;
-  --vxe-table-body-font-color: #d0d0d0 !important;
-  --vxe-table-checkbox-range-background-color: #2a2a2a !important;
+  // vxe-table 暗色主题变量(使用统一的暗色变量)
+  --vxe-table-border-color: var(--dark-border, #23272F) !important;
+  --vxe-ui-table-border-color: var(--dark-border, #23272F) !important;
+  --vxe-table-header-background-color: var(--dark-header, #14171C) !important;
+  --vxe-table-body-background-color: var(--dark-bg-table, #14171C) !important;
+  --vxe-table-row-hover-background-color: var(--dark-bg-hover, #1E2229) !important;
+  --vxe-table-row-current-background-color: var(--dark-bg-hover, #1E2229) !important;
+  --vxe-table-row-hover-current-background-color: var(--dark-bg-hover, #1E2229) !important;
+  --vxe-table-header-font-color: var(--dark-text-primary, #E5EAF3) !important;
+  --vxe-table-body-font-color: var(--dark-text-data, #C9CDD4) !important;
+  --vxe-table-checkbox-range-background-color: var(--dark-bg-hover, #1E2229) !important;
 
   // 强制覆盖 vxe-table 的所有边框
   .vxe-table--basic,
@@ -194,7 +194,7 @@ html.dark {
     .vxe-border,
     .vxe-table--inner-border,
     .vxe-table--inner-border--wrapper {
-      border-color: #404040 !important;
+      border-color: var(--dark-border, #23272F) !important;
     }
   }
 
@@ -203,34 +203,59 @@ html.dark {
   .vxe-header--column.col--ellipsis,
   .vxe-body--row.row--middle > td,
   .vxe-header--row.row--middle > th {
-    border-color: #404040 !important;
+    border-color: var(--dark-border, #23272F) !important;
   }
 
-  // 强制覆盖行的背景色（最高优先级）
+  // 强制覆盖行的背景色(支持奇偶行区分)
   .vxe-table--body-wrapper {
     .vxe-body--row {
-      background-color: #1a1a1a !important;
       transition: background-color 0.2s ease !important;
 
+      // 奇数行
+      &:nth-child(odd) {
+        background-color: var(--dark-row-odd, #0F1218) !important;
+
+        > td {
+          background-color: transparent !important;
+          color: var(--dark-text-data, #C9CDD4) !important;
+        }
+      }
+
+      // 偶数行
+      &:nth-child(even) {
+        background-color: var(--dark-row-even, #161A23) !important;
+
+        > td {
+          background-color: transparent !important;
+          color: var(--dark-text-primary, #E5EAF3) !important;
+        }
+      }
+
+      // hover 态
       &:hover,
       &.row--hover {
-        background-color: #2a2a2a !important;
+        background-color: var(--dark-bg-hover, #1E2229) !important;
 
         > td {
           background-color: transparent !important;
+          color: var(--dark-text-primary, #E5EAF3) !important;
         }
       }
 
+      // 选中行
       &.row--current {
-        background-color: #333333 !important;
+        background-color: var(--dark-bg-hover, #1E2229) !important;
+        outline: 1px solid var(--dark-primary, #409EFF) !important;
 
         > td {
           background-color: transparent !important;
+          color: var(--dark-text-primary, #E5EAF3) !important;
         }
       }
 
+      // hover + 选中
       &.row--hover.row--current {
-        background-color: #333333 !important;
+        background-color: var(--dark-bg-hover, #1E2229) !important;
       }
     }
   }

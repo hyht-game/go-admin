@@ -145,7 +145,7 @@ const contentConfig: IContentConfig = {
   defaultToolbar: ["refresh", "filter"], // 右侧默认工具栏
   table: {
     border: true,
-    stripe: false,
+    stripe: true,
   },
   indexAction: async (query: any) => {
     const { page, pageSize, ...queryParams } = query;

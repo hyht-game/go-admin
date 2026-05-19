@@ -13,6 +13,7 @@
 @use "./variables" as *;
 @use "./vendors";
 @use "./layouts";
+@use "./dark-mode"; // 暗黑模式专项优化（表单、Drawer、输入框等）
 
 // ============================================
 // 2. 基础重置
