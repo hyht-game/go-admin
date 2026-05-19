@@ -225,11 +225,11 @@ const handleSubmit = useThrottleFn(() => {
     props.modalConfig.formAction(formData).then(() => {
       if (props.modalConfig.component === "drawer") {
         ElMessage.success(
-          `${props.modalConfig.drawer?.title}${t("curd.message.operationSuccess")}`
+          `${props.modalConfig.drawer?.title}${t("pages.curd.message.operationSuccess")}`
         );
       } else {
         ElMessage.success(
-          `${props.modalConfig.dialog?.title}${t("curd.message.operationSuccess")}`
+          `${props.modalConfig.dialog?.title}${t("pages.curd.message.operationSuccess")}`
         );
       }
       emit("submitClick");

@@ -1,0 +1,65 @@
+{
+  "enable": {
+    "true": "Enabled",
+    "false": "Disabled"
+  },
+  "successStatus": {
+    "success": "Success",
+    "failed": "Failed"
+  },
+  "status": {
+    "ON": "On",
+    "OFF": "Off"
+  },
+  "dataAccessAuditLog": {
+    "accessType": {
+      "SELECT": "Select",
+      "INSERT": "Insert",
+      "UPDATE": "Update",
+      "DELETE": "Delete",
+      "VIEW": "View",
+      "BULK_READ": "Bulk Read",
+      "EXPORT": "Export",
+      "IMPORT": "Import",
+      "DDL_CREATE": "DDL Create",
+      "DDL_ALTER": "DDL Alter",
+      "DDL_DROP": "DDL Drop",
+      "METADATA_READ": "Metadata Read",
+      "SCAN": "Scan",
+      "ADMIN_OPERATION": "Admin Operation",
+      "OTHER": "Other"
+    }
+  },
+  "ossProvider": {
+    "LOCAL": "Local Storage",
+    "MINIO": "MinIO",
+    "ALIYUN": "Alibaba Cloud OSS",
+    "QINIU": "Qiniu Cloud",
+    "TENCENT": "Tencent Cloud COS",
+    "BAIDU": "Baidu Cloud BOS",
+    "HUAWEI": "Huawei Cloud OBS",
+    "AWS": "Amazon S3",
+    "AZURE": "Azure Blob Storage",
+    "GOOGLE": "Google Cloud Storage"
+  },
+  "tenant": {
+    "type": {
+      "TRIAL": "Trial Tenant",
+      "PAID": "Paid Tenant",
+      "INTERNAL": "Internal Tenant",
+      "PARTNER": "Partner Tenant",
+      "CUSTOM": "Custom Tenant"
+    },
+    "status": {
+      "ON": "Active",
+      "OFF": "Disabled",
+      "EXPIRED": "Expired",
+      "FREEZE": "Frozen"
+    },
+    "auditStatus": {
+      "PENDING": "Pending Review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    }
+  }
+}

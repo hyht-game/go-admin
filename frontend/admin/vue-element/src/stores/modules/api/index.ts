@@ -1,7 +1,5 @@
 import { computed } from "vue";
-import { i18n } from "@/i18n/setup";
-
-const t = i18n.global.t;
+import { $t } from "@/i18n";
 
 export * from "./admin-portal.store";
 export * from "./api.store";
@@ -31,18 +29,18 @@ export * from "./user.store";
 export * from "./user-profile.store";
 
 export const enableList = computed(() => [
-  { value: "true", label: t("enum.enable.true") },
-  { value: "false", label: t("enum.enable.false") },
+  { value: "true", label: $t("enum.enable.true") },
+  { value: "false", label: $t("enum.enable.false") },
 ]);
 
 export const enableBoolList = computed(() => [
-  { value: true, label: t("enum.enable.true") },
-  { value: false, label: t("enum.enable.false") },
+  { value: true, label: $t("enum.enable.true") },
+  { value: false, label: $t("enum.enable.false") },
 ]);
 
 export const successStatusList = computed(() => [
-  { value: true, label: t("enum.successStatus.success") },
-  { value: false, label: t("enum.successStatus.failed") },
+  { value: true, label: $t("enum.successStatus.success") },
+  { value: false, label: $t("enum.successStatus.failed") },
 ]);
 
 /**
@@ -82,11 +80,11 @@ export function enableBoolToName(
     case "true":
     case "TRUE":
     case "True": {
-      return t("enum.enable.true");
+      return $t("enum.enable.true");
     }
 
     default: {
-      return t("enum.enable.false");
+      return $t("enum.enable.false");
     }
   }
 }
@@ -100,8 +98,8 @@ export const methodList = [
 ];
 
 export const statusList = computed(() => [
-  { value: "ON", label: t("enum.status.ON") },
-  { value: "OFF", label: t("enum.status.OFF") },
+  { value: "ON", label: $t("enum.status.ON") },
+  { value: "OFF", label: $t("enum.status.OFF") },
 ]);
 
 /**

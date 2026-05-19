@@ -137,7 +137,9 @@
           <el-button type="primary" size="small" @click="handleConfirm">
             {{ confirmText }}
           </el-button>
-          <el-button size="small" @click="handleClear">{{ t("curd.tableSelect.clear") }}</el-button>
+          <el-button size="small" @click="handleClear">
+            {{ t("pages.curd.tableSelect.clear") }}
+          </el-button>
           <el-button size="small" @click="handleClose">{{ t("common.button.close") }}</el-button>
         </div>
       </div>
@@ -150,6 +152,7 @@ import { useI18n } from "@/i18n";
 import { ref, reactive, computed } from "vue";
 import { useResizeObserver } from "@vueuse/core";
 import type { FormInstance, PopoverProps, TableInstance } from "element-plus";
+import { ArrowDown } from "@element-plus/icons-vue";
 
 // 对象类型
 export type IObject = Record<string, any>;
@@ -217,7 +220,7 @@ const isMultiple = props.selectConfig.multiple === true;
 const width = props.selectConfig.width ?? "100%";
 // 占位符
 const placeholder = computed(
-  () => props.selectConfig.placeholder ?? t("curd.tableSelect.placeholder")
+  () => props.selectConfig.placeholder ?? t("pages.curd.tableSelect.placeholder")
 );
 // 是否显示弹出框
 const popoverVisible = ref(false);
@@ -293,8 +296,8 @@ for (const item of props.selectConfig.tableColumns) {
 const selectedItems = ref<IObject[]>([]);
 const confirmText = computed(() => {
   return selectedItems.value.length > 0
-    ? t("curd.tableSelect.selectedCount", { count: selectedItems.value.length })
-    : t("curd.tableSelect.placeholder");
+    ? t("pages.curd.tableSelect.selectedCount", { count: selectedItems.value.length })
+    : t("pages.curd.tableSelect.placeholder");
 });
 function handleSelect(selection: any[]) {
   if (isMultiple || selection.length === 0) {
@@ -330,7 +333,7 @@ function handleShow() {
 // 确定
 function handleConfirm() {
   if (selectedItems.value.length === 0) {
-    ElMessage.error(t("curd.tableSelect.pleaseSelectData"));
+    ElMessage.error(t("pages.curd.tableSelect.pleaseSelectData"));
     return;
   }
   popoverVisible.value = false;

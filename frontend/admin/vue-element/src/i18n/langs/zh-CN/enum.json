@@ -1,0 +1,65 @@
+{
+  "enable": {
+    "true": "启用",
+    "false": "禁用"
+  },
+  "successStatus": {
+    "success": "成功",
+    "failed": "失败"
+  },
+  "status": {
+    "ON": "开启",
+    "OFF": "关闭"
+  },
+  "dataAccessAuditLog": {
+    "accessType": {
+      "SELECT": "查询",
+      "INSERT": "插入",
+      "UPDATE": "更新",
+      "DELETE": "删除",
+      "VIEW": "查看",
+      "BULK_READ": "批量读取",
+      "EXPORT": "导出",
+      "IMPORT": "导入",
+      "DDL_CREATE": "创建表结构",
+      "DDL_ALTER": "修改表结构",
+      "DDL_DROP": "删除表结构",
+      "METADATA_READ": "读取元数据",
+      "SCAN": "扫描",
+      "ADMIN_OPERATION": "管理员操作",
+      "OTHER": "其他"
+    }
+  },
+  "ossProvider": {
+    "LOCAL": "本地存储",
+    "MINIO": "MinIO",
+    "ALIYUN": "阿里云 OSS",
+    "QINIU": "七牛云",
+    "TENCENT": "腾讯云 COS",
+    "BAIDU": "百度云 BOS",
+    "HUAWEI": "华为云 OBS",
+    "AWS": "Amazon S3",
+    "AZURE": "Azure Blob",
+    "GOOGLE": "Google Cloud Storage"
+  },
+  "tenant": {
+    "type": {
+      "TRIAL": "试用租户",
+      "PAID": "付费租户",
+      "INTERNAL": "内部租户",
+      "PARTNER": "合作伙伴租户",
+      "CUSTOM": "定制租户"
+    },
+    "status": {
+      "ON": "正常",
+      "OFF": "禁用",
+      "EXPIRED": "过期",
+      "FREEZE": "冻结"
+    },
+    "auditStatus": {
+      "PENDING": "待审核",
+      "APPROVED": "已批准",
+      "REJECTED": "已拒绝"
+    }
+  }
+}

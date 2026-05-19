@@ -57,7 +57,7 @@
           <!-- 展开/收起 -->
           <template v-if="isExpandable && formItems.length > showNumber">
             <el-link class="ml-3" type="primary" underline="never" @click="isExpand = !isExpand">
-              {{ isExpand ? t("curd.search.collapse") : t("curd.search.expand") }}
+              {{ isExpand ? t("pages.curd.search.collapse") : t("pages.curd.search.expand") }}
               <component :is="isExpand ? ArrowUp : ArrowDown" class="w-4 h-4 ml-2" />
             </el-link>
           </template>

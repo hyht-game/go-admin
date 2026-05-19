@@ -288,12 +288,12 @@
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text">
-                <span>{{ t("curd.import.dragText") }}</span>
-                <em>{{ t("curd.import.clickText") }}</em>
+                <span>{{ t("pages.curd.import.dragText") }}</span>
+                <em>{{ t("pages.curd.import.clickText") }}</em>
               </div>
               <template #tip>
                 <div class="el-upload__tip">
-                  {{ t("curd.import.fileTypeTip") }}
+                  {{ t("pages.curd.import.fileTypeTip") }}
                   <el-link
                     v-if="contentConfig.importTemplate"
                     type="primary"
@@ -301,7 +301,7 @@
                     underline="never"
                     @click="handleDownloadTemplate"
                   >
-                    {{ t("curd.import.downloadTemplate") }}
+                    {{ t("pages.curd.import.downloadTemplate") }}
                   </el-link>
                 </div>
               </template>
@@ -540,11 +540,11 @@ function handleRefresh(isRestart = false) {
 function handleDelete(id?: number | string) {
   const ids = [id || removeIds.value].join(",");
   if (!ids) {
-    ElMessage.warning(t("curd.message.selectDeleteItems"));
+    ElMessage.warning(t("pages.curd.message.selectDeleteItems"));
     return;
   }
 
-  ElMessageBox.confirm(t("curd.message.confirmDelete"), t("common.title.confirm"), {
+  ElMessageBox.confirm(t("pages.curd.message.confirmDelete"), t("common.title.confirm"), {
     confirmButtonText: t("common.button.confirm"),
     cancelButtonText: t("common.button.cancel"),
     type: "warning",
@@ -553,7 +553,7 @@ function handleDelete(id?: number | string) {
       if (props.contentConfig.deleteAction) {
         props.contentConfig.deleteAction(ids).then(
           () => {
-            ElMessage.success(t("curd.message.deleteSuccess"));
+            ElMessage.success(t("pages.curd.message.deleteSuccess"));
             removeIds.value = [];
             // 清空选中项
             tableRef.value?.clearSelection();
@@ -564,7 +564,7 @@ function handleDelete(id?: number | string) {
           }
         );
       } else {
-        ElMessage.error(t("curd.message.noDeleteAction"));
+        ElMessage.error(t("pages.curd.message.noDeleteAction"));
       }
     },
     () => {
@@ -604,8 +604,8 @@ const exportsFormData = reactive<{
   origin: ExportsOriginEnum.CURRENT,
 });
 const exportsFormRules: FormRules = {
-  fields: [{ required: true, message: t("curd.message.selectFields") }],
-  origin: [{ required: true, message: t("curd.message.selectOrigin") }],
+  fields: [{ required: true, message: t("pages.curd.message.selectFields") }],
+  origin: [{ required: true, message: t("pages.curd.message.selectOrigin") }],
 };
 // 打开导出弹窗
 function handleOpenExportsModal() {
@@ -655,7 +655,7 @@ function handleExports() {
         );
       });
     } else {
-      ElMessage.error(t("curd.message.noExportsAction"));
+      ElMessage.error(t("pages.curd.message.noExportsAction"));
     }
   } else {
     worksheet.addRows(
@@ -681,7 +681,7 @@ const importFormData = reactive<{
   files: [],
 });
 const importFormRules: FormRules = {
-  files: [{ required: true, message: t("curd.message.selectFile") }],
+  files: [{ required: true, message: t("pages.curd.message.selectFile") }],
 };
 // 打开导入弹窗
 function handleOpenImportModal(isFile: boolean = false) {
@@ -709,7 +709,7 @@ function handleDownloadTemplate() {
       saveXlsx(fileData, fileName);
     });
   } else {
-    ElMessage.error(t("curd.message.noImportTemplate"));
+    ElMessage.error(t("pages.curd.message.noImportTemplate"));
   }
 }
 // 导入确认
@@ -736,11 +736,11 @@ function handleCloseImportModal() {
 function handleImport() {
   const importAction = props.contentConfig.importAction;
   if (importAction === undefined) {
-    ElMessage.error(t("curd.message.noImportAction"));
+    ElMessage.error(t("pages.curd.message.noImportAction"));
     return;
   }
   importAction(importFormData.files[0].raw as File).then(() => {
-    ElMessage.success(t("curd.message.importSuccess"));
+    ElMessage.success(t("pages.curd.message.importSuccess"));
     handleCloseImportModal();
     handleRefresh(true);
   });
@@ -749,7 +749,7 @@ function handleImport() {
 function handleImports() {
   const importsAction = props.contentConfig.importsAction;
   if (importsAction === undefined) {
-    ElMessage.error(t("curd.message.noImportsAction"));
+    ElMessage.error(t("pages.curd.message.noImportsAction"));
     return;
   }
   // 获取选择的文件
@@ -790,11 +790,11 @@ function handleImports() {
             }
           }
           if (data.length === 0) {
-            ElMessage.error(t("curd.message.noDataParsed"));
+            ElMessage.error(t("pages.curd.message.noDataParsed"));
             return;
           }
           importsAction(data).then(() => {
-            ElMessage.success(t("curd.message.importSuccess"));
+            ElMessage.success(t("pages.curd.message.importSuccess"));
             handleCloseImportModal();
             handleRefresh(true);
           });
@@ -802,7 +802,7 @@ function handleImports() {
         (error) => console.log(error)
       );
     } else {
-      ElMessage.error(t("curd.message.readFileFailed"));
+      ElMessage.error(t("pages.curd.message.readFileFailed"));
     }
   };
 }
@@ -864,7 +864,7 @@ function handleModify(field: string, value: boolean | string | number, row: Reco
       value,
     });
   } else {
-    ElMessage.error(t("curd.message.noModifyAction"));
+    ElMessage.error(t("pages.curd.message.noModifyAction"));
   }
 }
 
@@ -927,10 +927,10 @@ function fetchPageData(formData: IObject = {}, isRestart = false) {
     )
     .then((data) => {
       if (showPagination) {
-        pagination.total = (data as any)?.total ?? 0;
+        pagination.total = Number((data as any)?.total ?? 0);
         pageData.value = (data as any)?.items ?? [];
       } else {
-        pageData.value = Array.isArray(data) ? data : (data?.items ?? (data as any)?.data ?? []);
+        pageData.value = Array.isArray(data) ? data : (data?.items ?? (data as any)?.items ?? []);
       }
     })
     .finally(() => {
@@ -950,7 +950,7 @@ function exportPageData(formData: IObject = {}) {
       saveXlsx(fileData, fileName);
     });
   } else {
-    ElMessage.error(t("curd.message.noExportAction"));
+    ElMessage.error(t("pages.curd.message.noExportAction"));
   }
 }
 
