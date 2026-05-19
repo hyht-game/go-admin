@@ -256,5 +256,8 @@ const handleToolbarClick = (name: string) => {
 <style lang="scss" scoped>
 .app-container {
   padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
 }
 </style>

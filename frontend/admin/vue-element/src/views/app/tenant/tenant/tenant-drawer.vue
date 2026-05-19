@@ -4,6 +4,8 @@
     :title="title"
     size="600px"
     :close-on-click-modal="false"
+    :append-to-body="true"
+    :destroy-on-close="true"
     @close="handleClose"
   >
     <ElForm :model="formData" label-width="120px">

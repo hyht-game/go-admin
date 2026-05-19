@@ -77,6 +77,8 @@ const { showTagsView, showLogo, isSidebarOpen, routes } = useLayout();
     margin-left: $sidebar-width;
     overflow-y: auto;
     transition: margin-left 0.28s;
+    width: calc(100% - #{$sidebar-width});
+    min-width: 0;
 
     &--collapsed {
       margin-left: $sidebar-width-collapsed;

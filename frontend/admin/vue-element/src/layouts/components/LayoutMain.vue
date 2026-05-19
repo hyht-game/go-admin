@@ -80,6 +80,8 @@ const transitionName = computed(() => {
   position: relative;
   overflow-y: auto;
   background-color: var(--el-bg-color-page);
+  width: 100%;
+  min-width: 0;
 
   /* fade */
   .fade-enter-active,

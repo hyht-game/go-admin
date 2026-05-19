@@ -1,6 +1,7 @@
 <template>
   <div
     class="rounded bg-[var(--el-bg-color)] border border-[var(--el-border-color)] p-5 h-full md:flex flex-1 flex-col md:overflow-auto"
+    style="min-width: 0;"
   >
     <!-- 表格工具 -->
     <div class="flex flex-col md:flex-row justify-between gap-y-2.5 mb-2.5">
@@ -65,6 +66,7 @@
       :scroll-y="{ enabled: true }"
       :data="pageData"
       class="flex-1"
+      style="overflow: hidden;"
       @checkbox-change="handleSelectionChange"
       @checkbox-all="handleSelectionChange"
     >
