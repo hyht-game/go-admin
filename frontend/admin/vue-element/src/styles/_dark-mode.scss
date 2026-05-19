@@ -12,7 +12,7 @@ html.dark {
   // CSS 变量定义（暗色模式专用）
   // ============================================
   
-  // 1. 核心对比度优化(先解决"看得见"的问题)
+  // 1. 核心对比度优化(先解决“看得见”的问题)
   --dark-bg-primary: #0A0C10;      // 页面主背景(压暗基底,拉开和表格的差距)
   --dark-bg-table: #14171C;         // 表格容器/输入框背景(比背景亮 2 个灰度层级,模块边界瞬间清晰)
   --dark-bg-hover: #1E2229;         // 悬浮态/展开态/表头(比输入框再亮一级,突出层级)
@@ -34,6 +34,13 @@ html.dark {
   --dark-accent: #F7BA1E;           // 强调色：暖黄
   --dark-error: #F53F3F;            // 错误态：高饱和红
   --dark-success: #00B42A;          // 成功态：高饱和绿
+
+  // 3. Element Plus 组件变量覆盖
+  --el-bg-color: var(--dark-bg-primary);
+  --el-bg-color-overlay: var(--dark-bg-table);
+  --el-fill-color-blank: var(--dark-bg-table);
+  --el-border-color: var(--dark-border);
+  --el-border-color-light: var(--dark-border);
 
   // ============================================
   // 表单和 Drawer 专项优化
@@ -165,17 +172,6 @@ html.dark {
         color: var(--dark-error) !important;
       }
     }
-
-    // 表单项分割线
-    .el-form-item {
-      border-bottom: 1px solid var(--dark-border) !important;
-      padding-bottom: 16px;
-      margin-bottom: 16px;
-
-      &:last-child {
-        border-bottom: none !important;
-      }
-    }
   }
 
   // 输入框专项优化
@@ -188,21 +184,21 @@ html.dark {
       background-color: var(--dark-bg-table) !important; // 输入框背景比主背景亮 2 个灰度层级
       border-color: var(--dark-border) !important;       // 加深边框
       box-shadow: 0 0 0 1px var(--dark-border) inset, 
-                  inset 0 1px 2px rgba(255, 255, 255, 0.05) !important; // 1px 内阴影，替代纯边框，更有"浮起"的层级感
+                  inset 0 1px 2px rgba(255, 255, 255, 0.05) !important; // 1px 内阴影，替代纯边框，更有“浮起”的层级感
       color: var(--dark-text-primary) !important;
-
+  
       // 占位符文本
       input::placeholder,
       textarea::placeholder {
         color: var(--dark-text-placeholder) !important;
       }
-
+  
       // hover 态：背景色微亮，提升交互反馈
       &:hover {
         border-color: var(--dark-primary) !important;
         background-color: var(--dark-bg-hover) !important;
       }
-
+  
       // 聚焦态：边框用主色高亮，背景色微亮，给用户明确的操作反馈
       &.is-focus {
         border-color: var(--dark-primary) !important;
@@ -210,24 +206,75 @@ html.dark {
                     inset 0 1px 2px rgba(64, 158, 255, 0.1) !important;
         background-color: var(--dark-bg-hover) !important;
       }
-
+  
       // 校验错误态：高饱和红
       &.is-error {
         border-color: var(--dark-error) !important;
         box-shadow: 0 0 0 1px var(--dark-error) inset !important;
       }
-
+  
       // 校验成功态：高饱和绿
       &.is-success {
         border-color: var(--dark-success) !important;
         box-shadow: 0 0 0 1px var(--dark-success) inset !important;
       }
     }
-
+  
     // 输入框后缀图标
     .el-input__suffix,
     .el-input__prefix {
       color: var(--dark-text-secondary) !important;
+    }
+  }
+  
+  // select 组件专项优化（确保与 input 背景色一致）
+  .el-select {
+    // select 容器本身
+    background-color: transparent !important;
+    
+    // select 内部的所有可能背景元素
+    .el-input__wrapper {
+      background-color: var(--dark-bg-table) !important;
+      border-color: var(--dark-border) !important;
+      box-shadow: 0 0 0 1px var(--dark-border) inset, 
+                  inset 0 1px 2px rgba(255, 255, 255, 0.05) !important;
+    }
+
+    // select 的输入框
+    .el-input__inner {
+      background-color: transparent !important;
+    }
+
+    // select 的后缀图标区域
+    .el-select__caret,
+    .el-select__suffix {
+      background-color: transparent !important;
+      color: var(--dark-text-secondary) !important;
+    }
+
+    // hover 态
+    &:hover .el-input__wrapper {
+      border-color: var(--dark-primary) !important;
+      background-color: var(--dark-bg-hover) !important;
+    }
+
+    // 聚焦态
+    &.is-focus .el-input__wrapper,
+    .el-input__wrapper.is-focus {
+      border-color: var(--dark-primary) !important;
+      box-shadow: 0 0 0 1px var(--dark-primary) inset, 
+                  inset 0 1px 2px rgba(64, 158, 255, 0.1) !important;
+      background-color: var(--dark-bg-hover) !important;
+    }
+  }
+
+  // 其他表单组件统一背景色
+  .el-input-number,
+  .el-date-editor,
+  .el-tree-select,
+  .el-cascader {
+    .el-input__wrapper {
+      background-color: var(--dark-bg-table) !important;
     }
   }
 
