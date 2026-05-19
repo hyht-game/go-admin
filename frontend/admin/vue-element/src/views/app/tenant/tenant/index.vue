@@ -18,21 +18,21 @@
     >
       <!-- 类型 -->
       <template #type="{ row }">
-        <ElTag :color="tenantTypeToColor(row.type)">
+        <ElTag size="small" effect="dark" round :color="tenantTypeToColor(row.type)">
           {{ tenantTypeToName(row.type) }}
         </ElTag>
       </template>
 
       <!-- 审核状态 -->
       <template #auditStatus="{ row }">
-        <ElTag :color="tenantAuditStatusToColor(row.auditStatus)">
+        <ElTag size="small" effect="dark" round :color="tenantAuditStatusToColor(row.auditStatus)">
           {{ tenantAuditStatusToName(row.auditStatus) }}
         </ElTag>
       </template>
 
       <!-- 状态 -->
       <template #status="{ row }">
-        <ElTag :color="tenantStatusToColor(row.status)">
+        <ElTag size="small" effect="dark" round :color="tenantStatusToColor(row.status)">
           {{ tenantStatusToName(row.status) }}
         </ElTag>
       </template>
@@ -180,16 +180,16 @@ const contentConfig: IContentConfig = {
       prop: "createdAt",
       label: $t("common.table.createdAt"),
       minWidth: 160,
-      formatter: (row: any) => {
-        if (!row.createdAt) return "";
-        return new Date(row.createdAt).toLocaleString("zh-CN");
-      },
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
     { prop: "remark", label: $t("common.table.remark"), minWidth: 150 },
     {
+      prop: "action",
       label: $t("common.table.action"),
       fixed: "right",
       width: 150,
+      template: "tool",
       action: [
         {
           name: "edit",

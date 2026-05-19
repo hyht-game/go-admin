@@ -199,6 +199,10 @@
             <template v-else-if="col.template === 'custom'">
               <slot :name="col.slotName ?? col.prop" :prop="col.prop" v-bind="scope" />
             </template>
+            <!-- 有slotName的列 -->
+            <template v-else-if="col.slotName">
+              <slot :name="col.slotName" :prop="col.prop" v-bind="scope" />
+            </template>
             <!-- 默认显示字段值 -->
             <template v-else>
               <template v-if="col.prop">
