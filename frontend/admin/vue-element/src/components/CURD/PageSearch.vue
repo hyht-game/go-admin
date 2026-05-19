@@ -50,12 +50,14 @@
         </template>
 
         <el-form-item :class="{ 'col-[auto/-1] justify-self-end': searchConfig?.grid === 'right' }">
-          <el-button icon="search" type="primary" @click="handleQuery">搜索</el-button>
-          <el-button icon="refresh" @click="handleReset">重置</el-button>
+          <el-button icon="search" type="primary" @click="handleQuery">
+            {{ t("common.button.search") }}
+          </el-button>
+          <el-button icon="refresh" @click="handleReset">{{ t("common.button.reset") }}</el-button>
           <!-- 展开/收起 -->
           <template v-if="isExpandable && formItems.length > showNumber">
             <el-link class="ml-3" type="primary" underline="never" @click="isExpand = !isExpand">
-              {{ isExpand ? "收起" : "展开" }}
+              {{ isExpand ? t("curd.search.collapse") : t("curd.search.expand") }}
               <component :is="isExpand ? ArrowUp : ArrowDown" class="w-4 h-4 ml-2" />
             </el-link>
           </template>
@@ -66,8 +68,9 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "@/i18n";
 import type { IObject, IForm, ISearchConfig, ISearchComponent } from "./types";
-import { ArrowUp, ArrowDown } from "@element-plus/icons-vue";
+import { ArrowUp, ArrowDown, QuestionFilled } from "@element-plus/icons-vue";
 import type { FormInstance } from "element-plus";
 import InputTag from "@/components/InputTag/index.vue";
 
@@ -78,6 +81,10 @@ const emit = defineEmits<{
   queryClick: [queryParams: IObject];
   resetClick: [queryParams: IObject];
 }>();
+
+// 国际化
+const { t } = useI18n();
+
 // 组件映射表
 const componentMap = new Map<ISearchComponent, any>([
   // @ts-ignore
@@ -128,6 +135,7 @@ const isGrid = computed(() =>
 const getTooltipProps = (tips: string | IObject) => {
   return typeof tips === "string" ? { content: tips } : tips;
 };
+
 // 查询/重置操作
 const handleQuery = () => emit("queryClick", queryParams);
 const handleReset = () => {
@@ -149,6 +157,7 @@ onMounted(() => {
     }
   });
 });
+
 // 暴露的属性和方法
 defineExpose({
   // 获取分页数据

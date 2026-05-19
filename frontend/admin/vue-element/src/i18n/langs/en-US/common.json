@@ -13,7 +13,10 @@
     "update": "Update",
     "view": "View",
     "close": "Close",
-    "back": "Back"
+    "back": "Back",
+    "refresh": "Refresh",
+    "batchImport": "Batch Import",
+    "batchExport": "Batch Export"
   },
   "status": {
     "enabled": "Enabled",

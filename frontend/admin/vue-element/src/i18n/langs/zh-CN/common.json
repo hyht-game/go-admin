@@ -13,7 +13,10 @@
     "update": "更新",
     "view": "查看",
     "close": "关闭",
-    "back": "返回"
+    "back": "返回",
+    "refresh": "刷新",
+    "batchImport": "批量导入",
+    "batchExport": "批量导出"
   },
   "status": {
     "enabled": "启用",

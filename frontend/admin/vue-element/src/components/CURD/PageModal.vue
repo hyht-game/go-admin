@@ -59,8 +59,10 @@
         </el-form>
 
         <template #footer>
-          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">确定</el-button>
-          <el-button @click="handleClose">关闭</el-button>
+          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">
+            {{ t("common.button.confirm") }}
+          </el-button>
+          <el-button @click="handleClose">{{ t("common.button.close") }}</el-button>
         </template>
       </el-drawer>
     </template>
@@ -124,8 +126,10 @@
         </el-form>
 
         <template #footer>
-          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">确定</el-button>
-          <el-button @click="handleClose">关闭</el-button>
+          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">
+            {{ t("common.button.confirm") }}
+          </el-button>
+          <el-button @click="handleClose">{{ t("common.button.close") }}</el-button>
         </template>
       </el-dialog>
     </template>
@@ -133,18 +137,23 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "@/i18n";
 import { useThrottleFn } from "@vueuse/core";
 import cloneDeep from "lodash-es/cloneDeep";
 import type { FormInstance, FormRules } from "element-plus";
 import type { IComponentType, IModalConfig, IObject } from "./types";
 import InputTag from "@/components/InputTag/index.vue";
 import IconSelect from "@/components/IconSelect/index.vue";
+import { QuestionFilled } from "@element-plus/icons-vue";
 
 defineSlots<{ [key: string]: (_args: any) => any }>();
 // 定义接收的属性
 const props = defineProps<{ modalConfig: IModalConfig }>();
 // 自定义事件
 const emit = defineEmits<{ submitClick: []; customSubmit: [queryParams: IObject] }>();
+
+// 国际化
+const { t } = useI18n();
 // 组件映射
 
 const componentMap = new Map<IComponentType, any>([
@@ -215,9 +224,13 @@ const handleSubmit = useThrottleFn(() => {
     }
     props.modalConfig.formAction(formData).then(() => {
       if (props.modalConfig.component === "drawer") {
-        ElMessage.success(`${props.modalConfig.drawer?.title}成功`);
+        ElMessage.success(
+          `${props.modalConfig.drawer?.title}${t("curd.message.operationSuccess")}`
+        );
       } else {
-        ElMessage.success(`${props.modalConfig.dialog?.title}成功`);
+        ElMessage.success(
+          `${props.modalConfig.dialog?.title}${t("curd.message.operationSuccess")}`
+        );
       }
       emit("submitClick");
       handleClose();
