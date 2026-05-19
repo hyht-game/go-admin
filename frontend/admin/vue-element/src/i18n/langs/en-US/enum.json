@@ -75,5 +75,15 @@
       "BRANCH": "Branch",
       "OTHER": "Other"
     }
+  },
+  "position": {
+    "type": {
+      "REGULAR": "Regular Employee",
+      "LEADER": "Leader",
+      "MANAGER": "Manager",
+      "INTERN": "Intern",
+      "CONTRACT": "Contract Worker",
+      "OTHER": "Other"
+    }
   }
 }

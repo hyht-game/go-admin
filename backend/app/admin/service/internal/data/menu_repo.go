@@ -108,23 +108,31 @@ func (r *MenuRepo) List(ctx context.Context, req *paginationV1.PagingRequest, tr
 
 	dtos := make([]*resourceV1.Menu, 0, len(entities))
 	if treeTravel {
+		// 构建映射表，用于快速查找
+		dtoMap := make(map[uint32]*resourceV1.Menu)
+
+		// 第一次遍历：转换所有实体并建立映射
 		for _, entity := range entities {
-			if entity.ParentID == nil {
-				dto := r.mapper.ToDTO(entity)
-				dtos = append(dtos, dto)
+			dto := r.mapper.ToDTO(entity)
+			if dto.Id != nil {
+				dtoMap[*dto.Id] = dto
 			}
 		}
-		for _, entity := range entities {
-			if entity.ParentID != nil {
-				dto := r.mapper.ToDTO(entity)
 
-				if entCrud.TravelChild(&dtos, dto, func(parent *resourceV1.Menu, node *resourceV1.Menu) {
-					parent.Children = append(parent.Children, node)
-				}) {
-					continue
-				}
-
+		// 第二次遍历：构建树结构
+		for _, dto := range dtoMap {
+			if dto.ParentId == nil || *dto.ParentId == 0 {
+				// 根节点
 				dtos = append(dtos, dto)
+			} else {
+				// 子节点：查找父节点并添加
+				if parent, ok := dtoMap[*dto.ParentId]; ok {
+					if parent.Children == nil {
+						parent.Children = make([]*resourceV1.Menu, 0)
+					}
+					parent.Children = append(parent.Children, dto)
+				}
+				// 如果找不到父节点，则该节点被跳过（孤儿节点）
 			}
 		}
 	} else {

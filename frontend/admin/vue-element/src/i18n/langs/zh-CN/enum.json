@@ -75,5 +75,15 @@
       "BRANCH": "分公司",
       "OTHER": "其他"
     }
+  },
+  "position": {
+    "type": {
+      "REGULAR": "普通员工",
+      "LEADER": "领导",
+      "MANAGER": "经理",
+      "INTERN": "实习生",
+      "CONTRACT": "合同工",
+      "OTHER": "其他"
+    }
   }
 }

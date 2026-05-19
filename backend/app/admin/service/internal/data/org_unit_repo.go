@@ -134,24 +134,32 @@ func (r *OrgUnitRepo) List(ctx context.Context, req *paginationV1.PagingRequest)
 		return sortI < sortJ
 	})
 
-	dtos := make([]*identityV1.OrgUnit, 0, len(entities))
+	// 构建映射表，用于快速查找
+	dtoMap := make(map[uint32]*identityV1.OrgUnit)
+	dtos := make([]*identityV1.OrgUnit, 0)
+
+	// 第一次遍历：转换所有实体并建立映射
 	for _, entity := range entities {
-		if entity.ParentID == nil {
-			dto := r.mapper.ToDTO(entity)
-			dtos = append(dtos, dto)
+		dto := r.mapper.ToDTO(entity)
+		if dto.Id != nil {
+			dtoMap[*dto.Id] = dto
 		}
 	}
-	for _, entity := range entities {
-		if entity.ParentID != nil {
-			dto := r.mapper.ToDTO(entity)
 
-			if entCrud.TravelChild(&dtos, dto, func(parent *identityV1.OrgUnit, node *identityV1.OrgUnit) {
-				parent.Children = append(parent.Children, node)
-			}) {
-				continue
-			}
-
+	// 第二次遍历：构建树结构
+	for _, dto := range dtoMap {
+		if dto.ParentId == nil || *dto.ParentId == 0 {
+			// 根节点
 			dtos = append(dtos, dto)
+		} else {
+			// 子节点：查找父节点并添加
+			if parent, ok := dtoMap[*dto.ParentId]; ok {
+				if parent.Children == nil {
+					parent.Children = make([]*identityV1.OrgUnit, 0)
+				}
+				parent.Children = append(parent.Children, dto)
+			}
+			// 如果找不到父节点，则该节点被跳过（孤儿节点）
 		}
 	}
 
