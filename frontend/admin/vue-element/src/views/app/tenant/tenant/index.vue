@@ -14,6 +14,7 @@
       :content-config="contentConfig"
       @add-click="handleAddClick"
       @operate-click="handleOperateClick"
+      @toolbar-click="handleToolbarClick"
     >
       <!-- 类型 -->
       <template #type="{ row }">
@@ -130,6 +131,8 @@ const searchConfig: ISearchConfig = {
 
 // 表格配置
 const contentConfig: IContentConfig = {
+  toolbar: ["add"], // 左侧工具栏
+  defaultToolbar: ["refresh", "exports", "imports", "filter"], // 右侧工具栏
   table: {
     border: true,
     stripe: false,
@@ -213,7 +216,7 @@ const handleOperateClick = (data: IOperateData) => {
   } else if (name === "delete") {
     // 删除
     ElMessageBox.confirm(
-      $t("common.text.do_you_want_delete", { moduleName: $t("pages.tenant.moduleName") }),
+      $t("common.confirm.do_you_want_delete", { moduleName: $t("pages.tenant.moduleName") }),
       $t("common.title.confirm"),
       {
         confirmButtonText: $t("common.button.confirm"),
@@ -240,6 +243,12 @@ const handleAddClick = () => {
 // 处理成功回调
 const handleSuccess = () => {
   contentRef.value?.fetchPageData({}, true);
+};
+
+// 处理工具栏点击
+const handleToolbarClick = (name: string) => {
+  console.log("Toolbar clicked:", name);
+  // 可以根据需要处理不同的工具栏按钮点击事件
 };
 </script>
 

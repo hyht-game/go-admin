@@ -75,7 +75,7 @@
   "title": {
     "confirm": "确认"
   },
-  "text": {
+  "confirm": {
     "do_you_want_delete": "确定要删除该{moduleName}吗？"
   },
   "navbar": {
@@ -94,5 +94,10 @@
       "notFound": "请求的资源不存在",
       "internalServerError": "服务器内部错误"
     }
+  },
+  "pagination": {
+    "total": "共 {total} 条记录",
+    "perPage": "{count}条/页",
+    "goToPage": "跳转到"
   }
 }

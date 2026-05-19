@@ -206,14 +206,18 @@
     </vxe-table>
 
     <!-- 分页 -->
-    <div v-if="showPagination" class="mt-4">
-      <el-scrollbar :class="['h-8!', { 'flex-x-end': contentConfig?.pagePosition === 'right' }]">
-        <el-pagination
-          v-bind="pagination"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </el-scrollbar>
+    <div v-if="showPagination" class="pagination-container mt-4">
+      <el-pagination
+        v-model:current-page="pagination.currentPage"
+        v-model:page-size="pagination.pageSize"
+        :page-sizes="pagination.pageSizes"
+        :total="pagination.total"
+        :background="pagination.background"
+        :layout="pagination.layout || 'total, sizes -> prev, pager, next'"
+        :pager-count="5"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
 
     <!-- 导出弹窗 -->
@@ -358,6 +362,13 @@ import {
   type UploadRawFile,
   type UploadUserFile,
 } from "element-plus";
+import {
+  ArrowLeft,
+  ArrowRight,
+  DArrowLeft,
+  DArrowRight,
+  UploadFilled,
+} from "@element-plus/icons-vue";
 import ExcelJS from "exceljs";
 import { reactive, ref, computed } from "vue";
 import type { VxeTableInstance } from "vxe-table";
@@ -1101,6 +1112,100 @@ defineExpose({ fetchPageData, exportPageData, getFilterParams, getSelectionData,
   // 表格边框
   &.vxe-table--border-line--inner {
     border-color: var(--el-border-color);
+  }
+}
+
+// 分页容器样式
+.pagination-container {
+  padding: 16px 0;
+  background-color: var(--el-bg-color);
+
+  .pagination-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    span {
+      font-size: 13px;
+      color: var(--el-text-color-regular);
+      white-space: nowrap;
+    }
+
+    .el-select {
+      width: 90px;
+
+      .el-input__wrapper {
+        padding: 0 12px;
+        height: 32px;
+      }
+    }
+  }
+
+  .pagination-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .el-button {
+      min-width: 32px;
+      padding: 0 8px;
+      height: 32px;
+      border-radius: 4px;
+      font-size: 13px;
+
+      &.is-disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.ellipsis-btn {
+        cursor: default;
+        pointer-events: none;
+        border: none;
+        background: transparent;
+        color: var(--el-text-color-placeholder);
+        padding: 0 4px;
+        min-width: auto;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+  }
+}
+
+// 暗黑模式下的分页样式优化
+html.dark {
+  .pagination-container {
+    background-color: var(--el-bg-color);
+
+    .pagination-right {
+      .el-button {
+        &:not(.is-primary):not(.is-disabled):not(.ellipsis-btn) {
+          background-color: var(--el-fill-color);
+          border-color: var(--el-border-color);
+          color: var(--el-text-color-regular);
+
+          &:hover {
+            background-color: var(--el-fill-color-dark);
+            border-color: var(--el-border-color-dark);
+            color: var(--el-color-primary);
+          }
+        }
+
+        &.is-primary {
+          background-color: var(--el-color-primary);
+          border-color: var(--el-color-primary);
+          color: #fff;
+
+          &:hover {
+            background-color: var(--el-color-primary-light-3);
+            border-color: var(--el-color-primary-light-3);
+          }
+        }
+      }
+    }
   }
 }
 </style>
