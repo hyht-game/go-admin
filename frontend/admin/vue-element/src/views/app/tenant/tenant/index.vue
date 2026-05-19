@@ -132,8 +132,8 @@ const searchConfig: ISearchConfig = {
 // 表格配置
 const contentConfig: IContentConfig = {
   permPrefix: "sys:manage_tenants", // 使用已有的租户管理权限
-  toolbar: ["add"], // 左侧工具栏
-  defaultToolbar: ["refresh", "exports", "imports", "filter"], // 右侧工具栏
+  toolbarRight: ["add"], // 右侧自定义按钮（在defaultToolbar左侧）
+  defaultToolbar: ["refresh", "exports", "imports", "filter"], // 右侧默认工具栏
   table: {
     border: true,
     stripe: false,

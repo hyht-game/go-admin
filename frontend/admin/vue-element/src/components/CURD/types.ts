@@ -103,8 +103,10 @@ export interface IContentConfig<TQuery = any, TItem = any> {
   importsAction?: (data: IObject[]) => Promise<any>;
   // 主键名(默认为id)
   pk?: string;
-  // 表格工具栏(默认:add,delete,export,也可自定义)
+  // 表格工具栏(左侧按钮，默认:add,delete,export,也可自定义)
   toolbar?: Array<ToolbarLeft | IToolsButton>;
+  // 表格工具栏右侧按钮(在defaultToolbar左侧的自定义按钮)
+  toolbarRight?: Array<ToolbarLeft | IToolsButton>;
   // 表格工具栏右侧图标(默认:refresh,filter,imports,exports,search)
   defaultToolbar?: Array<ToolbarRight | IToolsButton>;
   // table组件列属性(额外的属性template,action,slotName)

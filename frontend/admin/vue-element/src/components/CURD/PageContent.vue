@@ -19,6 +19,17 @@
       </div>
       <!-- 右侧工具 -->
       <div class="toolbar-right flex gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
+        <!-- 右侧自定义按钮 -->
+        <template v-for="(btn, index) in toolbarRightCustomBtn" :key="'custom-' + index">
+          <el-button
+            v-access:code="btn.perm ?? '*:**'"
+            v-bind="btn.attrs"
+            @click="handleToolbar(btn.name)"
+          >
+            {{ btn.text }}
+          </el-button>
+        </template>
+        <!-- 默认工具栏按钮 -->
         <template v-for="(btn, index) in toolbarRightBtn" :key="index">
           <el-popover v-if="btn.name === 'filter'" placement="bottom" trigger="click">
             <template #reference>
@@ -428,6 +439,8 @@ const buttonConfig = reactive<Record<string, IObject>>({
   },
   view: { textKey: "common.button.view", attrs: { icon: "view", type: "primary" }, perm: "view" },
   edit: { textKey: "common.button.edit", attrs: { icon: "edit", type: "primary" }, perm: "edit" },
+  // 右侧工具栏专用按钮
+  rightAdd: { textKey: "common.button.add", attrs: { icon: "plus" }, perm: "add" },
 });
 
 // 主键
@@ -488,6 +501,12 @@ const toolbarLeftBtn = computed(() => {
 const toolbarRightBtn = computed(() => {
   if (!config.value.defaultToolbar || config.value.defaultToolbar.length === 0) return [];
   return createToolbar(config.value.defaultToolbar, { circle: true });
+});
+
+// 右侧自定义按钮（在defaultToolbar左侧）
+const toolbarRightCustomBtn = computed(() => {
+  if (!config.value.toolbarRight || config.value.toolbarRight.length === 0) return [];
+  return createToolbar(config.value.toolbarRight, {});
 });
 
 // 表格操作工具栏
@@ -856,6 +875,7 @@ function handleToolbar(name: string) {
       emit("searchClick");
       break;
     case "add":
+    case "rightAdd":
       emit("addClick");
       break;
     case "delete":
