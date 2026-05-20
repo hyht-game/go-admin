@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@iconify/vue": "^5.0.1",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@tanstack/vue-store": "^0.11.0",
     "@tiptap/core": "^3.20.0",

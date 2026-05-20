@@ -135,7 +135,7 @@ const contentConfig: IContentConfig = {
     treeConfig: {
       parentField: "parentId",
       rowField: "id",
-      transform: true,
+      expandAll: true,
     },
   },
   pagination: false, // 禁用分页（树形表格不需要分页）

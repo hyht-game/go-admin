@@ -1,57 +1,49 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
-    <ElCard :bordered="false" class="profile-card">
-      <template #header>
-        <div class="card-header">
-          <span>{{ $t("pages.user.profile.tab.editPassword") }}</span>
-        </div>
-      </template>
+  <div class="page-container">
+    <ElForm
+      ref="formRef"
+      :model="formData"
+      :rules="formRules"
+      label-width="120px"
+      class="profile-form"
+    >
+      <ElFormItem :label="$t('pages.user.form.oldPassword')" prop="oldPassword">
+        <ElInput
+          v-model="formData.oldPassword"
+          type="password"
+          :placeholder="$t('common.placeholder.input')"
+          show-password
+          clearable
+        />
+      </ElFormItem>
 
-      <ElForm
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        label-width="120px"
-        class="profile-form"
-      >
-        <ElFormItem :label="$t('pages.user.form.oldPassword')" prop="oldPassword">
-          <ElInput
-            v-model="formData.oldPassword"
-            type="password"
-            :placeholder="$t('common.placeholder.input')"
-            show-password
-            clearable
-          />
-        </ElFormItem>
+      <ElFormItem :label="$t('pages.user.form.newPassword')" prop="newPassword">
+        <ElInput
+          v-model="formData.newPassword"
+          type="password"
+          :placeholder="$t('common.placeholder.input')"
+          show-password
+          strength="strong"
+          clearable
+        />
+      </ElFormItem>
 
-        <ElFormItem :label="$t('pages.user.form.newPassword')" prop="newPassword">
-          <ElInput
-            v-model="formData.newPassword"
-            type="password"
-            :placeholder="$t('common.placeholder.input')"
-            show-password
-            strength="strong"
-            clearable
-          />
-        </ElFormItem>
+      <ElFormItem :label="$t('pages.user.form.confirmPassword')" prop="confirmPassword">
+        <ElInput
+          v-model="formData.confirmPassword"
+          type="password"
+          :placeholder="$t('common.placeholder.input')"
+          show-password
+          clearable
+        />
+      </ElFormItem>
+    </ElForm>
 
-        <ElFormItem :label="$t('pages.user.form.confirmPassword')" prop="confirmPassword">
-          <ElInput
-            v-model="formData.confirmPassword"
-            type="password"
-            :placeholder="$t('common.placeholder.input')"
-            show-password
-            clearable
-          />
-        </ElFormItem>
-      </ElForm>
-
-      <div class="form-actions">
-        <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
-          {{ $t("pages.user.button.updatePassword") }}
-        </ElButton>
-      </div>
-    </ElCard>
+    <div class="form-actions">
+      <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
+        {{ $t("pages.user.button.updatePassword") }}
+      </ElButton>
+    </div>
   </div>
 </template>
 
@@ -111,7 +103,7 @@ async function handleSubmit() {
       confirmPassword: "",
     });
     formRef.value?.clearValidate();
-  } catch (_error) {
+  } catch {
     ElMessage.error($t("common.notification.updateFailed"));
   } finally {
     submitLoading.value = false;
@@ -120,20 +112,9 @@ async function handleSubmit() {
 </script>
 
 <style lang="scss" scoped>
-.app-container {
-  padding: 20px;
+.page-container {
   width: 100%;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.profile-card {
   max-width: 800px;
-}
-
-.card-header {
-  font-size: 16px;
-  font-weight: 500;
 }
 
 .profile-form {

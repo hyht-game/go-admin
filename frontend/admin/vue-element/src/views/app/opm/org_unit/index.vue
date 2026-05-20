@@ -112,7 +112,7 @@ const contentConfig: IContentConfig = {
     stripe: false,
     // 树形表格配置
     treeConfig: {
-      // transform: true, // 自动转换树形数据（后端返回的是混合结构）
+      expandAll: true,
       rowField: "id",
       childrenField: "children",
     },

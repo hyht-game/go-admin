@@ -136,6 +136,7 @@ const tenantOptions = computed(() =>
 );
 
 const filterOption = (input: string, option: any) => {
+  if (!option) return false;
   const text = String(option.value ?? option.label ?? "").toLowerCase();
   return text.includes(input.toLowerCase());
 };
@@ -143,7 +144,7 @@ const filterOption = (input: string, option: any) => {
 /**
  * 递归转换树形数据（替代 mapTree）
  */
-function mapTreeData(nodes: OrgUnit[], _parentId: number | null = null): any[] {
+function mapTreeData(nodes: OrgUnit[]): any[] {
   return nodes.map((node) => ({
     ...node,
     key: `${node.parentId}-${node.id}`,

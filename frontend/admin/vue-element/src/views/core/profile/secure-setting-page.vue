@@ -1,28 +1,16 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
-    <ElCard :bordered="false" class="profile-card">
-      <template #header>
-        <div class="card-header">
-          {{ $t("pages.user.profile.tab.securitySettings") }}
+  <div class="page-container">
+    <div class="setting-list">
+      <div v-for="item in secureSettingList" :key="item.key" class="setting-item">
+        <div class="setting-item-content">
+          <span class="item-title">{{ item.title }}</span>
+          <ElLink v-if="item.extra" type="primary" underline="never" class="item-link">
+            {{ item.extra }}
+          </ElLink>
         </div>
-      </template>
-
-      <ElList>
-        <ElListItem v-for="item in secureSettingList" :key="item.key">
-          <template #default>
-            <div class="list-item-content">
-              <span class="item-title">{{ item.title }}</span>
-              <ElLink v-if="item.extra" type="primary" :underline="false" class="item-link">
-                {{ item.extra }}
-              </ElLink>
-            </div>
-          </template>
-          <template #description>
-            <div class="item-description">{{ item.description }}</div>
-          </template>
-        </ElListItem>
-      </ElList>
-    </ElCard>
+        <div class="item-description">{{ item.description }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -71,31 +59,36 @@ const secureSettingList: SettingItem[] = [
 </script>
 
 <style lang="scss" scoped>
-.app-container {
-  padding: 20px;
+.page-container {
   width: 100%;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.profile-card {
   max-width: 800px;
 }
 
-.card-header {
-  font-size: 16px;
-  font-weight: 500;
+.setting-list {
+  padding-top: 20px;
 }
 
-.list-item-content {
+.setting-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.setting-item-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: 8px;
 }
 
 .item-title {
   flex: 1;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .item-link {
@@ -104,7 +97,7 @@ const secureSettingList: SettingItem[] = [
 
 .item-description {
   color: var(--el-text-color-secondary);
-  font-size: 14px;
-  padding-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 </style>

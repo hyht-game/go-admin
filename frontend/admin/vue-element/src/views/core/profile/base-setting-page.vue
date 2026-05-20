@@ -1,118 +1,110 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
-    <ElCard :bordered="false" class="profile-card">
-      <template #header>
-        <div class="card-header">
-          {{ $t("pages.user.profile.tab.basicSettings") }}
-        </div>
-      </template>
+  <div class="page-container">
+    <ElRow :gutter="24">
+      <ElCol :span="14">
+        <ElForm ref="formRef" :model="formData" label-width="120px" class="profile-form">
+          <ElFormItem :label="$t('pages.user.table.nickname')">
+            <ElInput
+              v-model="formData.nickname"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
 
-      <ElRow :gutter="24">
-        <ElCol :span="14">
-          <ElForm ref="formRef" :model="formData" label-width="120px" class="profile-form">
-            <ElFormItem :label="$t('pages.user.table.nickname')">
-              <ElInput
-                v-model="formData.nickname"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
+          <ElFormItem :label="$t('pages.user.table.realname')">
+            <ElInput
+              v-model="formData.realname"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
+
+          <ElFormItem :label="$t('pages.user.table.email')">
+            <ElInput
+              v-model="formData.email"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
+
+          <ElFormItem :label="$t('pages.user.table.mobile')">
+            <ElInput
+              v-model="formData.mobile"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
+
+          <ElFormItem :label="$t('pages.user.table.telephone')">
+            <ElInput
+              v-model="formData.telephone"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
+
+          <ElFormItem :label="$t('pages.user.table.gender')">
+            <ElSelect
+              v-model="formData.gender"
+              :placeholder="$t('common.placeholder.select')"
+              filterable
+              clearable
+              style="width: 100%"
+            >
+              <ElOption
+                v-for="item in genderList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
               />
-            </ElFormItem>
+            </ElSelect>
+          </ElFormItem>
 
-            <ElFormItem :label="$t('pages.user.table.realname')">
-              <ElInput
-                v-model="formData.realname"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
-              />
-            </ElFormItem>
+          <ElFormItem :label="$t('pages.user.table.region')">
+            <ElInput
+              v-model="formData.region"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
 
-            <ElFormItem :label="$t('pages.user.table.email')">
-              <ElInput
-                v-model="formData.email"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
-              />
-            </ElFormItem>
+          <ElFormItem :label="$t('pages.user.table.address')">
+            <ElInput
+              v-model="formData.address"
+              :placeholder="$t('common.placeholder.input')"
+              clearable
+            />
+          </ElFormItem>
 
-            <ElFormItem :label="$t('pages.user.table.mobile')">
-              <ElInput
-                v-model="formData.mobile"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
-              />
-            </ElFormItem>
+          <ElFormItem :label="$t('pages.user.table.description')">
+            <ElInput
+              v-model="formData.description"
+              type="textarea"
+              :rows="3"
+              :placeholder="$t('common.placeholder.input')"
+            />
+          </ElFormItem>
+        </ElForm>
+      </ElCol>
 
-            <ElFormItem :label="$t('pages.user.table.telephone')">
-              <ElInput
-                v-model="formData.telephone"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
-              />
-            </ElFormItem>
-
-            <ElFormItem :label="$t('pages.user.table.gender')">
-              <ElSelect
-                v-model="formData.gender"
-                :placeholder="$t('common.placeholder.select')"
-                filterable
-                clearable
-                style="width: 100%"
-              >
-                <ElOption
-                  v-for="item in genderList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </ElSelect>
-            </ElFormItem>
-
-            <ElFormItem :label="$t('pages.user.table.region')">
-              <ElInput
-                v-model="formData.region"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
-              />
-            </ElFormItem>
-
-            <ElFormItem :label="$t('pages.user.table.address')">
-              <ElInput
-                v-model="formData.address"
-                :placeholder="$t('common.placeholder.input')"
-                clearable
-              />
-            </ElFormItem>
-
-            <ElFormItem :label="$t('pages.user.table.description')">
-              <ElInput
-                v-model="formData.description"
-                type="textarea"
-                :rows="3"
-                :placeholder="$t('common.placeholder.input')"
-              />
-            </ElFormItem>
-          </ElForm>
-        </ElCol>
-
-        <ElCol :span="10">
-          <div class="change-avatar">
-            <div class="avatar-label">{{ $t("pages.user.table.avatar") }}</div>
-            <!-- 头像显示区域（可根据需要添加上传功能） -->
-            <div class="avatar-placeholder">
-              <ElIcon :size="64" color="#909399">
-                <UserFilled />
-              </ElIcon>
-            </div>
+      <ElCol :span="10">
+        <div class="change-avatar">
+          <div class="avatar-label">{{ $t("pages.user.table.avatar") }}</div>
+          <!-- 头像显示区域（可根据需要添加上传功能） -->
+          <div class="avatar-placeholder">
+            <ElIcon :size="64" color="#909399">
+              <UserFilled />
+            </ElIcon>
           </div>
-        </ElCol>
-      </ElRow>
+        </div>
+      </ElCol>
+    </ElRow>
 
-      <div class="form-actions">
-        <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
-          {{ $t("pages.user.button.updateUserInfo") }}
-        </ElButton>
-      </div>
-    </ElCard>
+    <div class="form-actions">
+      <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
+        {{ $t("pages.user.button.updateUserInfo") }}
+      </ElButton>
+    </div>
   </div>
 </template>
 
@@ -171,7 +163,7 @@ async function handleSubmit() {
   try {
     await userProfileStore.updateUser(formData);
     ElMessage.success($t("common.notification.updateSuccess"));
-  } catch (_error) {
+  } catch {
     ElMessage.error($t("common.notification.updateFailed"));
   } finally {
     submitLoading.value = false;
@@ -183,20 +175,9 @@ loadUserData();
 </script>
 
 <style lang="scss" scoped>
-.app-container {
-  padding: 20px;
+.page-container {
   width: 100%;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.profile-card {
   max-width: 1200px;
-}
-
-.card-header {
-  font-size: 16px;
-  font-weight: 500;
 }
 
 .profile-form {

@@ -1,64 +1,42 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
-    <ElCard :bordered="false" class="profile-card">
-      <template #header>
-        <div class="card-header">
-          {{ $t("pages.user.profile.tab.accountBind") }}
-        </div>
-      </template>
-
-      <ElList>
-        <ElListItem v-for="item in accountBindList" :key="item.key">
-          <template #default>
-            <div class="list-item-content">
-              <div class="item-left">
-                <ElIcon :size="40" :color="item.color" class="item-avatar">
-                  <component :is="getIconComponent(item.avatar)" />
-                </ElIcon>
-                <div class="item-info">
-                  <span class="item-title">{{ item.title }}</span>
-                  <ElButton
-                    v-if="item.extra"
-                    type="primary"
-                    link
-                    size="small"
-                    :disabled="item.disabled"
-                    class="item-btn"
-                  >
-                    {{ item.extra }}
-                  </ElButton>
-                </div>
-              </div>
+  <div class="page-container">
+    <div class="account-list">
+      <div v-for="item in accountBindList" :key="item.key" class="account-item">
+        <div class="account-item-content">
+          <!-- 左侧：图标和标题 -->
+          <div class="item-left">
+            <IconifyIcon
+              :icon="item.avatar"
+              :width="28"
+              :height="28"
+              :color="item.color"
+              class="item-avatar"
+            />
+            <div class="item-info">
+              <span class="item-title">{{ item.title }}</span>
+              <span class="item-description">{{ item.description }}</span>
             </div>
-          </template>
-          <template #description>
-            <div class="item-description">{{ item.description }}</div>
-          </template>
-        </ElListItem>
-      </ElList>
-    </ElCard>
+          </div>
+          <!-- 右侧：操作链接 -->
+          <ElLink
+            v-if="item.extra"
+            type="primary"
+            underline="never"
+            :disabled="item.disabled"
+            class="item-link"
+          >
+            {{ item.extra }}
+          </ElLink>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { ElIcon } from "element-plus";
+import { Icon as IconifyIcon } from "@iconify/vue";
 import { $t } from "@/i18n";
-
-// Iconify 图标映射（实际使用时需要安装对应的图标库）
-const iconMap: Record<string, any> = {
-  "ri:mail-fill": "Mail",
-  "ri:smartphone-fill": "Phone",
-  "fa-brands:github": "GitHub",
-  "ri:wechat-fill": "ChatDotRound",
-  "ri:weibo-fill": "Service",
-  "ri:dingding-fill": "Service",
-  "ri:qq-fill": "Service",
-  "ri:alipay-fill": "Service",
-  "ri:google-fill": "Service",
-  "ri:apple-fill": "Service",
-  "ri:twitter-fill": "Service",
-};
 
 interface AccountBindItem {
   key: string;
@@ -149,67 +127,71 @@ const accountBindList = ref<AccountBindItem[]>([
     platform: "dingtalk",
   },
 ]);
-
-// 获取图标组件
-function getIconComponent(iconName: string) {
-  return iconMap[iconName] || "Service";
-}
 </script>
 
 <style lang="scss" scoped>
-.app-container {
-  padding: 20px;
+.page-container {
   width: 100%;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.profile-card {
   max-width: 800px;
 }
 
-.card-header {
-  font-size: 16px;
-  font-weight: 500;
+.account-list {
+  padding-top: 20px;
 }
 
-.list-item-content {
+.account-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.account-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
 }
 
 .item-left {
   display: flex;
   align-items: center;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 .item-avatar {
   margin-right: 16px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .item-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 4px;
   min-width: 0;
 }
 
 .item-title {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.item-btn {
-  padding: 0;
-  height: auto;
-  line-height: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+  line-height: 1.4;
 }
 
 .item-description {
+  font-size: 13px;
   color: var(--el-text-color-secondary);
+  line-height: 1.5;
+}
+
+.item-link {
+  flex-shrink: 0;
   font-size: 14px;
-  padding-top: 4px;
 }
 </style>

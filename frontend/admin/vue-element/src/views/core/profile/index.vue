@@ -1,11 +1,32 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
+  <div class="app-container h-full flex flex-1">
     <ElCard :bordered="false" class="profile-card">
-      <ElTabs v-model="activeTab" type="border-card" class="profile-tabs">
-        <ElTabPane v-for="item in settingList" :key="item.key" :label="item.name" :name="item.key">
-          <component :is="item.component" />
-        </ElTabPane>
-      </ElTabs>
+      <div class="profile-layout">
+        <!-- 左侧导航菜单 -->
+        <div class="profile-sidebar">
+          <div
+            v-for="item in settingList"
+            :key="item.key"
+            class="sidebar-item"
+            :class="{ active: activeTab === item.key }"
+            @click="activeTab = item.key"
+          >
+            {{ item.name }}
+          </div>
+        </div>
+
+        <!-- 右侧内容区域 -->
+        <div class="profile-content">
+          <div class="content-header">
+            <h2 class="content-title">
+              {{ settingList.find((item) => item.key === activeTab)?.name }}
+            </h2>
+          </div>
+          <div class="content-body">
+            <component :is="settingList.find((item) => item.key === activeTab)?.component" />
+          </div>
+        </div>
+      </div>
     </ElCard>
   </div>
 </template>
@@ -62,9 +83,74 @@ const settingList = [
 
 .profile-card {
   height: 100%;
+  flex: 1;
 }
 
-.profile-tabs {
-  min-height: 600px;
+.profile-layout {
+  display: flex;
+  height: 100%;
+}
+
+// 左侧导航菜单
+.profile-sidebar {
+  width: 180px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--el-border-color-lighter);
+  padding: 16px 0;
+
+  .sidebar-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--el-text-color-regular);
+    transition: all 0.3s;
+    position: relative;
+
+    &:hover {
+      background-color: var(--el-fill-color-light);
+      color: var(--el-color-primary);
+    }
+
+    &.active {
+      color: var(--el-color-primary);
+      font-weight: 500;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 24px;
+        background-color: var(--el-color-primary);
+        border-radius: 2px;
+      }
+    }
+  }
+}
+
+// 右侧内容区域
+.profile-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.content-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+
+  .content-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+  }
+}
+
+.content-body {
+  min-height: 400px;
 }
 </style>

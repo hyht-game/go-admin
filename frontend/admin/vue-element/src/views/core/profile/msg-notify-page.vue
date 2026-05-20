@@ -1,31 +1,19 @@
 <template>
-  <div class="app-container h-full flex flex-1 flex-col">
-    <ElCard :bordered="false" class="profile-card">
-      <template #header>
-        <div class="card-header">
-          {{ $t("pages.user.profile.tab.notification") }}
+  <div class="page-container">
+    <div class="notify-list">
+      <div v-for="item in msgNotifyList" :key="item.key" class="notify-item">
+        <div class="notify-item-content">
+          <span class="item-title">{{ item.title }}</span>
+          <ElSwitch
+            v-model="item.checked"
+            :active-text="$t('common.switch.active')"
+            :inactive-text="$t('common.switch.inactive')"
+            class="item-switch"
+          />
         </div>
-      </template>
-
-      <ElList>
-        <ElListItem v-for="item in msgNotifyList" :key="item.key">
-          <template #default>
-            <div class="list-item-content">
-              <span class="item-title">{{ item.title }}</span>
-              <ElSwitch
-                v-model="item.checked"
-                :active-text="$t('common.switch.active')"
-                :inactive-text="$t('common.switch.inactive')"
-                class="item-switch"
-              />
-            </div>
-          </template>
-          <template #description>
-            <div class="item-description">{{ item.description }}</div>
-          </template>
-        </ElListItem>
-      </ElList>
-    </ElCard>
+        <div class="item-description">{{ item.description }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -64,32 +52,36 @@ const msgNotifyList = reactive<NotifyItem[]>([
 </script>
 
 <style lang="scss" scoped>
-.app-container {
-  padding: 20px;
+.page-container {
   width: 100%;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.profile-card {
   max-width: 800px;
 }
 
-.card-header {
-  font-size: 16px;
-  font-weight: 500;
+.notify-list {
+  padding-top: 20px;
 }
 
-.list-item-content {
+.notify-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.notify-item-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: 8px;
 }
 
 .item-title {
   flex: 1;
-  margin-right: 16px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .item-switch {
@@ -98,7 +90,7 @@ const msgNotifyList = reactive<NotifyItem[]>([
 
 .item-description {
   color: var(--el-text-color-secondary);
-  font-size: 14px;
-  padding-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 </style>

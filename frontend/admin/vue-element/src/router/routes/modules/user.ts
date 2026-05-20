@@ -6,6 +6,7 @@ const userRoutes: RouteRecordRaw[] = [
     name: "Profile",
     path: "/profile",
     component: Layout,
+    redirect: "/profile/user",
     meta: {
       title: "routes.profile.settings",
       hideInMenu: true,
@@ -13,7 +14,7 @@ const userRoutes: RouteRecordRaw[] = [
 
     children: [
       {
-        path: "/profile",
+        path: "user",
         name: "ProfilePage",
         component: () => import("@/views/core/profile/index.vue"),
         meta: {
