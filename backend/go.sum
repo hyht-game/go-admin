@@ -909,8 +909,8 @@ github.com/tx7do/go-utils v1.1.39 h1:da+mBT8eiJ9oLBxbFPQYhWImU3/eavM8AdACU6otpoA
 github.com/tx7do/go-utils v1.1.39/go.mod h1:A5zjhW0UTM6veYuCbq7/mcwDXaBw8UhBnvaLSwURBRg=
 github.com/tx7do/go-utils/aggregator v0.0.5 h1:JId6VIcIR27fMgxvwRPvcY3/9WBGZJKyKvZOdjKNJfc=
 github.com/tx7do/go-utils/aggregator v0.0.5/go.mod h1:HCSOKLV4YfhiHm9unbqiJi2UAY3xo2oVvfUGSREW3+c=
-github.com/tx7do/go-utils/captcha v0.0.3 h1:owo6ge1YYSlO26v5XayiuuNktMcz1qzpaaY9hbrzI4w=
-github.com/tx7do/go-utils/captcha v0.0.3/go.mod h1:vMMsUuUSColiKRhN/AaizZNGaiEhGq8xqs7PMuLnRaE=
+github.com/tx7do/go-utils/captcha v0.0.4 h1:Q5kKDNm+mN89uhz6O1f18B6UAI6DWAlJP9icJEHh308=
+github.com/tx7do/go-utils/captcha v0.0.4/go.mod h1:r8NGDV0A0wqaDPN7/5RzkK/p4aj2lu1JoIaZmmSpnmQ=
 github.com/tx7do/go-utils/copierutil v0.0.8 h1:zH1qAEuJMO1xrO4A5A3xZllS4o6/E0F5q7xuaHHnRko=
 github.com/tx7do/go-utils/copierutil v0.0.8/go.mod h1:bCTuve4AbL++mRTmMCsizZy5M6eNG9qiwQz5Hs+pd54=
 github.com/tx7do/go-utils/crypto v0.0.2 h1:XjpPmjW8Sg598BkJzvqmPsfJ+wUewGLlpbZOG7Gkh+o=

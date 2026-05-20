@@ -29,7 +29,7 @@ require (
 	github.com/tx7do/go-crud/viewer v0.0.6
 	github.com/tx7do/go-utils v1.1.39
 	github.com/tx7do/go-utils/aggregator v0.0.5
-	github.com/tx7do/go-utils/captcha v0.0.3
+	github.com/tx7do/go-utils/captcha v0.0.4
 	github.com/tx7do/go-utils/copierutil v0.0.8
 	github.com/tx7do/go-utils/crypto v0.0.2
 	github.com/tx7do/go-utils/geoip v1.1.8
