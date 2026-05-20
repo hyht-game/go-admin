@@ -116,33 +116,15 @@ SELECT setval('sys_login_policies_id_seq', (SELECT MAX(id) FROM sys_login_polici
 
 -- 插入字典类型
 INSERT INTO public.sys_dict_types (
-    id, type_code, sort_order, is_enabled, created_at, updated_at
+    id, type_code, type_name, sort_order, is_enabled, created_at, updated_at
 ) VALUES
-      (1, 'USER_STATUS', 10, true, now(), now()),
-      (2, 'DEVICE_TYPE', 20, true, now(), now()),
-      (3, 'ORDER_STATUS', 30, true, now(), now()),
-      (4, 'GENDER', 40, true, now(), now()),
-      (5, 'PAYMENT_METHOD', 50, true, now(), now())
+      (1, 'USER_STATUS', '用户状态', 10, true, now(), now()),
+      (2, 'DEVICE_TYPE', '设备类型', 20, true, now(), now()),
+      (3, 'ORDER_STATUS', '订单状态', 30, true, now(), now()),
+      (4, 'GENDER', '性别', 40, true, now(), now()),
+      (5, 'PAYMENT_METHOD', '支付方式', 50, true, now(), now())
 ;
 SELECT setval('sys_dict_types_id_seq', (SELECT MAX(id) FROM sys_dict_types));
-
--- 插入字典类型国际化（zh-CN）
-INSERT INTO public.sys_dict_type_i18n (
-    type_id, language_code, type_name, description, tenant_id, created_at, updated_at
-) VALUES
-      (1, 'zh-CN', '用户状态', '系统用户的状态管理，包括正常、冻结、注销', 0, now(), now()),
-      (2, 'zh-CN', '设备类型', 'IoT平台接入的设备品类，新增需同步至设备接入模块', 0, now(), now()),
-      (3, 'zh-CN', '订单状态', '电商订单的全生命周期状态', 0, now(), now()),
-      (4, 'zh-CN', '性别', '用户性别枚举，默认未知', 0, now(), now()),
-      (5, 'zh-CN', '支付方式', '支持的支付渠道，含第三方支付和自有渠道', 0, now(), now()),
-
-      (1, 'en-US', 'User Status', 'System user status management, including normal, frozen, and canceled', 0, now(), now()),
-      (2, 'en-US', 'Device Type', 'IoT device categories connected to the platform; new types must be synchronized with the device access module', 0, now(), now()),
-      (3, 'en-US', 'Order Status', 'Full lifecycle statuses for e-commerce orders', 0, now(), now()),
-      (4, 'en-US', 'Gender', 'User gender enumeration, defaulting to unknown', 0, now(), now()),
-      (5, 'en-US', 'Payment Method', 'Supported payment channels, including third-party and proprietary options', 0, now(), now())
-;
-SELECT setval('sys_dict_type_i18n_id_seq', (SELECT MAX(id) FROM sys_dict_type_i18n));
 
 -- 插入字典条目
 INSERT INTO public.sys_dict_entries (
