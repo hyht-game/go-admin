@@ -25,7 +25,7 @@
 
         <!-- 搜索框和工具栏 -->
         <div class="input-row">
-          <span class="input-label">{{ $t("pages.org-unit.moduleName") }}</span>
+          <span class="input-label">{{ $t("pages.org_unit.moduleName") }}</span>
           <ElInput
             class="search-input"
             clearable

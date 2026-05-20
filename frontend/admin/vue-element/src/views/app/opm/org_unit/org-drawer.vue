@@ -18,15 +18,15 @@
       <!-- 基本信息 -->
       <ElDivider content-position="left">{{ $t("common.section.basic") }}</ElDivider>
 
-      <ElFormItem :label="$t('pages.org-unit.name')" prop="name">
+      <ElFormItem :label="$t('pages.org_unit.name')" prop="name">
         <ElInput v-model="formData.name" :placeholder="$t('common.placeholder.input')" clearable />
       </ElFormItem>
 
-      <ElFormItem :label="$t('pages.org-unit.code')" prop="code">
+      <ElFormItem :label="$t('pages.org_unit.code')" prop="code">
         <ElInput v-model="formData.code" :placeholder="$t('common.placeholder.input')" clearable />
       </ElFormItem>
 
-      <ElFormItem :label="$t('pages.org-unit.parentId')" prop="parentId">
+      <ElFormItem :label="$t('pages.org_unit.parentId')" prop="parentId">
         <ElTreeSelect
           v-model="formData.parentId"
           :data="orgUnitTreeData"
@@ -42,7 +42,7 @@
         />
       </ElFormItem>
 
-      <ElFormItem :label="$t('pages.org-unit.leaderId')" prop="leaderId">
+      <ElFormItem :label="$t('pages.org_unit.leaderId')" prop="leaderId">
         <ElSelect
           v-model="formData.leaderId"
           :placeholder="$t('common.placeholder.select')"
@@ -59,7 +59,7 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem :label="$t('pages.org-unit.type')" prop="type">
+      <ElFormItem :label="$t('pages.org_unit.type')" prop="type">
         <ElSelect
           v-model="formData.type"
           :placeholder="$t('common.placeholder.select')"
@@ -94,15 +94,15 @@
       </ElFormItem>
 
       <!-- 法人实体信息 -->
-      <ElDivider content-position="left">{{ $t("pages.org-unit.legalEntity") }}</ElDivider>
+      <ElDivider content-position="left">{{ $t("pages.org_unit.legalEntity") }}</ElDivider>
 
-      <ElFormItem :label="$t('pages.org-unit.isLegalEntity')" prop="isLegalEntity">
+      <ElFormItem :label="$t('pages.org_unit.isLegalEntity')" prop="isLegalEntity">
         <ElSwitch v-model="formData.isLegalEntity" />
       </ElFormItem>
 
       <ElFormItem
         v-if="formData.isLegalEntity"
-        :label="$t('pages.org-unit.registrationNumber')"
+        :label="$t('pages.org_unit.registrationNumber')"
         prop="registrationNumber"
       >
         <ElInput
@@ -112,13 +112,13 @@
         />
       </ElFormItem>
 
-      <ElFormItem v-if="formData.isLegalEntity" :label="$t('pages.org-unit.taxId')" prop="taxId">
+      <ElFormItem v-if="formData.isLegalEntity" :label="$t('pages.org_unit.taxId')" prop="taxId">
         <ElInput v-model="formData.taxId" :placeholder="$t('common.placeholder.input')" clearable />
       </ElFormItem>
 
       <ElFormItem
         v-if="formData.isLegalEntity"
-        :label="$t('pages.org-unit.address')"
+        :label="$t('pages.org_unit.address')"
         prop="address"
       >
         <ElInput
@@ -131,7 +131,7 @@
       <!-- 其他信息 -->
       <ElDivider content-position="left">{{ $t("common.section.other") }}</ElDivider>
 
-      <ElFormItem :label="$t('pages.org-unit.description')" prop="description">
+      <ElFormItem :label="$t('pages.org_unit.description')" prop="description">
         <ElInput
           v-model="formData.description"
           type="textarea"
@@ -210,8 +210,8 @@ const formRules = {
 // 标题
 const title = computed(() =>
   isCreate.value
-    ? $t("common.modal.create", { moduleName: $t("pages.org-unit.moduleName") })
-    : $t("common.modal.update", { moduleName: $t("pages.org-unit.moduleName") })
+    ? $t("common.modal.create", { moduleName: $t("pages.org_unit.moduleName") })
+    : $t("common.modal.update", { moduleName: $t("pages.org_unit.moduleName") })
 );
 
 // 组织树数据

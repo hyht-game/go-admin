@@ -57,7 +57,7 @@ const searchConfig: ISearchConfig = {
   formItems: [
     {
       type: "input",
-      label: $t("pages.permission-group.name"),
+      label: $t("pages.permission_group.name"),
       prop: "name",
       attrs: {
         placeholder: $t("common.placeholder.input"),
@@ -66,7 +66,7 @@ const searchConfig: ISearchConfig = {
     },
     {
       type: "input",
-      label: $t("pages.permission-group.module"),
+      label: $t("pages.permission_group.module"),
       prop: "module",
       attrs: {
         placeholder: $t("common.placeholder.input"),
@@ -112,14 +112,14 @@ const contentConfig: IContentConfig = {
   columns: [
     {
       prop: "name",
-      label: $t("pages.permission-group.name"),
+      label: $t("pages.permission_group.name"),
       minWidth: 150,
       treeNode: true,
       align: "left",
     },
     {
       prop: "module",
-      label: $t("pages.permission-group.module"),
+      label: $t("pages.permission_group.module"),
       minWidth: 120,
       align: "left",
     },
@@ -166,7 +166,7 @@ async function handleOperateClick(data: IOperateData) {
   } else if (name === "delete") {
     try {
       await ElMessageBox.confirm(
-        $t("common.message.confirmDelete", { moduleName: $t("pages.permission-group.moduleName") }),
+        $t("common.message.confirmDelete", { moduleName: $t("pages.permission_group.moduleName") }),
         $t("common.title.warning"),
         {
           confirmButtonText: $t("common.button.confirm"),

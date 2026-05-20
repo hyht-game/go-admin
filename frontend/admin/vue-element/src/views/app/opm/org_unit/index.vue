@@ -69,7 +69,7 @@ const searchConfig: ISearchConfig = {
   formItems: [
     {
       type: "input",
-      label: $t("pages.org-unit.name"),
+      label: $t("pages.org_unit.name"),
       prop: "name",
       attrs: {
         placeholder: $t("common.placeholder.input"),
@@ -91,7 +91,7 @@ const searchConfig: ISearchConfig = {
     },
     {
       type: "select",
-      label: $t("pages.org-unit.type"),
+      label: $t("pages.org_unit.type"),
       prop: "type",
       attrs: {
         placeholder: $t("common.placeholder.select"),
@@ -135,15 +135,15 @@ const contentConfig: IContentConfig = {
   },
   columns: [
     { type: "index", label: $t("common.table.seq"), width: 60 },
-    { prop: "name", label: $t("pages.org-unit.name"), minWidth: 150, treeNode: true },
-    { prop: "code", label: $t("pages.org-unit.code"), minWidth: 120 },
+    { prop: "name", label: $t("pages.org_unit.name"), minWidth: 150, treeNode: true },
+    { prop: "code", label: $t("pages.org_unit.code"), minWidth: 120 },
     {
       prop: "type",
-      label: $t("pages.org-unit.type"),
+      label: $t("pages.org_unit.type"),
       minWidth: 100,
       slotName: "type",
     },
-    { prop: "leaderName", label: $t("pages.org-unit.leaderName"), minWidth: 100 },
+    { prop: "leaderName", label: $t("pages.org_unit.leaderName"), minWidth: 100 },
     {
       prop: "status",
       label: $t("common.table.status"),
@@ -196,7 +196,7 @@ async function handleOperateClick(data: IOperateData) {
   } else if (name === "delete") {
     try {
       await ElMessageBox.confirm(
-        $t("common.message.confirmDelete", { moduleName: $t("pages.org-unit.moduleName") }),
+        $t("common.message.confirmDelete", { moduleName: $t("pages.org_unit.moduleName") }),
         $t("common.title.warning"),
         {
           confirmButtonText: $t("common.button.confirm"),

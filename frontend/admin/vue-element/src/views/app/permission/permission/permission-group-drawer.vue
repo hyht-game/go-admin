@@ -15,15 +15,15 @@
       label-width="120px"
       class="drawer-form"
     >
-      <ElFormItem :label="$t('pages.permission-group.name')" prop="name">
+      <ElFormItem :label="$t('pages.permission_group.name')" prop="name">
         <ElInput v-model="formData.name" :placeholder="$t('common.placeholder.input')" clearable />
       </ElFormItem>
 
-      <ElFormItem :label="$t('pages.permission-group.module')" prop="module">
+      <ElFormItem :label="$t('pages.permission_group.module')" prop="module">
         <ElInput v-model="formData.module" :placeholder="$t('common.placeholder.input')" clearable />
       </ElFormItem>
 
-      <ElFormItem :label="$t('pages.permission-group.parentId')" prop="parentId">
+      <ElFormItem :label="$t('pages.permission_group.parentId')" prop="parentId">
         <ElTreeSelect
           v-model="formData.parentId"
           :data="permissionGroupTreeData"
@@ -111,8 +111,8 @@ const formRules = {
 // 标题
 const title = computed(() =>
   isCreate.value
-    ? $t("common.modal.create", { moduleName: $t("pages.permission-group.moduleName") })
-    : $t("common.modal.update", { moduleName: $t("pages.permission-group.moduleName") })
+    ? $t("common.modal.create", { moduleName: $t("pages.permission_group.moduleName") })
+    : $t("common.modal.update", { moduleName: $t("pages.permission_group.moduleName") })
 );
 
 // 权限分组树数据
