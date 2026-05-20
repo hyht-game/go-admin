@@ -51,7 +51,8 @@
     "numeral": "^2.0.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "swagger-ui-dist": "^5.32.1"
+    "swagger-ui-dist": "^5.32.1",
+    "@microsoft/fetch-event-source": "^2.0.1"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^3.3.0",

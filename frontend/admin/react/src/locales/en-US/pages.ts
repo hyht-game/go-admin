@@ -85,4 +85,13 @@ export default {
   'authentication.codeTip': 'Please enter verification code',
   'authentication.sendCode': 'Send Code',
   'authentication.sendText': 'Resend in {0}s',
+  // Error message translations
+  'network.error': 'Network connection error, please check your network settings and try again',
+  'error.timeout': 'Request timeout, please check your network connection and try again',
+  'error.badRequest': 'Bad request',
+  'error.unauthorized': 'Unauthorized, please login',
+  'error.forbidden': 'Forbidden, insufficient permissions',
+  'error.notFound': 'Resource not found',
+  'error.requestTimeout': 'Request timeout',
+  'error.internalServerError': 'Internal server error, please try again later',
 };

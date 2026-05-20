@@ -1,6 +1,6 @@
 import type {AxiosRequestConfig} from 'axios';
 
-import type {RequestClient} from '@/transport/rest';
+import type {RequestClient} from '../request-client';
 import type {RequestResponse} from '../types';
 
 class FileDownloader {

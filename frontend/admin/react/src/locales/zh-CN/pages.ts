@@ -80,4 +80,13 @@ export default {
   'authentication.codeTip': '请输入验证码',
   'authentication.sendCode': '发送验证码',
   'authentication.sendText': '{0}秒后重新发送',
+  // 错误信息翻译
+  'network.error': '网络连接错误，请检查网络设置后重试',
+  'error.timeout': '请求超时，请检查网络连接后重试',
+  'error.badRequest': '请求参数错误',
+  'error.unauthorized': '未授权，请登录',
+  'error.forbidden': '权限不足',
+  'error.notFound': '请求的资源不存在',
+  'error.requestTimeout': '请求超时',
+  'error.internalServerError': '服务器内部错误，请稍后重试',
 };

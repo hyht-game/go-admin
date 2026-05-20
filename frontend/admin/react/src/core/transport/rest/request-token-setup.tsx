@@ -4,8 +4,9 @@
  * 用于在应用初始化时设置 AccessModel 的 token获取方法
  */
 
-import {setGetTokenCallback} from '@/transport/rest';
 import React, {useEffect} from 'react';
+
+import {setGetTokenCallback} from './rest-client';
 
 /**
  * AppInitializer 内部组件

@@ -3,7 +3,7 @@ import type {AxiosProgressEvent} from 'axios';
 import {
   createFileTransferServiceClient,
 } from '@/api/admin/service/v1';
-import {requestApi, requestClient} from '@/transport/rest';
+import {requestApi, requestClient} from '@/core/transport/rest';
 
 export interface DownloadFileParams {
   bucketName?: string;

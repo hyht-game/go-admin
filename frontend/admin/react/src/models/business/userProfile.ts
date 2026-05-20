@@ -2,7 +2,7 @@ import {useState, useCallback} from 'react';
 import {
   createUserProfileServiceClient,
 } from '@/api/admin/service/v1';
-import {requestApi} from '@/transport/rest';
+import {requestApi} from '@/core/transport/rest';
 import type {IUser} from '../types';
 
 /**
@@ -24,10 +24,10 @@ export default function UserProfileModel() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const profile = await userProfileService.GetUser({});
       setUserProfile(profile as unknown as IUser);
-      
+
       return profile as unknown as IUser;
     } catch (err: any) {
       setError(err?.message || '获取用户信息失败');

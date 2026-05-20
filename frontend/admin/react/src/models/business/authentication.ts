@@ -4,7 +4,7 @@ import {
   createUserProfileServiceClient,
   authenticationservicev1_GrantType,
 } from '@/api/admin/service/v1';
-import {requestApi} from '@/transport/rest';
+import {requestApi} from '@/core/transport/rest';
 import {encryptByAES} from '@/utils/crypto';
 import type {IUser} from '../types';
 import {saveAccessToken, saveRefreshToken} from "@/models/auth/access";
@@ -81,7 +81,7 @@ export default function AuthenticationModel() {
             value: accessToken,
             expiresAt: Date.now() + (response.expires_in || 7200) * 1000, // 默认 2 小时
           };
-          
+
           saveAccessToken(accessTokenPayload);
           console.log('[Authentication] Access token saved:', accessTokenPayload);
 
@@ -101,7 +101,7 @@ export default function AuthenticationModel() {
 
           // 获取用户信息
           userInfo = await fetchUserInfo();
-          
+
           // 保存用户信息到 localStorage
           if (userInfo) {
             const userKey = 'gowind-admin-user-info';

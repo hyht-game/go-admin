@@ -1,9 +1,12 @@
-import {RequestClient} from "@/transport/rest/request-client";
-import {HttpResponse} from "@/transport/rest/types";
+import {message} from 'antd';
+
 import {
   authenticateResponseInterceptor,
   errorMessageResponseInterceptor
-} from "@/transport/rest/preset-interceptors";
+} from "./preset-interceptors";
+import {RequestClient} from "./request-client";
+import {HttpResponse} from "./types";
+import {defaultIdGenerator} from "./utils";
 
 // 用于存储获取 token 的函数
 let getTokenCallback: (() => string | null) | null = null;
@@ -38,6 +41,12 @@ export function createRequestClient(baseURL: string) {
       // if (getLocale) {
       //   config.headers['Accept-Language'] = getLocale();
       // }
+
+      const requestId = config.headers["X-Request-ID"] || defaultIdGenerator();
+      (config as any)._requestId = requestId;
+      config.headers["X-Request-ID"] = requestId;
+      config.headers["X-Requested-With"] = "XMLHttpRequest";
+
       return config as never;
     },
   });
@@ -80,9 +89,24 @@ export function createRequestClient(baseURL: string) {
     }),
   );
 
-  // 通用的错误处理，如果没有进入上面的错误处理逻辑，就会进入这里
+  // 错误消息映射
+  const errorMessages: Record<string, string> = {
+    'network.error': '网络连接错误,请检查网络设置后重试',
+    'error.timeout': '请求超时,请检查网络连接后重试',
+    'error.badRequest': '请求参数错误',
+    'error.unauthorized': '未授权,请登录',
+    'error.forbidden': '权限不足',
+    'error.notFound': '请求的资源不存在',
+    'error.requestTimeout': '请求超时',
+    'error.internalServerError': '服务器内部错误,请稍后重试',
+  };
+
+  // 通用的错误处理,如果没有进入上面的错误处理逻辑,就会进入这里
   client.addResponseInterceptor(
-    errorMessageResponseInterceptor(async (msg: string, error) => {
+    errorMessageResponseInterceptor((msg: string, error) => {
+      // 使用映射表获取错误消息,如果没有则使用原始消息
+      const errorMessage = errorMessages[msg] || msg;
+      message.error(errorMessage);
     }),
   );
 

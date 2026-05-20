@@ -1,7 +1,7 @@
 import {useIntl} from '@umijs/max';
 import {Button, message, notification} from 'antd';
 import defaultSettings from '../config/defaultSettings';
-import {setGetTokenCallback} from '@/transport/rest';
+import {setGetTokenCallback} from '@/core/transport/rest';
 import {loadAccessToken} from "@/models/auth/access";
 
 const {pwa} = defaultSettings;
