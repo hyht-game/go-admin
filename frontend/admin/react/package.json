@@ -40,9 +40,10 @@
     "@ant-design/pro-components": "^2.7.19",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@antv/l7-react": "^2.4.3",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "antd": "^5.25.4",
     "antd-style": "^3.7.0",
-    "axios": "^1.13.6",
+    "axios": "^1.16.1",
     "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
@@ -51,8 +52,7 @@
     "numeral": "^2.0.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "swagger-ui-dist": "^5.32.1",
-    "@microsoft/fetch-event-source": "^2.0.1"
+    "swagger-ui-dist": "^5.32.1"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^3.3.0",
