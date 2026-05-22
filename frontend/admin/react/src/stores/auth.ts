@@ -112,7 +112,6 @@ export const useAuthStore = create<AuthState>()(
                 } catch (err: any) {
                     const errorMsg = err?.message || '登录失败';
                     set({error: errorMsg});
-                    message.error(errorMsg);
                     throw err;
                 } finally {
                     set({loginLoading: false});
