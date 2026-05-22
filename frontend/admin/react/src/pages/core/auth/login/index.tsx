@@ -1,16 +1,17 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Form, Input, Button, Checkbox, message as antdMessage } from 'antd';
+import { Form, Input, Button, Checkbox, App } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '@/stores';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import '../auth-form.style.less';
 
 const Login: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
   const { login, loginLoading } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { message } = App.useApp();
 
   const handleSubmit = async (values: { username: string; password: string; remember?: boolean }) => {
     try {
@@ -20,7 +21,7 @@ const Login: React.FC = () => {
         grant_type: 'password',
       });
 
-      antdMessage.success(t('auth:loginSuccess'));
+      message.success(t('loginSuccess'));
 
       // 跳转到重定向页面或首页
       const redirect = searchParams.get('redirect') || '/';
@@ -36,9 +37,9 @@ const Login: React.FC = () => {
     <div className="auth-form-container">
       {/* 标题 */}
       <div className="auth-form-header">
-        <h2 className="auth-form-title">{t('auth:welcomeBack')}</h2>
+        <h2 className="auth-form-title">{t('welcomeBack')}</h2>
         <p className="auth-form-description">
-          {t('auth:loginDescription')}
+          {t('loginDescription')}
         </p>
       </div>
 
@@ -55,13 +56,13 @@ const Login: React.FC = () => {
           rules={[
             {
               required: true,
-              message: t('auth:usernameRequired'),
+              message: t('usernameRequired'),
             },
           ]}
         >
           <Input
             prefix={<UserOutlined />}
-            placeholder={t('auth:usernamePlaceholder')}
+            placeholder={t('usernamePlaceholder')}
             autoComplete="username"
           />
         </Form.Item>
@@ -72,13 +73,13 @@ const Login: React.FC = () => {
           rules={[
             {
               required: true,
-              message: t('auth:passwordRequired'),
+              message: t('passwordRequired'),
             },
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder={t('auth:passwordPlaceholder')}
+            placeholder={t('passwordPlaceholder')}
             autoComplete="current-password"
           />
         </Form.Item>
@@ -86,7 +87,7 @@ const Login: React.FC = () => {
         <Form.Item className="auth-remember-checkbox">
           <div className="flex items-center justify-between">
             <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>{t('auth:rememberAccount')}</Checkbox>
+              <Checkbox>{t('rememberAccount')}</Checkbox>
             </Form.Item>
           </div>
         </Form.Item>
@@ -99,7 +100,7 @@ const Login: React.FC = () => {
             block
             className="auth-submit-button"
           >
-            {loginLoading ? t('auth:loggingIn') : t('auth:loginButton')}
+            {loginLoading ? t('loggingIn') : t('loginButton')}
           </Button>
         </Form.Item>
       </Form>
@@ -107,10 +108,10 @@ const Login: React.FC = () => {
       {/* 底部链接 */}
       <div className="auth-footer-link">
         <span className="auth-footer-text">
-          {t('auth:noAccount')}{' '}
+          {t('noAccount')}{' '}
         </span>
         <a href="/auth/register" className="auth-footer-anchor">
-          {t('auth:createAccount')}
+          {t('createAccount')}
         </a>
       </div>
     </div>

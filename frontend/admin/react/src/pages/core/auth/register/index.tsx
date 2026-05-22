@@ -1,15 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Form, Input, Button, message as antdMessage } from 'antd';
+import { Form, Input, Button, App } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '@/stores';
 import { useNavigate } from 'react-router-dom';
 import '../auth-form.style.less';
 
 const Register: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
   const { register, registerLoading } = useAuthStore();
   const navigate = useNavigate();
+  const { message } = App.useApp();
 
   const handleSubmit = async (values: { 
     username: string; 
@@ -18,7 +19,7 @@ const Register: React.FC = () => {
   }) => {
     // 验证密码一致性
     if (values.password !== values.confirmPassword) {
-      antdMessage.error(t('auth:passwordMismatch'));
+      message.error(t('passwordMismatch'));
       return;
     }
 
@@ -28,7 +29,7 @@ const Register: React.FC = () => {
         password: values.password,
       });
 
-      antdMessage.success(t('auth:registerSuccess'));
+      message.success(t('registerSuccess'));
 
       // 注册成功后跳转到登录页
       setTimeout(() => {
@@ -43,9 +44,9 @@ const Register: React.FC = () => {
     <div className="auth-form-container">
       {/* 标题 */}
       <div className="auth-form-header">
-        <h2 className="auth-form-title">{t('auth:registerTitle')}</h2>
+        <h2 className="auth-form-title">{t('registerTitle')}</h2>
         <p className="auth-form-description">
-          {t('auth:registerDescription')}
+          {t('registerDescription')}
         </p>
       </div>
 
@@ -61,13 +62,13 @@ const Register: React.FC = () => {
           rules={[
             {
               required: true,
-              message: t('auth:usernameRequired'),
+              message: t('usernameRequired'),
             },
           ]}
         >
           <Input
             prefix={<UserOutlined />}
-            placeholder={t('auth:usernamePlaceholder')}
+            placeholder={t('usernamePlaceholder')}
             autoComplete="username"
           />
         </Form.Item>
@@ -78,17 +79,17 @@ const Register: React.FC = () => {
           rules={[
             {
               required: true,
-              message: t('auth:passwordRequired'),
+              message: t('passwordRequired'),
             },
             {
               min: 6,
-              message: t('auth:passwordMinLength'),
+              message: t('passwordMinLength'),
             },
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder={t('auth:passwordPlaceholder')}
+            placeholder={t('passwordPlaceholder')}
             autoComplete="new-password"
           />
         </Form.Item>
@@ -100,21 +101,21 @@ const Register: React.FC = () => {
           rules={[
             {
               required: true,
-              message: t('auth:confirmPasswordRequired'),
+              message: t('confirmPasswordRequired'),
             },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error(t('auth:passwordMismatch')));
+                return Promise.reject(new Error(t('passwordMismatch')));
               },
             }),
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder={t('auth:confirmPasswordPlaceholder')}
+            placeholder={t('confirmPasswordPlaceholder')}
             autoComplete="new-password"
           />
         </Form.Item>
@@ -127,7 +128,7 @@ const Register: React.FC = () => {
             block
             className="auth-submit-button"
           >
-            {registerLoading ? t('auth:registering') : t('auth:registerButton')}
+            {registerLoading ? t('registering') : t('registerButton')}
           </Button>
         </Form.Item>
       </Form>
@@ -135,10 +136,10 @@ const Register: React.FC = () => {
       {/* 底部链接 */}
       <div className="auth-footer-link">
         <span className="auth-footer-text">
-          {t('auth:hasAccount')}{' '}
+          {t('hasAccount')}{' '}
         </span>
         <a href="/auth/login" className="auth-footer-anchor">
-          {t('auth:backToLogin')}
+          {t('backToLogin')}
         </a>
       </div>
     </div>

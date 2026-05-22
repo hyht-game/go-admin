@@ -1,5 +1,3 @@
-import { message } from 'antd';
-
 import {
   authenticateResponseInterceptor,
   errorMessageResponseInterceptor,
@@ -10,12 +8,23 @@ import { defaultIdGenerator } from './utils';
 // 用于存储获取 token 的函数
 let getTokenCallback: (() => string | null) | null = null;
 
+// 用于存储错误消息处理函数
+let errorHandlerCallback: ((msg: string) => void) | null = null;
+
 /**
  * 设置获取 Token 的回调函数
  * 需要在应用初始化时调用，传入从 AccessModel 获取 token 的方法
  */
 export function setGetTokenCallback(callback: () => string | null) {
   getTokenCallback = callback;
+}
+
+/**
+ * 设置错误消息处理的回调函数
+ * 需要在应用初始化时调用，传入使用 App.useApp().message 的处理函数
+ */
+export function setErrorHandlerCallback(callback: (msg: string) => void) {
+  errorHandlerCallback = callback;
 }
 
 export function createRequestClient(baseURL: string) {
@@ -35,7 +44,7 @@ export function createRequestClient(baseURL: string) {
     fulfilled: (config) => {
       if (getTokenCallback) {
         const token = getTokenCallback();
-        console.log('token', token);
+        // console.log('token', token);
         config.headers.Authorization = formatToken(token);
       }
       // if (getLocale) {
@@ -92,11 +101,11 @@ export function createRequestClient(baseURL: string) {
   // ==========================
   client.addResponseInterceptor(
     errorMessageResponseInterceptor((msg: string) => {
-      // 去重提示
-      message.error({
-        content: msg,
-        key: msg,
-      });
+      // 如果设置了错误处理回调，则使用它
+      if (errorHandlerCallback) {
+        errorHandlerCallback(msg);
+      }
+      // 否则不显示任何消息（由调用方自行处理）
     }),
   );
 

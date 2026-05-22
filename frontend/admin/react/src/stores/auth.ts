@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { message } from 'antd';
 
 import { encryptPassword } from '@/utils';
 import {
@@ -115,8 +114,6 @@ export const useAuthStore = create<AuthState>()(
           } else if (userInfo?.homePath) {
             window.location.href = userInfo.homePath;
           }
-
-          message.success('登录成功');
         } catch (err: any) {
           const errorMsg = err?.message || '登录失败';
           set({ error: errorMsg });
@@ -133,8 +130,6 @@ export const useAuthStore = create<AuthState>()(
         try {
           // 调用注册 API（API 内部已处理密码加密）
           await register(params.username, params.password);
-
-          message.success('注册成功');
         } catch (err: any) {
           const errorMsg = err?.message || '注册失败';
           set({ error: errorMsg });
