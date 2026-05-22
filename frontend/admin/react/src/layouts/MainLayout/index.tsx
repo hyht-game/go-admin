@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { Outlet, useLocation, useMatches } from 'react-router-dom';
-import { PageContainer } from '@ant-design/pro-components';
 import { ConfigProvider } from 'antd';
 
 // 内部组件
@@ -8,6 +7,7 @@ import HeaderContent from './components/HeaderContent';
 import SiderMenu from './components/SiderMenu';
 import TabsBar from './components/TabsBar';
 import AppFooter from './components/Footer';
+import { PageContainer } from '@/layouts/components/PageContainer';
 
 // Hooks
 import { useMenuData } from './hooks/useMenuData';

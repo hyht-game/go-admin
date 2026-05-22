@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RouterProvider } from 'react-router-dom';
+
 import { createAccessibleRouter } from '@/core/router/factory';
 import { staticRoutes } from './config/static';
 import { useAuthStore, useUserStore } from '@/stores';
 
-import Forbidden from '@/pages/core/error/401.tsx';
 import BlankLayout from '@/layouts/BlankLayout';
+import UserLayout from '@/layouts/UserLayout';
+import RouteErrorFallback from '@/layouts/components/ErrorFallback/RouteErrorFallback.tsx';
+
 import Login from '@/pages/core/auth/login';
 import Register from '@/pages/core/auth/register';
-import { NotFound } from '@/pages/core/error';
-import RouteErrorFallback from '@/layouts/components/ErrorFallback/RouteErrorFallback.tsx';
+import { NotFound, Forbidden } from '@/pages/core/error';
 
 export const AppRouter = () => {
   const [router, setRouter] = useState<any>(null);
@@ -29,11 +31,11 @@ export const AppRouter = () => {
       try {
         // 未登录：只允许访问登录页、注册页和 404，并强制重定向到登录页
         if (!isAuthenticated) {
-          // 直接构建公开路由，避免从 staticRoutes 中提取导致引用问题
+          // 直接使用 UserLayout，支持左右分栏布局
           const publicRoutes = [
             {
               path: '/auth',
-              element: <BlankLayout />,
+              element: <UserLayout requireAuth={false} />,
               errorElement: <RouteErrorFallback />,
               children: [
                 {

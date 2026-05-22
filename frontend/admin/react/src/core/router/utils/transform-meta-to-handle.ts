@@ -1,5 +1,4 @@
 import type { AppRouteObject, RouteMeta } from '../types';
-import type { RouteHandle } from '@/types/global';
 
 /**
  * 将 meta 转换为 React Router 的 handle
@@ -12,7 +11,8 @@ export function transformMetaToHandle(meta?: RouteMeta): RouteHandle | undefined
     title: meta.title,
     icon: typeof meta.icon === 'string' ? meta.icon : undefined,
     permission: meta.permission,
-    ...meta, // 保留其他自定义字段
+    // 展开其他自定义字段（排除已明确指定的字段）
+    ...((({ title, icon, permission, ...rest }) => rest)(meta)),
   };
 }
 

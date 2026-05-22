@@ -1,26 +1,18 @@
-import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Form, Input, Button, Checkbox, message as antdMessage } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '@/stores';
-import { usePreferences } from '@/core/preferences';
-
-import './login.style.less';
-import AuthLayout from '@/components/bussiness/AuthLayout';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import '../auth-form.style.less';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
   const { login, loginLoading } = useAuthStore();
-  const { theme } = usePreferences();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  // 根据主题模式判断当前是否为亮色模式
-  const isLightMode = React.useMemo(() => {
-    if (theme.mode === 'auto') {
-      return window.matchMedia('(prefers-color-scheme: light)').matches;
-    }
-    return theme.mode === 'light';
-  }, [theme.mode]);
-
-  const handleSubmit = async (values: { username: string; password: string }) => {
+  const handleSubmit = async (values: { username: string; password: string; remember?: boolean }) => {
     try {
       await login({
         username: values.username,
@@ -28,112 +20,100 @@ const Login: React.FC = () => {
         grant_type: 'password',
       });
 
-      // 等待一小段时间确保 localStorage 写入完成，然后跳转
+      antdMessage.success(t('auth:loginSuccess'));
+
+      // 跳转到重定向页面或首页
+      const redirect = searchParams.get('redirect') || '/';
       setTimeout(() => {
-        const urlParams = new URL(window.location.href).searchParams;
-        window.location.href = urlParams.get('redirect') || '/';
+        navigate(redirect);
       }, 300);
     } catch (error: any) {
-      // 错误已在 store 中处理，这里不需要再次弹出 message
+      // 错误已在 store 中处理
     }
   };
 
   return (
-    <AuthLayout
-      title={t('auth:welcomeBack')}
-      description={t('auth:loginDescription')}
-      pageKey="login"
-      footerLink={{
-        text: t('auth:noAccount'),
-        linkText: t('auth:createAccount'),
-        href: '/auth/register',
-      }}
-    >
-      <LoginForm
-        loading={loginLoading}
-        logo={false}
-        title={false}
-        subTitle={false}
-        initialValues={{
-          autoLogin: true,
-        }}
+    <div className="auth-form-container">
+      {/* 标题 */}
+      <div className="auth-form-header">
+        <h2 className="auth-form-title">{t('auth:welcomeBack')}</h2>
+        <p className="auth-form-description">
+          {t('auth:loginDescription')}
+        </p>
+      </div>
+
+      {/* 登录表单 */}
+      <Form
+        name="login"
         onFinish={handleSubmit}
-        submitter={false}
+        size="large"
+        initialValues={{ remember: true }}
       >
-        <ProFormText
+        <Form.Item
           name="username"
-          fieldProps={{
-            size: 'large',
-            placeholder: t('auth:usernamePlaceholder'),
-            autoComplete: 'username',
-          }}
+          className="auth-form-item"
           rules={[
             {
               required: true,
               message: t('auth:usernameRequired'),
             },
           ]}
-        />
-        <ProFormText.Password
+        >
+          <Input
+            prefix={<UserOutlined />}
+            placeholder={t('auth:usernamePlaceholder')}
+            autoComplete="username"
+          />
+        </Form.Item>
+
+        <Form.Item
           name="password"
-          fieldProps={{
-            size: 'large',
-            placeholder: t('auth:passwordPlaceholder'),
-            autoComplete: 'current-password',
-          }}
+          className="auth-form-item"
           rules={[
             {
               required: true,
               message: t('auth:passwordRequired'),
             },
           ]}
-        />
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 24,
-            marginTop: 8,
-          }}
         >
-          <ProFormCheckbox
-            name="autoLogin"
-            fieldProps={{
-              style: {
-                color: isLightMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.75)',
-                fontSize: 13,
-              },
-            }}
-          >
-            {t('auth:rememberAccount')}
-          </ProFormCheckbox>
-        </div>
-        <div style={{ marginTop: 36 }}>
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              height: 40,
-              background: '#1677ff',
-              border: 'none',
-              borderRadius: 6,
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 500,
-              cursor: loginLoading ? 'not-allowed' : 'pointer',
-              opacity: loginLoading ? 0.7 : 1,
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 0 rgba(5, 145, 255, 0.1)',
-              letterSpacing: '0.5px',
-            }}
-            disabled={loginLoading}
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder={t('auth:passwordPlaceholder')}
+            autoComplete="current-password"
+          />
+        </Form.Item>
+
+        <Form.Item className="auth-remember-checkbox">
+          <div className="flex items-center justify-between">
+            <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Checkbox>{t('auth:rememberAccount')}</Checkbox>
+            </Form.Item>
+          </div>
+        </Form.Item>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loginLoading}
+            block
+            className="auth-submit-button"
           >
             {loginLoading ? t('auth:loggingIn') : t('auth:loginButton')}
-          </button>
-        </div>
-      </LoginForm>
-    </AuthLayout>
+          </Button>
+        </Form.Item>
+      </Form>
+
+      {/* 底部链接 */}
+      <div className="auth-footer-link">
+        <span className="auth-footer-text">
+          {t('auth:noAccount')}{' '}
+        </span>
+        <a href="/auth/register" className="auth-footer-anchor">
+          {t('auth:createAccount')}
+        </a>
+      </div>
+    </div>
   );
 };
 

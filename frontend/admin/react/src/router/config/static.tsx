@@ -3,6 +3,7 @@ import React from 'react';
 import { type AppRouteObject, AuthGuard } from '@/core/router';
 
 import MainLayout from '@/layouts/MainLayout';
+import UserLayout from '@/layouts/UserLayout';
 import BlankLayout from '@/layouts/BlankLayout';
 import RouteErrorFallback from '@/layouts/components/ErrorFallback/RouteErrorFallback.tsx';
 import PageSkeleton from '@/layouts/components/LoadingSkeleton/presets/PageSkeleton';
@@ -36,7 +37,7 @@ export const staticRoutes: AppRouteObject[] = [
   {
     name: 'auth',
     path: '/auth',
-    element: <BlankLayout />,
+    element: <UserLayout requireAuth={false} />,
     errorElement: <RouteErrorFallback />,
     meta: { title: '认证', ignoreAccess: true, hideInMenu: true, hideInTab: true },
     children: [
@@ -79,7 +80,7 @@ export const staticRoutes: AppRouteObject[] = [
           title: '仪表盘',
           permission: 'dashboard:view',
           icon: 'DashboardOutlined',
-          order: 1
+          order: 1,
         },
       },
       // 示例：系统管理模块（可扩展）
@@ -90,11 +91,9 @@ export const staticRoutes: AppRouteObject[] = [
           title: '系统管理',
           icon: 'SettingOutlined',
           order: 10,
-          permission: 'system:view'
+          permission: 'system:view',
         },
-        children: [
-
-        ],
+        children: [],
       },
     ],
   },

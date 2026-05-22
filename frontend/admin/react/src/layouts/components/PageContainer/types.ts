@@ -12,7 +12,7 @@ export interface PageContainerProps extends Omit<ProPageContainerProps, 'title' 
   breadcrumb?: ProPageContainerProps['breadcrumb'] | false;
 
   /** 路由对象（用于自动计算标题/面包屑/权限） */
-  route?: AppRoute | null;
+  route?: Partial<AppRoute> | null;
 
   // 🔹 权限控制
   /** 所需权限码（满足任一即可） */
