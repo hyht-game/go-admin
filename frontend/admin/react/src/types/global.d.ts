@@ -1,6 +1,17 @@
 declare global {
     type ClassType = Array<object | string> | object | string;
 
+    /**
+     * React Router 路由 handle 元数据类型
+     * 用于 useMatches() 获取路由附加信息
+     */
+    interface RouteHandle {
+        title?: string;
+        icon?: string;
+        permission?: string;
+        [key: string]: any;
+    }
+
     interface BasicOption {
         label: string;
         value: string;

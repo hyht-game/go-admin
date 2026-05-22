@@ -119,12 +119,11 @@ export interface AppRoute extends Omit<RouteObject, 'meta' | 'children' | 'eleme
  * 用于替代原生的 RouteObject，携带业务元数据
  */
 export interface AppRouteObject extends Omit<RouteObject, 'children'> {
-    // 必填：路由唯一标识（权限匹配关键）
-    name: string;
+    // 路由唯一标识（权限匹配关键）
+    // 注：index 路由（index: true）不需要 name 和 path，所以改为可选
+    name?: string;
 
-    path: string;
-
-    label: string;
+    path?: string;
 
     // 元数据（核心扩展）
     meta?: RouteMeta;

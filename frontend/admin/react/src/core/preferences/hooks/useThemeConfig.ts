@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useMemo, useState, useEffect} from 'react';
 import {theme as antdTheme} from 'antd';
 
 import {usePreferencesStore} from '../store';
@@ -6,9 +6,29 @@ import {usePreferencesStore} from '../store';
 export const useThemeConfig = () => {
     const {theme, app} = usePreferencesStore((state) => state.preferences);
 
+    // 响应式跟踪系统暗色模式（仅 auto 模式需要）
+    const [systemIsDark, setSystemIsDark] = useState(
+        () => window.matchMedia('(prefers-color-scheme: dark)').matches,
+    );
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = (e: MediaQueryListEvent) => setSystemIsDark(e.matches);
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
+    }, []);
+
+    // 计算有效主题：auto 模式下跟随系统偏好
+    const effectiveIsDark = useMemo(() => {
+        if (theme.mode === 'dark') return true;
+        if (theme.mode === 'light') return false;
+        if (theme.mode === 'auto') return systemIsDark;
+        return false;
+    }, [theme.mode, systemIsDark]);
+
     return useMemo(() => {
         const algorithms = [];
-        if (theme.mode === 'dark') algorithms.push(antdTheme.darkAlgorithm);
+        if (effectiveIsDark) algorithms.push(antdTheme.darkAlgorithm);
         if (app.compact) algorithms.push(antdTheme.compactAlgorithm);
 
         return {
@@ -22,5 +42,5 @@ export const useThemeConfig = () => {
             },
             cssVar: true,
         };
-    }, [theme, app]);
+    }, [effectiveIsDark, theme, app]);
 };

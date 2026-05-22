@@ -2,7 +2,26 @@
   "button": {
     "back": "Back"
   },
+  "header": {
+    "profile": "Profile",
+    "settings": "Preferences",
+    "logout": "Logout",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "helpDoc": "Help Docs",
+    "notification": "Notifications",
+    "guest": "Guest"
+  },
   "refresh": "Refresh",
+  "home": "Home",
+  "iframe": {
+    "noUrlTitle": "No Embedded Page URL Configured",
+    "noUrlDesc": "Please provide an iframe URL in the route config (via state.url or query parameter url)",
+    "loading": "Loading embedded page...",
+    "loadErrorTitle": "Load Failed",
+    "loadErrorDesc": "Failed to load iframe content, please check if the link is valid",
+    "embeddedPage": "Embedded Page"
+  },
   "fallback": {
     "unauthorized": "Unauthorized",
     "unauthorizedDesc": "You don't have permission to access this page. Please log in and try again.",
@@ -14,7 +33,33 @@
     "internalErrorDesc": "An internal server error occurred. Please try again later.",
     "comingSoon": "Coming Soon",
     "offlineError": "Offline",
-    "offlineErrorDesc": "Network connection has been lost. Please check your network settings."
+    "offlineErrorDesc": "Network connection has been lost. Please check your network settings.",
+    "errorFallback": {
+      "title": "Page Rendering Error",
+      "subTitle": "An unexpected error occurred during component loading. It has been intercepted to prevent application crash. You can try to retry or go back to home page.",
+      "retry": "Retry",
+      "backToHome": "Back to Home",
+      "refreshPage": "Refresh Page",
+      "errorDetails": "Error Details (Development Environment Only)",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copySuccess": "Error info copied to clipboard",
+      "copyFailed": "Copy failed, please select and copy manually",
+      "errorMessage": "Error Message:",
+      "callStack": "Call Stack:",
+      "componentStack": "Component Stack:"
+    }
+  },
+  "skeleton": {
+    "loading": "Loading"
+  },
+  "pageContainer": {
+    "defaultTitle": "Page",
+    "forbiddenTitle": "Access Denied",
+    "forbiddenDesc": "You do not have permission to view this page. Please contact your administrator to request access."
+  },
+  "app": {
+    "defaultName": "Admin"
   },
   "requestError": {
     "networkError": "Network connection error, please check your network settings and try again",

@@ -20,6 +20,13 @@ interface ImportMeta {
     readonly env: ImportMetaEnv
 }
 
+// React Router handle 类型增强
+declare module 'react-router' {
+    interface RouteMatch {
+        handle: RouteHandle;
+    }
+}
+
 // 兼容 process.env
 declare namespace NodeJS {
     interface ProcessEnv extends ImportMetaEnv {
