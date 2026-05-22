@@ -10,7 +10,9 @@
     "exitFullscreen": "Exit Fullscreen",
     "helpDoc": "Help Docs",
     "notification": "Notifications",
-    "guest": "Guest"
+    "guest": "Guest",
+    "switchToLight": "Switch to Light Mode",
+    "switchToDark": "Switch to Dark Mode"
   },
   "refresh": "Refresh",
   "home": "Home",

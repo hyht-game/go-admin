@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { Outlet, useNavigate, useLocation, useMatches } from 'react-router-dom';
-import { ProLayout } from '@ant-design/pro-components';
+import { ProLayout, PageContainer } from '@ant-design/pro-components';
 import { ConfigProvider } from 'antd';
 
 // 内部组件
@@ -22,20 +22,18 @@ import { staticRoutes } from '@/router/config/static';
 import type { AppRouteObject } from '@/core/router/types';
 import type { MenuDataItem } from '@ant-design/pro-components';
 
-/** 路由 handle 元数据类型 */
 interface LayoutRouteHandle {
   title?: string;
   icon?: string;
 }
 
-/** 带类型的路由匹配 */
 interface LayoutRouteMatch {
   pathname: string;
   handle: LayoutRouteHandle;
 }
 
 interface MainLayoutProps {
-  routes?: AppRouteObject[]; // 可选：动态路由（后端模式）
+  routes?: AppRouteObject[];
 }
 
 export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
@@ -45,19 +43,46 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   const matches = rawMatches as LayoutRouteMatch[];
 
   // Stores
-  const { userInfo, userRoles } = useUserStore();
-  const { logout, refreshToken } = useAuthStore();
+  const { userInfo } = useUserStore();
+  const { logout } = useAuthStore();
 
   // Preferences
   const preferences = usePreferencesStore((state) => state.preferences);
-  const { setPreferences } = usePreferencesStore();
+  const setPreferences = usePreferencesStore((state) => state.setPreferences);
 
-  // Theme & i18n
+  // Theme
   const themeConfig = useThemeConfig();
   const { t } = useI18n('common');
+  const [isDark, setIsDark] = useState(() => {
+    const { theme } = preferences;
+    if (theme.mode === 'dark') return true;
+    if (theme.mode === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
-  // 布局状态（本地状态，不与 preferences 冲突）
-  const { collapsed, setCollapsed, isMobile, setIsMobile, selectedKeys, openKeys, setOpenKeys } =
+  // 监听系统主题变化
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => {
+      const { theme } = preferences;
+      if (theme.mode === 'auto') {
+        setIsDark(mediaQuery.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [preferences.theme.mode]);
+
+  // 监听偏好设置变化
+  useEffect(() => {
+    const { theme } = preferences;
+    if (theme.mode === 'dark') setIsDark(true);
+    else if (theme.mode === 'light') setIsDark(false);
+    else setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, [preferences.theme.mode]);
+
+  // 布局状态
+  const { collapsed, setCollapsed, isMobile, setIsMobile, openKeys, setOpenKeys } =
     useLayoutState();
 
   // 菜单数据
@@ -71,7 +96,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   // 全屏状态
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // 监听窗口大小（移动端适配）
+  // 窗口大小监听
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
@@ -84,23 +109,22 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, [collapsed, setCollapsed, setIsMobile]);
 
-  // 菜单项点击处理
+  // 菜单项点击
   const handleMenuItemClick = useCallback(
-    (menuInfo: any) => {
-      const { key, path } = menuInfo.item.props;
-      if (path) {
-        // 外链处理
-        if (path.startsWith('http')) {
-          window.open(path, '_blank');
+    (item: MenuDataItem) => {
+      if (item.path) {
+        if (item.path.startsWith('http')) {
+          window.open(item.path, '_blank');
         } else {
-          navigate(path);
+          navigate(item.path);
         }
+        if (isMobile) setCollapsed(true);
       }
     },
-    [navigate],
+    [navigate, isMobile, setCollapsed],
   );
 
-  // 面包屑项渲染
+  // 面包屑
   const breadcrumbRender = useCallback(
     (routers: any[] = []) => {
       return [
@@ -115,11 +139,19 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         })),
       ];
     },
-    [navigate],
+    [navigate, t],
   );
 
-  // 右侧内容渲染（用户头像/通知/设置等）
+  // 顶栏右侧
   const rightContentRender = useCallback(() => {
+    const toggleTheme = () => {
+      setPreferences({
+        theme: {
+          mode: isDark ? 'light' : 'dark',
+        },
+      });
+    };
+
     return (
       <HeaderContent
         userInfo={userInfo}
@@ -134,26 +166,13 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
           }
         }}
         onLogout={logout}
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
       />
     );
-  }, [userInfo, isFullscreen, logout]);
+  }, [userInfo, isFullscreen, logout, isDark, setPreferences]);
 
-  // 菜单头渲染（Logo + 标题）
-  const menuHeaderRender = useCallback(
-    (logoDom: React.ReactNode, titleDom: React.ReactNode) => {
-      return (
-        <div className="flex items-center gap-2 cursor-pointer h-16" onClick={() => navigate('/')}>
-          {logoDom}
-          {preferences.app.dynamicTitle && (
-            <span className="font-bold text-lg truncate max-w-[120px]">{preferences.app.name}</span>
-          )}
-        </div>
-      );
-    },
-    [navigate, preferences.app],
-  );
-
-  // 处理侧边栏折叠
+  // 侧边栏折叠
   const handleCollapse = useCallback(
     (collapsed: boolean) => {
       setCollapsed(collapsed);
@@ -161,100 +180,157 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     [setCollapsed],
   );
 
-  // 处理菜单展开
+  // 菜单展开
   const handleOpenChange = useCallback(
-    (keys: string[]) => {
-      setOpenKeys(keys);
+    (keys: string[] | false) => {
+      if (keys !== false) {
+        setOpenKeys(keys);
+      }
     },
     [setOpenKeys],
   );
 
   return (
-    <ConfigProvider {...themeConfig}>
-      {/* ✅ 修复5：给 ProLayout 最外层设置高度，确保布局撑开全屏 */}
-      <div className="h-screen w-screen overflow-hidden">
-        <ProLayout
-          // 🔹 基础配置
-          title={preferences.app.name}
-          logo={preferences.logo.enable ? preferences.logo.source : undefined}
-          layout={preferences.app.layout}
-          contentWidth={preferences.app.contentCompact === 'wide' ? 'Fluid' : 'Fixed'}
-          fixedHeader={preferences.header.enable && preferences.header.mode === 'fixed'}
-          fixSiderbar={preferences.sidebar.enable}
-          // ✅ 修复2：传入 location，让 ProLayout 自动匹配路由
-          location={{ pathname: location.pathname }}
-          // 🔹 侧边栏
-          collapsed={collapsed}
-          collapsedButtonRender={isMobile ? false : undefined}
-          onCollapse={handleCollapse}
-          siderWidth={preferences.sidebar.width}
-          collapsedWidth={preferences.sidebar.collapsedShowTitle ? 80 : 48}
-          // ✅ 修复2：简化菜单配置，移除冲突的 menuItemRender
-          menu={{
-            autoClose: isMobile,
-            ignoreOpenKeys: false, // 改为 false，让 ProLayout 自动管理展开状态
+    <ConfigProvider theme={themeConfig}>
+      <div
+        style={{
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          background: isDark ? '#000000' : '#f5f5f5',
+        }}
+      >
+        {/* 顶栏 */}
+        <div
+          style={{
+            height: 56,
+            backgroundColor: isDark ? '#141414' : '#ffffff',
+            borderBottom: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 24px',
+            flexShrink: 0,
+            zIndex: 100,
           }}
-          menuData={menuData as MenuDataItem[]}
-          openKeys={openKeys}
-          onOpenChange={handleOpenChange}
-          // 🔹 菜单头渲染
-          menuHeaderRender={menuHeaderRender}
-          onMenuHeaderClick={() => navigate('/')}
-          // 🔹 面包屑
-          breadcrumbRender={breadcrumbRender}
-          breadcrumbProps={{
-            separator: '>',
-            itemRender: (route, params, routes, paths) => {
-              const last = routes.indexOf(route) === routes.length - 1;
-              return last ? (
-                <span className="text-gray-500">{route.breadcrumbName}</span>
-              ) : (
-                <span
-                  className="text-blue-600 cursor-pointer hover:underline"
-                  onClick={() => route.path && navigate(route.path)}
-                >
-                  {route.breadcrumbName}
-                </span>
-              );
-            },
-          }}
-          // 🔹 顶栏
-          headerTheme={preferences.theme.semiDarkHeader ? 'light' : undefined}
-          headerContentRender={() => preferences.header.enable && rightContentRender()}
-          // 🔹 页脚
-          footerRender={() => (preferences.footer.enable ? <AppFooter /> : false)}
-          // ✅ 修复1：移除 pageContainerRender，避免与 children 冲突
-          // 🔹 自定义侧边栏渲染
-          siderMenuRender={(menuDom, actions) => (
-            <SiderMenu
-              menuDom={menuDom}
-              actions={actions}
-              collapsed={collapsed}
-              isMobile={isMobile}
-            />
-          )}
-          // ✅ 修复1&5：简化 children，移除 TabBar，确保内容区正确渲染
-          children={
-            <div className="h-full overflow-auto">
-              <Outlet />
+        >
+          {/* 左侧：Logo 和标题 */}
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => navigate('/')}
+            style={{ height: '100%' }}
+          >
+            {preferences.logo.enable && (
+              <img src={preferences.logo.source} alt="logo" style={{ height: 32, width: 32 }} />
+            )}
+            {preferences.app.dynamicTitle && (
+              <span
+                className="font-bold text-lg truncate"
+                style={{
+                  color: isDark ? '#ffffff' : '#262626',
+                  maxWidth: 140,
+                }}
+              >
+                {preferences.app.name}
+              </span>
+            )}
+          </div>
+
+          {/* 右侧：操作按钮 */}
+          {rightContentRender()}
+        </div>
+
+        {/* 主体区域 */}
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          <ProLayout
+            // 核心配置
+            layout="side"
+            contentWidth="Fluid"
+            fixedHeader={false}
+            fixSiderbar={true}
+            location={{ pathname: location.pathname }}
+            // 侧边栏配置
+            collapsed={collapsed}
+            onCollapse={handleCollapse}
+            siderWidth={256}
+            menu={{
+              autoClose: isMobile ? undefined : false,
+              type: 'group',
+            }}
+            menuData={menuData as MenuDataItem[]}
+            openKeys={openKeys}
+            onOpenChange={handleOpenChange}
+            menuItemRender={(item, dom) => (
+              <div onClick={() => handleMenuItemClick(item)} className="w-full h-full">
+                {dom}
+              </div>
+            )}
+            // 面包屑
+            breadcrumbRender={breadcrumbRender}
+            breadcrumbProps={{
+              separator: '/',
+              itemRender: (route, _params, routes) => {
+                const last = routes.indexOf(route) === routes.length - 1;
+                return last ? (
+                  <span>{route.title}</span>
+                ) : (
+                  <span
+                    className="cursor-pointer hover:text-blue-400 transition-colors"
+                    onClick={() => route.path && navigate(route.path)}
+                  >
+                    {route.title}
+                  </span>
+                );
+              },
+            }}
+            // 页脚
+            footerRender={() => (preferences.footer.enable ? <AppFooter /> : false)}
+            // 侧边栏渲染
+            menuContentRender={(_, defaultDom) => (
+              <SiderMenu menuDom={defaultDom} collapsed={collapsed} isMobile={isMobile} />
+            )}
+            // 内容区
+            token={{
+              sider: {
+                colorMenuBackground: isDark ? '#141414' : '#ffffff',
+                colorTextMenu: isDark ? '#a6a6a6' : '#595959',
+                colorTextMenuSelected: '#1677ff',
+                colorBgMenuItemSelected: isDark ? '#1f1f1f' : '#e6f7ff',
+                colorBgMenuItemHover: isDark ? '#1f1f1f' : '#f5f5f5',
+                colorTextMenuActive: '#1677ff',
+                colorTextMenuTitle: isDark ? '#ffffff' : '#262626',
+                colorBgMenuItemCollapsedElevated: isDark ? '#1f1f1f' : '#f5f5f5',
+              },
+              colorPrimary: '#1677ff',
+            }}
+            breakpoint={false}
+            style={{
+              flex: 1,
+              background: 'transparent',
+            }}
+          >
+            <div
+              style={{
+                minHeight: 'calc(100vh - 56px)',
+                backgroundColor: isDark ? '#000000' : '#f5f5f5',
+              }}
+            >
+              <PageContainer
+                ghost={true}
+                header={{
+                  title: matches.at(-1)?.handle?.title || '',
+                  breadcrumb: {},
+                }}
+                style={{
+                  padding: '24px',
+                  background: 'transparent',
+                }}
+              >
+                <Outlet />
+              </PageContainer>
             </div>
-          }
-          // ✅ 修复4：使用标准主题色，移除半透明值
-          token={{
-            header: {
-              colorBgHeader: preferences.theme.semiDarkHeader
-                ? '#ffffff'
-                : undefined,
-            },
-            sider: {
-              colorMenuBackground: preferences.theme.semiDarkSidebar
-                ? '#001529'
-                : undefined,
-            },
-          }}
-          //  移动端适配
-          breakpoint={false}
-        />
+          </ProLayout>
+        </div>
       </div>
     </ConfigProvider>
   );

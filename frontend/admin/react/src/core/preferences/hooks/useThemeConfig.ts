@@ -1,9 +1,9 @@
 import {useMemo, useState, useEffect} from 'react';
-import {theme as antdTheme} from 'antd';
+import {theme as antdTheme, type ThemeConfig, type MappingAlgorithm} from 'antd';
 
 import {usePreferencesStore} from '../store';
 
-export const useThemeConfig = () => {
+export const useThemeConfig = (): ThemeConfig => {
     const {theme, app} = usePreferencesStore((state) => state.preferences);
 
     // 响应式跟踪系统暗色模式（仅 auto 模式需要）
@@ -26,8 +26,8 @@ export const useThemeConfig = () => {
         return false;
     }, [theme.mode, systemIsDark]);
 
-    return useMemo(() => {
-        const algorithms = [];
+    return useMemo((): ThemeConfig => {
+        const algorithms: MappingAlgorithm[] = [];
         if (effectiveIsDark) algorithms.push(antdTheme.darkAlgorithm);
         if (app.compact) algorithms.push(antdTheme.compactAlgorithm);
 
@@ -40,7 +40,6 @@ export const useThemeConfig = () => {
                 colorError: theme.colorDestructive,
                 borderRadius: Number.parseInt(theme.radius) || 6,
             },
-            cssVar: true,
         };
     }, [effectiveIsDark, theme, app]);
 };
