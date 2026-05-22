@@ -11,7 +11,7 @@ interface AuthGuardProps {
 export const AuthGuard = ({
                               isAuthenticated: isAuthenticatedProp,
                               children,
-                              loginPath = '/login'
+                              loginPath = '/auth/login'
                           }: AuthGuardProps) => {
     const location = useLocation();
     // 若未显式传入 isAuthenticated，则从 store 读取

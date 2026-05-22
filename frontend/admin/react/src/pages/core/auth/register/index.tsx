@@ -35,7 +35,7 @@ const Register: React.FC = () => {
 
       // 注册成功后跳转到登录页
       setTimeout(() => {
-        window.location.href = '/login';
+        window.location.href = '/auth/login';
       }, 300);
     } catch (error: any) {
       // 错误已在 store 中处理
@@ -50,7 +50,7 @@ const Register: React.FC = () => {
       footerLink={{
         text: t('auth:hasAccount'),
         linkText: t('auth:backToLogin'),
-        href: '/login',
+        href: '/auth/login',
       }}
     >
       <LoginForm

@@ -98,7 +98,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // 刷新 key（用于强制重渲染内容区）
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [, setRefreshKey] = useState(0);
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
@@ -157,14 +157,13 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   }, [userInfo, collapsed, isFullscreen, logout, isDark, setPreferences, handleRefresh]);
 
   // 主题切换
-  const handleToggleTheme = useCallback(() => {
+  useCallback(() => {
     setPreferences({
       theme: {
         mode: isDark ? 'light' : 'dark',
       },
     });
   }, [isDark, setPreferences]);
-
   return (
     <ConfigProvider theme={themeConfig}>
       <div
@@ -239,6 +238,9 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
           {preferences.footer.enable && <AppFooter />}
         </div>
       </div>
+
+      {/* 设置面板 */}
+      <PreferencesPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </ConfigProvider>
   );
 };

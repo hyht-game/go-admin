@@ -161,7 +161,7 @@ export const useAuthStore = create<AuthState>()(
 
           // 跳转
           if (redirect && window.location.pathname !== '/login') {
-            window.location.href = '/user/login';
+            window.location.href = '/auth/login';
           }
         }
       },
@@ -204,7 +204,7 @@ export const useAuthStore = create<AuthState>()(
         console.warn('Token invalid, please re-login');
         set({ error: '认证已过期，请重新登录' });
         // 可选：自动跳转登录页
-        // window.location.href = '/user/login';
+        // window.location.href = '/auth/login';
       },
 
       // 设置用户信息

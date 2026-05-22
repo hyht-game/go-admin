@@ -1,4 +1,1 @@
-export { default as AccessControl } from "./access-control.vue";
-
-export * from "./directive";
-export * from "./use-access";
+// Access control module - to be implemented for React

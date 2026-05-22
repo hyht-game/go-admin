@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { App as AntdApp } from 'antd';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 
@@ -30,9 +31,11 @@ bootstrap().then(() => {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <RequestTokenSetup>
-            <App />
-          </RequestTokenSetup>
+          <AntdApp>
+            <RequestTokenSetup>
+              <App />
+            </RequestTokenSetup>
+          </AntdApp>
         </ThemeProvider>
 
         <ReactQueryDevtools initialIsOpen={false} />

@@ -46,7 +46,7 @@ const Login: React.FC = () => {
       footerLink={{
         text: t('auth:noAccount'),
         linkText: t('auth:createAccount'),
-        href: '/register',
+        href: '/auth/register',
       }}
     >
       <LoginForm

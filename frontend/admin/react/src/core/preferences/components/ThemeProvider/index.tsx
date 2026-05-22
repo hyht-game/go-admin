@@ -59,7 +59,7 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
                 colorError: themePrefs.colorDestructive,
                 borderRadius: Number.parseInt(themePrefs.radius) || 6,
             },
-            cssVar: {key: 'theme'}, // AntD 推荐：启用 CSS 变量，提升动态主题渲染性能
+            // antd v6 默认使用 CSS 变量模式，无需显式配置 cssVar
         };
     }, [effectiveMode, appPrefs.compact, themePrefs]);
 

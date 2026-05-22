@@ -18,7 +18,8 @@
     "refresh": "Refresh Page",
     "switchLanguage": "Switch Language",
     "search": "Search",
-    "searchPlaceholder": "Search menu or features..."
+    "searchPlaceholder": "Search menu or features...",
+    "searchShortcut": "Ctrl K"
   },
   "refresh": "Refresh",
   "home": "Home",

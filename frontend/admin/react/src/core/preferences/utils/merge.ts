@@ -1,4 +1,5 @@
 import type {DeepPartial} from "../types";
+import {isValidElement} from "react";
 
 /**
  * 深度合并对象
@@ -10,6 +11,17 @@ export function mergeDeep<T extends object>(target: T, source: DeepPartial<T>): 
         if (Object.prototype.hasOwnProperty.call(source, key)) {
             const sourceValue = source[key as keyof DeepPartial<T>];
             const targetValue = target[key as keyof T];
+
+            // 跳过 React 元素、DOM 节点、函数等非纯对象
+            if (
+                isValidElement(sourceValue) || 
+                sourceValue instanceof Element || 
+                typeof sourceValue === 'function' ||
+                sourceValue === null
+            ) {
+                console.warn(`[mergeDeep] 跳过非纯对象字段: ${String(key)}, type:`, typeof sourceValue);
+                continue;
+            }
 
             // 如果两个值都是普通对象，则递归合并
             if (

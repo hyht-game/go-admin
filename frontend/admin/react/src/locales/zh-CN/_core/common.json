@@ -19,7 +19,8 @@
     "refresh": "刷新页面",
     "switchLanguage": "切换语言",
     "search": "搜索",
-    "searchPlaceholder": "搜索菜单或功能..."
+    "searchPlaceholder": "搜索菜单或功能...",
+    "searchShortcut": "Ctrl K"
   },
   "refresh": "刷新",
   "iframe": {

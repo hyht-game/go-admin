@@ -132,6 +132,7 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTimes: typeof import('../src/hooks/useTime').useTimes
+  const useTitle: typeof import('../src/hooks/useTitle').useTitle
   const useToken: typeof import('../src/hooks/useToken').useToken
   const useTransition: typeof import('react').useTransition
   const useTranslation: typeof import('react-i18next').useTranslation

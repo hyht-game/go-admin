@@ -19,6 +19,7 @@ import {
 import { useMatches, useNavigate } from 'react-router-dom';
 import { useI18n } from '@/core/i18n';
 import { usePreferencesStore } from '@/core/preferences/store';
+import type { SupportedLanguagesType } from '@/core/preferences/types/layout';
 
 interface HeaderContentProps {
   userInfo: BasicUserInfo | null;
@@ -48,8 +49,6 @@ export const HeaderContent = ({
   const { t } = useI18n('common');
   const navigate = useNavigate();
   const matches = useMatches();
-  const preferences = usePreferencesStore((state) => state.preferences);
-  const locale = preferences.app.locale;
 
   // 计算面包屑
   const breadcrumbItems = useMemo(() => {
@@ -82,11 +81,28 @@ export const HeaderContent = ({
   }, [matches, navigate, t]);
 
   // 语言切换
-  const toggleLocale = () => {
-    const newLocale = locale === 'zh-CN' ? 'en-US' : 'zh-CN';
+  const toggleLocale = (newLocale: SupportedLanguagesType) => {
+    console.log('[HeaderContent] toggleLocale called with:', newLocale);
     const { setPreferences } = usePreferencesStore.getState();
+    console.log('[HeaderContent] calling setPreferences with:', { app: { locale: newLocale } });
     setPreferences({ app: { locale: newLocale } });
   };
+
+  // 语言菜单
+  const languageMenuItems: MenuProps['items'] = [
+    {
+      key: 'zh-CN',
+      label: '简体中文',
+      icon: <span style={{ fontSize: 16 }}>🇨🇳</span>,
+      onClick: () => toggleLocale('zh-CN'),
+    },
+    {
+      key: 'en-US',
+      label: 'English',
+      icon: <span style={{ fontSize: 16 }}>🇺🇸</span>,
+      onClick: () => toggleLocale('en-US'),
+    },
+  ];
 
   // 用户菜单
   const userMenuItems: MenuProps['items'] = [
@@ -200,32 +216,76 @@ export const HeaderContent = ({
       </div>
 
       {/* ========== 右侧区域：搜索 + 设置 + 主题 + 语言 + 全屏 + 通知 + 头像 ========== */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-        {/* 搜索框 */}
-        <Tooltip title={t('header.search')}>
-          <Popover
-            trigger="click"
-            placement="bottomRight"
-            content={
-              <div style={{ width: 280, padding: 4 }}>
-                <Input.Search
-                  placeholder={t('header.searchPlaceholder')}
-                  onSearch={(value) => {
-                    console.log('Search:', value);
-                    // 后续可实现全局搜索逻辑
-                  }}
-                />
-              </div>
-            }
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+        {/* 搜索按钮（带快捷键提示） */}
+        <Popover
+          trigger="click"
+          placement="bottomRight"
+          content={
+            <div style={{ width: 320, padding: 8 }}>
+              <Input.Search
+                placeholder={t('header.searchPlaceholder')}
+                size="large"
+                onSearch={(value) => {
+                  console.log('Search:', value);
+                  // 后续可实现全局搜索逻辑
+                }}
+                autoFocus
+              />
+            </div>
+          }
+        >
+          <div
+            className="search-trigger-btn"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 12px',
+              borderRadius: 20,
+              backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5',
+              border: `1px solid ${isDark ? '#404040' : '#d9d9d9'}`,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = isDark ? '#363636' : '#e8e8e8';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = isDark ? '#2a2a2a' : '#f5f5f5';
+            }}
           >
-            <Button
-              type="text"
-              icon={<SearchOutlined />}
-              size="small"
-              style={btnStyle}
+            <SearchOutlined
+              style={{
+                color: isDark ? '#a6a6a6' : '#8c8c8c',
+                fontSize: 14,
+              }}
             />
-          </Popover>
-        </Tooltip>
+            <span
+              style={{
+                color: isDark ? '#a6a6a6' : '#8c8c8c',
+                fontSize: 13,
+              }}
+            >
+              {t('header.search')}
+            </span>
+            <kbd
+              style={{
+                display: 'inline-block',
+                padding: '2px 6px',
+                fontSize: 11,
+                fontFamily: 'monospace',
+                lineHeight: 1.4,
+                color: isDark ? '#8c8c8c' : '#595959',
+                backgroundColor: isDark ? '#1f1f1f' : '#e8e8e8',
+                border: `1px solid ${isDark ? '#404040' : '#d9d9d9'}`,
+                borderRadius: 3,
+              }}
+            >
+              {t('header.searchShortcut')}
+            </kbd>
+          </div>
+        </Popover>
 
         {/* 设置按钮 */}
         <Tooltip title={t('header.settings')}>
@@ -249,16 +309,12 @@ export const HeaderContent = ({
           />
         </Tooltip>
 
-        {/* 语言切换 */}
-        <Tooltip title={t('header.switchLanguage')}>
-          <Button
-            type="text"
-            icon={<GlobalOutlined />}
-            onClick={toggleLocale}
-            size="small"
-            style={btnStyle}
-          />
-        </Tooltip>
+        {/* 语言切换 - 下拉菜单 */}
+        <Dropdown menu={{ items: languageMenuItems }} trigger={['click']} placement="bottomRight">
+          <Tooltip title={t('header.switchLanguage')}>
+            <Button type="text" icon={<GlobalOutlined />} size="small" style={btnStyle} />
+          </Tooltip>
+        </Dropdown>
 
         {/* 全屏切换 */}
         <Tooltip title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}>
@@ -274,12 +330,7 @@ export const HeaderContent = ({
         {/* 通知 */}
         <Badge count={3} size="small" offset={[0, 4]}>
           <Tooltip title={t('header.notification')}>
-            <Button
-              type="text"
-              icon={<BellOutlined />}
-              size="small"
-              style={btnStyle}
-            />
+            <Button type="text" icon={<BellOutlined />} size="small" style={btnStyle} />
           </Tooltip>
         </Badge>
 
