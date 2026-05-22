@@ -1,67 +1,103 @@
-import { Drawer, Select, ColorPicker } from 'antd';
+import React, { useState } from 'react';
+import { Button, Drawer, Segmented } from 'antd';
+import { ReloadOutlined, CopyOutlined, LogoutOutlined } from '@ant-design/icons';
 
 import { usePreferencesStore } from '../../store';
-import type { AuthPageLayoutType, LayoutType } from '../../types';
+import { AppearancePanel } from './AppearancePanel';
+import { LayoutPanel } from './LayoutPanel';
+import { ShortcutKeyPanel } from './ShortcutKeyPanel';
+import { GeneralPanel } from './GeneralPanel';
+import './PreferencesPanel.style.less';
 
 interface PreferencesPanelProps {
   open: boolean;
   onClose: () => void;
 }
 
-export const PreferencesPanel = ({ open, onClose }: PreferencesPanelProps) => {
-  const { preferences, setPreferences } = usePreferencesStore();
+type TabType = 'appearance' | 'layout' | 'shortcut' | 'general';
 
-  const handleLayoutChange = (layout: LayoutType) => {
-    console.log('[PreferencesPanel] handleLayoutChange:', layout);
-    setPreferences({ app: { layout } });
+const TAB_OPTIONS = [
+  { label: '外观', value: 'appearance' },
+  { label: '布局', value: 'layout' },
+  { label: '快捷键', value: 'shortcut' },
+  { label: '通用', value: 'general' },
+];
+
+const TAB_COMPONENTS = {
+  appearance: AppearancePanel,
+  layout: LayoutPanel,
+  shortcut: ShortcutKeyPanel,
+  general: GeneralPanel,
+};
+
+export const PreferencesPanel: React.FC<PreferencesPanelProps> = ({ open, onClose }) => {
+  const { resetPreferences } = usePreferencesStore();
+  const [activeTab, setActiveTab] = useState<TabType>('appearance');
+
+  const ActiveComponent = TAB_COMPONENTS[activeTab];
+
+  const handleReset = () => {
+    resetPreferences();
   };
 
-  const handleAuthLayoutChange = (layout: AuthPageLayoutType) => {
-    console.log('[PreferencesPanel] handleAuthLayoutChange:', layout);
-    setPreferences({ app: { authPageLayout: layout } });
+  const handleCopy = () => {
+    // TODO: 实现复制偏好设置功能
+    console.log('复制偏好设置');
+  };
+
+  const handleLogout = () => {
+    // TODO: 实现退出登录功能
+    console.log('退出登录');
   };
 
   return (
-    <Drawer title="偏好设置" placement="right" size={320} open={open} onClose={onClose}>
-      <div className="space-y-6">
-        {/* 布局方式 */}
-        <section>
-          <h4 className="font-medium mb-3">布局方式</h4>
-          <Select
-            className="w-full"
-            value={preferences.app.layout}
-            options={[
-              { label: '侧边菜单', value: 'side' },
-              { label: '顶部菜单', value: 'top' },
-              { label: '混合菜单', value: 'mix' },
-            ]}
-            onChange={handleLayoutChange}
-          />
-        </section>
+    <Drawer
+      title={
+        <div className="drawer-header">
+          <div>
+            <h2 className="drawer-title">偏好设置</h2>
+            <p className="drawer-subtitle">自定义偏好设置 & 实时预览</p>
+          </div>
+          <div className="drawer-actions">
+            <Button type="text" icon={<ReloadOutlined />} onClick={handleReset} title="重置" />
+            <Button
+              type="text"
+              icon={<span style={{ fontSize: 16 }}>×</span>}
+              onClick={onClose}
+              title="关闭"
+            />
+          </div>
+        </div>
+      }
+      placement="right"
+      size={360}
+      open={open}
+      onClose={onClose}
+      className="preferences-drawer"
+      footer={
+        <div className="drawer-footer">
+          <Button type="primary" icon={<CopyOutlined />} onClick={handleCopy}>
+            复制偏好设置
+          </Button>
+          <Button type="link" danger icon={<LogoutOutlined />} onClick={handleLogout}>
+            清空缓存 & 退出登录
+          </Button>
+        </div>
+      }
+    >
+      {/* Tab 切换 */}
+      <div className="drawer-tabs">
+        <Segmented
+          options={TAB_OPTIONS}
+          value={activeTab}
+          onChange={(value) => setActiveTab(value as TabType)}
+          block
+        />
+      </div>
 
-        {/* 登录页布局 */}
-        <section>
-          <h4 className="font-medium mb-3">登录页布局</h4>
-          <Select
-            className="w-full"
-            value={preferences.app.authPageLayout}
-            options={[
-              { label: '居中面板', value: 'panel-center' },
-              { label: '左侧面板', value: 'panel-left' },
-              { label: '右侧面板', value: 'panel-right' },
-            ]}
-            onChange={handleAuthLayoutChange}
-          />
-        </section>
-
-        {/* 主题色 */}
-        <section>
-          <h4 className="font-medium mb-3">主题色</h4>
-          <ColorPicker
-            value={preferences.theme.colorPrimary}
-            onChange={(color) => setPreferences({ theme: { colorPrimary: color.toHexString() } })}
-          />
-        </section>
+      {/* 内容区域 */}
+      <div className="drawer-content">
+        <ActiveComponent />
       </div>
     </Drawer>
   );
