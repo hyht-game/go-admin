@@ -1,4 +1,5 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 
 import { type AppRouteObject, AuthGuard, GuestGuard } from '@/core/router';
 
@@ -80,12 +81,19 @@ export const staticRoutes: AppRouteObject[] = [
       requiresAuth: true,
       hideInMenu: false,
     },
-    redirect: '/dashboard',
     children: [
+      // 根路径重定向到 dashboard
+      {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+        meta: {
+          title: '概览',
+          hideInMenu: true,
+        },
+      },
       {
         name: 'dashboard',
         path: 'dashboard',
-        // 懒加载 + 自动 Suspense
         element: createLazyRoute(() => import('@/pages/app/dashboard')),
         meta: {
           title: '仪表盘',
