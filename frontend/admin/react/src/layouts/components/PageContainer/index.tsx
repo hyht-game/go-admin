@@ -102,7 +102,8 @@ export const PageContainer = ({
     return (
       <ProPageContainer
         ghost={ghost}
-        title={pageTitle}
+        header={header === false ? undefined : header}
+        title={header === false ? undefined : pageTitle}
         breadcrumb={
           breadcrumb === false
             ? undefined
@@ -120,7 +121,8 @@ export const PageContainer = ({
     return (
       <ProPageContainer
         ghost={ghost}
-        title={pageTitle}
+        header={header === false ? undefined : header}
+        title={header === false ? undefined : pageTitle}
         breadcrumb={
           breadcrumb === false
             ? undefined
@@ -137,7 +139,8 @@ export const PageContainer = ({
   return (
     <ProPageContainer
       ghost={ghost}
-      title={pageTitle}
+      header={header === false ? undefined : header}
+      title={header === false ? undefined : pageTitle}
       breadcrumb={
         breadcrumb === false
           ? undefined

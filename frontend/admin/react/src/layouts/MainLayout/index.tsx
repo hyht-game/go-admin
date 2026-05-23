@@ -227,11 +227,11 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
                 },
               }}
               header={{
-                title: matches.at(-1)?.handle?.title || '',
-                breadcrumb: {},
+                breadcrumb: undefined,
               }}
+              contentPadding={false}
               style={{
-                padding: '24px',
+                padding: '0',
                 background: 'transparent',
               }}
             >

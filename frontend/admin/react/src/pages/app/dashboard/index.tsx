@@ -116,7 +116,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div>
+        <div style={{ margin: 0 }}>
             {/* 统计卡片 */}
             <Row gutter={[16, 16]}>
                 {statsData.map((stat, index) => (
@@ -151,7 +151,10 @@ const Dashboard = () => {
             </Row>
 
             {/* 访问趋势图 */}
-            <Card style={{marginTop: 16}}>
+            <Card 
+              style={{marginTop: 16}}
+              styles={{ body: { padding: 0 } }}
+            >
                 <ReactECharts option={trendOption} style={{height: 300}}/>
             </Card>
         </div>

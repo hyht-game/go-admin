@@ -3,13 +3,16 @@ import type { PageContainerProps as ProPageContainerProps } from '@ant-design/pr
 
 import type { AppRoute } from '@/core/router/types';
 
-export interface PageContainerProps extends Omit<ProPageContainerProps, 'title' | 'breadcrumb'> {
+export interface PageContainerProps extends Omit<ProPageContainerProps, 'title' | 'breadcrumb' | 'header'> {
   // 🔹 核心配置
   /** 页面标题（优先级：传入 > route.meta.title > 默认） */
   title?: ReactNode;
 
   /** 面包屑配置（传入则覆盖自动计算） */
   breadcrumb?: ProPageContainerProps['breadcrumb'] | false;
+
+  /** 页面头部配置（传入 false 则隐藏头部） */
+  header?: ProPageContainerProps['header'] | false;
 
   /** 路由对象（用于自动计算标题/面包屑/权限） */
   route?: Partial<AppRoute> | null;
