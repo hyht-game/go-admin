@@ -27,7 +27,7 @@ const defaultPreferences: Preferences = {
     breadcrumb: {
         enable: true,
         hideOnlyOne: false,
-        showHome: false,
+        showHome: true,
         showIcon: true,
         styleType: "normal",
     },
@@ -83,7 +83,6 @@ const defaultPreferences: Preferences = {
         showIcon: true,
         showMaximize: true,
         showMore: true,
-        showRefresh: true,
         styleType: "chrome",
     },
     theme: {

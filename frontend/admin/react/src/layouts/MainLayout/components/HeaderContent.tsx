@@ -47,17 +47,23 @@ export const HeaderContent = ({
   const navigate = useNavigate();
   const matches = useMatches();
 
+  // 面包屑偏好设置
+  const breadcrumbPreferences = usePreferencesStore((state) => state.preferences.breadcrumb);
+  const breadcrumbStyleType = breadcrumbPreferences?.styleType ?? 'normal';
+
   // 计算面包屑
   const breadcrumbItems = useMemo(() => {
     type MatchWithHandle = { pathname: string; handle?: { title?: string; icon?: string } };
     const typedMatches = matches as MatchWithHandle[];
+    const showIcon = breadcrumbPreferences?.showIcon ?? true;
+    const showHome = breadcrumbPreferences?.showHome ?? true;
 
     const items = typedMatches
       .filter((match) => match.handle?.title)
       .map((match, index, arr) => {
         // 将图标字符串转换为 React 组件
         let icon: React.ReactNode = undefined;
-        if (match.handle?.icon) {
+        if (showIcon && match.handle?.icon) {
           const IconComponent = (Icons as any)[match.handle.icon];
           if (IconComponent) {
             icon = React.createElement(IconComponent);
@@ -77,24 +83,22 @@ export const HeaderContent = ({
         };
       });
 
-    // 如果第一个不是首页，添加首页
-    if (items.length && items[0].key !== '/') {
+    // 始终在开头添加首页（如果 showHome 为 true）
+    if (showHome) {
       items.unshift({
         key: '/',
         title: t('home'),
-        icon: React.createElement(Icons.HomeOutlined), // 首页图标
+        icon: showIcon ? React.createElement(Icons.HomeOutlined) : undefined, // 首页图标
         onClick: () => navigate('/'),
       });
     }
 
     return items;
-  }, [matches, navigate, t]);
+  }, [matches, navigate, t, breadcrumbPreferences?.showIcon, breadcrumbPreferences?.showHome]);
 
   // 语言切换
   const toggleLocale = (newLocale: SupportedLanguagesType) => {
-    console.log('[HeaderContent] toggleLocale called with:', newLocale);
     const { setPreferences } = usePreferencesStore.getState();
-    console.log('[HeaderContent] calling setPreferences with:', { app: { locale: newLocale } });
     setPreferences({ app: { locale: newLocale } });
   };
 
@@ -199,7 +203,17 @@ export const HeaderContent = ({
 
         {/* 面包屑 */}
         <Breadcrumb
-          items={breadcrumbItems.map((item) => ({
+          separator={breadcrumbStyleType === 'background' ? '/' : '>'}
+          style={
+            breadcrumbStyleType === 'background'
+              ? {
+                  padding: '4px 8px',
+                  borderRadius: 6,
+                  backgroundColor: isDark ? '#1f1f1f' : '#f5f5f5',
+                }
+              : undefined
+          }
+          items={breadcrumbItems.map((item, _index) => ({
             key: item.key,
             title: item.onClick ? (
               <a
@@ -213,6 +227,14 @@ export const HeaderContent = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 4,
+                  ...(breadcrumbStyleType === 'background'
+                    ? {
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                        border: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+                      }
+                    : {}),
                 }}
               >
                 {item.icon}
@@ -227,6 +249,14 @@ export const HeaderContent = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 4,
+                  ...(breadcrumbStyleType === 'background'
+                    ? {
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                        border: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+                      }
+                    : {}),
                 }}
               >
                 {item.icon}

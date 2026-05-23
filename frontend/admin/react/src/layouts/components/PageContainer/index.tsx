@@ -6,6 +6,7 @@ import { ReloadOutlined, FullscreenOutlined, FullscreenExitOutlined } from '@ant
 import { useUserStore } from '@/stores/user';
 import { useI18n } from '@/core/i18n';
 import { usePageRefreshStore } from '@/stores/pageRefresh';
+import { usePreferencesStore } from '@/core/preferences/store';
 import { useBreadcrumb } from './hooks/useBreadcrumb';
 import { usePageTitle } from './hooks/usePageTitle';
 import { checkPagePermission } from './utils/permission';
@@ -58,6 +59,10 @@ export const PageContainer = ({
   // 页面刷新管理
   const { setRefreshCallback, removeRefreshCallback } = usePageRefreshStore();
 
+  // 面包屑偏好设置
+  const breadcrumbPreferences = usePreferencesStore((state) => state.preferences.breadcrumb);
+  const breadcrumbStyleType = breadcrumbPreferences?.styleType ?? 'normal';
+
   // 生成页面唯一 key
   const pageKey = useMemo(() => {
     return customPageKey || location.pathname;
@@ -95,11 +100,9 @@ export const PageContainer = ({
   const breadcrumb = useBreadcrumb({
     manual: manualBreadcrumb === false ? false : undefined,
     route,
-    showHomeIcon: true,
+    showHomeIcon: breadcrumbPreferences?.showHome ?? true,
+    showIcon: breadcrumbPreferences?.showIcon ?? true,
   });
-  
-  // 调试：查看面包屑数据
-  console.log('PageContainer - breadcrumb:', breadcrumb);
 
   // 计算标题
   const pageTitle = usePageTitle({
@@ -209,7 +212,17 @@ export const PageContainer = ({
             : {
                 items: effectiveBreadcrumb.map((item) => ({
                   title: (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: 4,
+                      ...(breadcrumbStyleType === 'background' ? {
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                      } : {}),
+                    }}>
                       {item.icon}
                       <span>{item.breadcrumbName}</span>
                     </span>
@@ -240,7 +253,17 @@ export const PageContainer = ({
             : {
                 items: effectiveBreadcrumb.map((item) => ({
                   title: (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: 4,
+                      ...(breadcrumbStyleType === 'background' ? {
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                      } : {}),
+                    }}>
                       {item.icon}
                       <span>{item.breadcrumbName}</span>
                     </span>
@@ -271,7 +294,17 @@ export const PageContainer = ({
               // 使用 items 而不是 routes（Ant Design v6）
               items: effectiveBreadcrumb.map((item) => ({
                 title: (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: 4,
+                    ...(breadcrumbStyleType === 'background' ? {
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                    } : {}),
+                  }}>
                     {item.icon}
                     <span>{item.breadcrumbName}</span>
                   </span>

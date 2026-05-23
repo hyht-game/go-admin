@@ -114,6 +114,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
 
   // 页面刷新
   const triggerPageRefresh = usePageRefreshStore((state) => state.triggerRefresh);
+  const refreshTrigger = usePageRefreshStore((state) => state.refreshTrigger);
 
   // 窗口大小监听
   useEffect(() => {
@@ -305,7 +306,10 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
                 background: 'transparent',
               }}
             >
-              <Outlet />
+              {/* 使用 refreshTrigger 作为 key，触发页面重新渲染 */}
+              <div key={refreshTrigger}>
+                <Outlet />
+              </div>
             </PageContainer>
           </div>
 

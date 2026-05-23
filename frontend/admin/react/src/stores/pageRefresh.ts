@@ -46,6 +46,7 @@ export const usePageRefreshStore = create<PageRefreshState>((set, get) => ({
   
   triggerRefresh: () => {
     const { refreshCallbacks } = get();
+    
     // 触发所有注册的回调
     refreshCallbacks.forEach(async (callback) => {
       try {
@@ -54,6 +55,9 @@ export const usePageRefreshStore = create<PageRefreshState>((set, get) => ({
         console.error('[PageRefresh] Error during refresh:', error);
       }
     });
+    
+    // 增加 refreshTrigger，强制重新渲染 Outlet
+    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 }));
   },
   
   incrementTrigger: () => {
