@@ -18,6 +18,7 @@ import { usePreferencesStore } from '@/core/preferences/store';
 import { useTabsStore } from '@/stores/tabs';
 import { useI18n } from '@/core/i18n';
 import { usePageRefreshStore } from '@/stores/pageRefresh';
+import { getIconFromName } from '../../utils/iconResolver';
 import './tabsbar.css';
 
 interface TabItem {
@@ -35,8 +36,37 @@ export const Index = () => {
   const navigate = useNavigate();
   const matches = useMatches();
   const preferences = usePreferencesStore((state) => state.preferences);
-  const isDark = preferences.theme.mode === 'dark';
   const tabbarConfig = preferences.tabbar;
+
+  // 计算实际的暗色模式（支持 auto 模式）
+  const [isDark, setIsDark] = useState(() => {
+    const { theme } = preferences;
+    if (theme.mode === 'dark') return true;
+    if (theme.mode === 'light') return false;
+    // auto 模式：跟随系统
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  // 监听系统主题变化
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => {
+      const { theme } = preferences;
+      if (theme.mode === 'auto') {
+        setIsDark(mediaQuery.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [preferences.theme.mode]);
+
+  // 监听偏好设置变化
+  useEffect(() => {
+    const { theme } = preferences;
+    if (theme.mode === 'dark') setIsDark(true);
+    else if (theme.mode === 'light') setIsDark(false);
+    else setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, [preferences.theme.mode]);
 
   const { t } = useI18n('common');
 
@@ -82,6 +112,7 @@ export const Index = () => {
     closeAllTabs,
     togglePinTab,
     reloadTab,
+    reorderTabs,
   } = useTabsStore();
 
   // 获取当前风格对应的 CSS 类名
@@ -110,10 +141,12 @@ export const Index = () => {
   const currentTab = useMemo(() => {
     const lastMatch = matches.at(-1) as any;
     const title = lastMatch?.handle?.title || lastMatch?.data?.title || '未知页面';
+    const icon = lastMatch?.handle?.icon;
     return {
       key: location.pathname,
       path: location.pathname,
       title,
+      icon,
       closable: location.pathname !== '/',
     };
   }, [location.pathname, matches]);
@@ -123,6 +156,19 @@ export const Index = () => {
     addTab(currentTab);
   }, [currentTab, addTab]);
 
+  // 根据 persist 配置决定是否清除持久化数据
+  useEffect(() => {
+    if (!tabbarConfig.persist) {
+      // 如果不启用持久化，清除存储的标签页
+      const stored = localStorage.getItem('app-tabs');
+      if (stored) {
+        localStorage.removeItem('app-tabs');
+        // 重新初始化 store
+        useTabsStore.setState({ tabs: [] });
+      }
+    }
+  }, [tabbarConfig.persist]);
+
   // 构建标签列表（支持图标显示）
   const tabItems: TabItem[] = useMemo(() => {
     return tabs.map((tab) => ({
@@ -131,7 +177,7 @@ export const Index = () => {
         <span className="tabsbar-tab-label">
           {tabbarConfig.showIcon && tab.icon && (
             <span className="tabsbar-tab-icon" style={{ marginRight: 4 }}>
-              {tab.icon}
+              {getIconFromName(tab.icon)}
             </span>
           )}
           {tab.title}
@@ -402,12 +448,75 @@ export const Index = () => {
     navigate,
   ]);
 
-  // 自定义渲染 TabBar，添加右键菜单功能
+  // 自定义渲染 TabBar，添加右键菜单和拖拽功能
   const renderTabBar: TabsProps['renderTabBar'] = useCallback(
     (props: any, DefaultTabBar: React.ComponentType<any>) => {
+      // 如果启用了拖拽，添加拖拽相关的事件处理
+      if (tabbarConfig.draggable) {
+        return (
+          <DefaultTabBar
+            {...props}
+            onDragStart={(e: React.DragEvent) => {
+              const target = e.target as HTMLElement;
+              const tabElement = target.closest('.ant-tabs-tab');
+              if (tabElement) {
+                const index = parseInt(tabElement.getAttribute('data-index') || '0', 10);
+                e.dataTransfer.setData('text/plain', String(index));
+                tabElement.classList.add('dragging');
+              }
+            }}
+            onDragEnd={(e: React.DragEvent) => {
+              const target = e.target as HTMLElement;
+              const tabElement = target.closest('.ant-tabs-tab');
+              if (tabElement) {
+                tabElement.classList.remove('dragging');
+              }
+              // 清除所有 drag-over 样式
+              document.querySelectorAll('.ant-tabs-tab.drag-over').forEach((el) => {
+                el.classList.remove('drag-over');
+              });
+            }}
+            onDragOver={(e: React.DragEvent) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+
+              const target = e.target as HTMLElement;
+              const tabElement = target.closest('.ant-tabs-tab');
+              if (tabElement) {
+                // 清除其他元素的 drag-over 样式
+                document.querySelectorAll('.ant-tabs-tab.drag-over').forEach((el) => {
+                  if (el !== tabElement) {
+                    el.classList.remove('drag-over');
+                  }
+                });
+                tabElement.classList.add('drag-over');
+              }
+            }}
+            onDrop={(e: React.DragEvent) => {
+              e.preventDefault();
+              const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+
+              const target = e.target as HTMLElement;
+              const tabElement = target.closest('.ant-tabs-tab');
+              if (tabElement) {
+                const toIndex = parseInt(tabElement.getAttribute('data-index') || '0', 10);
+                if (fromIndex !== toIndex) {
+                  reorderTabs(fromIndex, toIndex);
+                }
+              }
+
+              // 清除所有 drag-over 样式
+              document.querySelectorAll('.ant-tabs-tab.drag-over').forEach((el) => {
+                el.classList.remove('drag-over');
+              });
+            }}
+          />
+        );
+      }
+
       return <DefaultTabBar {...props} />;
     },
-    [],
+    [tabbarConfig.draggable, reorderTabs],
   );
 
   // 为每个 Tab 项添加右键菜单

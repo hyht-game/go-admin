@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface TabItem {
   key: string;
@@ -39,111 +40,133 @@ interface TabsState {
   
   // 重新加载标签页
   reloadTab: (key: string) => void;
+  
+  // 更新标签页顺序（拖拽后）
+  reorderTabs: (fromIndex: number, toIndex: number) => void;
 }
 
-export const useTabsStore = create<TabsState>((set, get) => ({
-  tabs: [],
-  
-  addTab: (tab) => {
-    set((state) => {
-      // 检查是否已存在
-      const exists = state.tabs.find((t) => t.key === tab.key);
-      if (exists) {
-        return state;
-      }
+export const useTabsStore = create<TabsState>()(
+  persist(
+    (set, get) => ({
+      tabs: [],
       
-      return {
-        tabs: [
-          ...state.tabs,
-          {
-            ...tab,
-            closable: tab.closable !== false && tab.path !== '/',
-          },
-        ],
-      };
-    });
-  },
-  
-  removeTab: (key) => {
-    set((state) => ({
-      tabs: state.tabs.filter((tab) => tab.key !== key),
-    }));
-  },
-  
-  closeTab: (key) => {
-    const { tabs } = get();
-    const currentIndex = tabs.findIndex((tab) => tab.key === key);
-    
-    if (currentIndex === -1) return;
-    
-    const currentTab = tabs[currentIndex];
-    if (!currentTab.closable) return;
-    
-    // 如果关闭的是当前激活的标签，需要跳转到其他标签
-    const newTabs = tabs.filter((tab) => tab.key !== key);
-    
-    set({ tabs: newTabs });
-  },
-  
-  closeLeftTabs: (key) => {
-    const { tabs } = get();
-    const currentIndex = tabs.findIndex((tab) => tab.key === key);
-    
-    if (currentIndex === -1) return;
-    
-    // 保留当前标签及其右侧的标签，以及固定的标签
-    const newTabs = tabs.filter((tab, index) => 
-      index >= currentIndex || tab.pinned
-    );
-    
-    set({ tabs: newTabs });
-  },
-  
-  closeRightTabs: (key) => {
-    const { tabs } = get();
-    const currentIndex = tabs.findIndex((tab) => tab.key === key);
-    
-    if (currentIndex === -1) return;
-    
-    // 保留当前标签及其左侧的标签，以及固定的标签
-    const newTabs = tabs.filter((tab, index) => 
-      index <= currentIndex || tab.pinned
-    );
-    
-    set({ tabs: newTabs });
-  },
-  
-  closeOtherTabs: (key) => {
-    const { tabs } = get();
-    
-    // 只保留当前标签和固定的标签
-    const newTabs = tabs.filter((tab) => 
-      tab.key === key || tab.pinned
-    );
-    
-    set({ tabs: newTabs });
-  },
-  
-  closeAllTabs: () => {
-    const { tabs } = get();
-    
-    // 只保留固定的标签
-    const newTabs = tabs.filter((tab) => tab.pinned);
-    
-    set({ tabs: newTabs });
-  },
-  
-  togglePinTab: (key) => {
-    set((state) => ({
-      tabs: state.tabs.map((tab) =>
-        tab.key === key ? { ...tab, pinned: !tab.pinned } : tab
-      ),
-    }));
-  },
-  
-  reloadTab: (key) => {
-    // 这个功能需要配合 PageContainer 的刷新机制
-    // 这里只是标记需要刷新，实际刷新由 PageContainer 处理
-    console.log('[TabsStore] Reload tab:', key);
-  },
-}));
+      addTab: (tab) => {
+        set((state) => {
+          // 检查是否已存在
+          const exists = state.tabs.find((t) => t.key === tab.key);
+          if (exists) {
+            return state;
+          }
+          
+          return {
+            tabs: [
+              ...state.tabs,
+              {
+                ...tab,
+                closable: tab.closable !== false && tab.path !== '/',
+              },
+            ],
+          };
+        });
+      },
+      
+      removeTab: (key) => {
+        set((state) => ({
+          tabs: state.tabs.filter((tab) => tab.key !== key),
+        }));
+      },
+      
+      closeTab: (key) => {
+        const { tabs } = get();
+        const currentIndex = tabs.findIndex((tab) => tab.key === key);
+        
+        if (currentIndex === -1) return;
+        
+        const currentTab = tabs[currentIndex];
+        if (!currentTab.closable) return;
+        
+        // 如果关闭的是当前激活的标签，需要跳转到其他标签
+        const newTabs = tabs.filter((tab) => tab.key !== key);
+        
+        set({ tabs: newTabs });
+      },
+      
+      closeLeftTabs: (key) => {
+        const { tabs } = get();
+        const currentIndex = tabs.findIndex((tab) => tab.key === key);
+        
+        if (currentIndex === -1) return;
+        
+        // 保留当前标签及其右侧的标签，以及固定的标签
+        const newTabs = tabs.filter((tab, index) => 
+          index >= currentIndex || tab.pinned
+        );
+        
+        set({ tabs: newTabs });
+      },
+      
+      closeRightTabs: (key) => {
+        const { tabs } = get();
+        const currentIndex = tabs.findIndex((tab) => tab.key === key);
+        
+        if (currentIndex === -1) return;
+        
+        // 保留当前标签及其左侧的标签，以及固定的标签
+        const newTabs = tabs.filter((tab, index) => 
+          index <= currentIndex || tab.pinned
+        );
+        
+        set({ tabs: newTabs });
+      },
+      
+      closeOtherTabs: (key) => {
+        const { tabs } = get();
+        
+        // 只保留当前标签和固定的标签
+        const newTabs = tabs.filter((tab) => 
+          tab.key === key || tab.pinned
+        );
+        
+        set({ tabs: newTabs });
+      },
+      
+      closeAllTabs: () => {
+        const { tabs } = get();
+        
+        // 只保留固定的标签
+        const newTabs = tabs.filter((tab) => tab.pinned);
+        
+        set({ tabs: newTabs });
+      },
+      
+      togglePinTab: (key) => {
+        set((state) => ({
+          tabs: state.tabs.map((tab) =>
+            tab.key === key ? { ...tab, pinned: !tab.pinned } : tab
+          ),
+        }));
+      },
+      
+      reloadTab: (key) => {
+        // 这个功能需要配合 PageContainer 的刷新机制
+        // 这里只是标记需要刷新，实际刷新由 PageContainer 处理
+        console.log('[TabsStore] Reload tab:', key);
+      },
+      
+      reorderTabs: (fromIndex, toIndex) => {
+        set((state) => {
+          const newTabs = [...state.tabs];
+          const [removed] = newTabs.splice(fromIndex, 1);
+          newTabs.splice(toIndex, 0, removed);
+          return { tabs: newTabs };
+        });
+      },
+    }),
+    {
+      name: 'app-tabs',
+      // 只有当 preferences.tabbar.persist 为 true 时才持久化
+      // 这里我们先存储，在组件层根据配置决定是否使用
+      partialize: (state) => ({ tabs: state.tabs }),
+    }
+  )
+);

@@ -208,6 +208,39 @@
       margin-left: 8px;
       margin-right: -4px;
     }
+    
+    /* 拖拽样式 */
+    .ant-tabs-tab {
+      cursor: default;
+      transition: all 0.2s ease;
+      
+      &[draggable="true"] {
+        cursor: grab;
+        
+        &:active {
+          cursor: grabbing;
+        }
+      }
+      
+      &.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+      
+      &.drag-over {
+        border-left: 2px solid #1677ff;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: -2px;
+          top: 0;
+          bottom: 0;
+          width: 2px;
+          background: #1677ff;
+        }
+      }
+    }
   }
 }
 
