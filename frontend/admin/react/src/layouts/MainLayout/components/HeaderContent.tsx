@@ -53,13 +53,26 @@ export const HeaderContent = ({
 
   // 计算面包屑
   const breadcrumbItems = useMemo(() => {
-    type MatchWithHandle = { pathname: string; handle?: { title?: string; icon?: string } };
+    type MatchWithHandle = { 
+      pathname: string; 
+      handle?: { title?: string; icon?: string };
+      id?: string; // React Router 内部 ID，用于识别 index 路由
+    };
     const typedMatches = matches as MatchWithHandle[];
     const showIcon = breadcrumbPreferences?.showIcon ?? true;
     const showHome = breadcrumbPreferences?.showHome ?? true;
 
     const items = typedMatches
-      .filter((match) => match.handle?.title)
+      .filter((match) => {
+        // 过滤掉没有 title 的路由
+        if (!match.handle?.title) return false;
+        
+        // 过滤掉 index 路由（它们通常是重定向，不应该出现在面包屑中）
+        // index 路由的 id 通常包含 "-index"
+        if (match.id?.includes('-index')) return false;
+        
+        return true;
+      })
       .map((match, index, arr) => {
         // 将图标字符串转换为 React 组件
         let icon: React.ReactNode = undefined;
@@ -73,7 +86,7 @@ export const HeaderContent = ({
         return {
           key: match.pathname,
           title: match.handle?.title || '',
-          icon, // 添加图标
+          icon,
           onClick:
             index < arr.length - 1
               ? () => {
@@ -88,7 +101,7 @@ export const HeaderContent = ({
       items.unshift({
         key: '/',
         title: t('home'),
-        icon: showIcon ? React.createElement(Icons.HomeOutlined) : undefined, // 首页图标
+        icon: showIcon ? React.createElement(Icons.HomeOutlined) : undefined,
         onClick: () => navigate('/'),
       });
     }

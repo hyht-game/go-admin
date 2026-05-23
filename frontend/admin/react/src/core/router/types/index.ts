@@ -50,7 +50,7 @@ export interface GenerateRoutesResult {
 
 export interface RouteMeta {
     // 基础信息
-    title: string;                    // 必填：菜单/标签页标题
+    title?: string;                    // 必填：菜单/标签页标题
     icon?: IconType;                  // 菜单/标签页图标
     activeIcon?: IconType;            // 激活时图标
 

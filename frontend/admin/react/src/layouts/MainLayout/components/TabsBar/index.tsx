@@ -142,23 +142,32 @@ export const Index = () => {
   const currentTab = useMemo(() => {
     const lastMatch = matches.at(-1) as any;
     const title = lastMatch?.handle?.title || lastMatch?.data?.title || '未知页面';
-    
-    // 从 handle 中获取图标字符串（已绎通过 transformMetaToHandle 转换）
+      
+    // 从 handle 中获取图标字符串（已经通过 transformMetaToHandle 转换）
     const icon = lastMatch?.handle?.icon || lastMatch?.data?.icon;
-    
-    console.log('TabsBar - currentTab:', { title, icon, handle: lastMatch?.handle });
-    
+      
+    // 获取 hideInTab 配置
+    const hideInTab = lastMatch?.handle?.hideInTab || lastMatch?.data?.hideInTab || false;
+      
+    console.log('TabsBar - currentTab:', { title, icon, hideInTab, handle: lastMatch?.handle });
+      
     return {
       key: location.pathname,
       path: location.pathname,
       title,
       icon, // 保持为字符串，后续通过 getIconFromName 转换
       closable: location.pathname !== '/',
+      hideInTab, // 传递 hideInTab 配置
     };
   }, [location.pathname, matches]);
-
-  // 自动添加当前标签
+  
+  // 自动添加当前标签（检查 hideInTab）
   useEffect(() => {
+    // 如果路由配置了 hideInTab，则不添加到标签页
+    if (currentTab.hideInTab) {
+      console.log('TabsBar - skip tab (hideInTab):', currentTab.key);
+      return;
+    }
     addTab(currentTab);
   }, [currentTab, addTab]);
 

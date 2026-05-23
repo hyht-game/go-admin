@@ -5,7 +5,8 @@ type MenuRoute = AppRouteObject;
 
 export const transformRoutesToMenu = (
     routes: MenuRoute[],
-    permissions: string[]
+    permissions: string[],
+    parentPath: string = ''
 ): NonNullable<ProLayoutProps['route']>['routes'] => {
     return routes
         .filter((route) => {
@@ -17,14 +18,19 @@ export const transformRoutesToMenu = (
             return !(meta?.permission && !permissions.includes(meta.permission));
         })
         .map((route) => {
+            // 处理路径：将相对路径转换为绝对路径
+            const fullPath = route.path?.startsWith('/')
+                ? route.path
+                : `${parentPath}/${route.path}`.replace(/\/+/g, '/');
+
             const menuItem: any = {
-                path: route.path,
+                path: fullPath, // 使用完整路径作为 key
                 name: route.label || route.meta?.title,
                 icon: route.meta?.icon,
             };
 
             if (route.children) {
-                menuItem.children = transformRoutesToMenu(route.children, permissions);
+                menuItem.children = transformRoutesToMenu(route.children, permissions, fullPath);
             }
 
             return menuItem;

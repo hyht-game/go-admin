@@ -19,7 +19,7 @@ import { usePreferencesStore } from '@/core/preferences/store';
 import { useThemeConfig } from '@/core/preferences/hooks/useThemeConfig';
 import { PreferencesPanel } from '@/core/preferences/components';
 
-import { staticRoutes } from '@/router/config/static';
+import { allRoutes } from '@/router';
 import type { AppRouteObject } from '@/core/router/types';
 
 interface LayoutRouteHandle {
@@ -101,7 +101,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   // 菜单数据
   const permissions = useMemo(() => userInfo?.permissions || [], [userInfo?.permissions]);
   const menuData = useMenuData({
-    staticRoutes,
+    staticRoutes: allRoutes,
     dynamicRoutes,
     permissions,
   });

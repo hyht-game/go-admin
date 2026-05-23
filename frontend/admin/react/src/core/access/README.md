@@ -223,7 +223,7 @@ if (hasAccessByRoles(['ADMIN'])) {
 
 ### 工具函数（兼容层）
 
-位于 `src/utils/auth.ts`，内部调用 `core/access`，标记为 `@deprecated`：
+位于 `src/utils/auth.tsx`，内部调用 `core/access`，标记为 `@deprecated`：
 
 ```typescript
 /**
