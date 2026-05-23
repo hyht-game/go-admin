@@ -210,7 +210,7 @@ export const LayoutPanel: React.FC = () => {
             onChange={(checked) => setPreferences({ sidebar: { collapsed: checked } })}
           />
         </div>
-        <div className={`preference-item ${preferences.sidebar.collapsed ? 'disabled' : ''}`}>
+        <div className={`preference-item ${!preferences.sidebar.collapsed ? 'disabled' : ''}`}>
           <span>{t('layout.collapseShowTitle')}</span>
           <Switch
             disabled={!preferences.sidebar.collapsed}

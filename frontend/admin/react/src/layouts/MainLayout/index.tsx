@@ -80,8 +80,23 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   }, [preferences.theme.mode]);
 
   // 布局状态
-  const { collapsed, setCollapsed, isMobile, setIsMobile, openKeys, setOpenKeys } =
-    useLayoutState();
+  const {
+    collapsed: _collapsed,
+    setCollapsed: _setCollapsed,
+    isMobile,
+    setIsMobile,
+    openKeys,
+    setOpenKeys,
+  } = useLayoutState();
+
+  // 使用 preferences.sidebar.hidden 控制侧边栏显示/隐藏
+  const sidebarHidden = preferences.sidebar?.hidden ?? false;
+  const setSidebarHidden = useCallback(
+    (hidden: boolean) => {
+      setPreferences({ sidebar: { hidden } });
+    },
+    [setPreferences],
+  );
 
   // 菜单数据
   const permissions = useMemo(() => userInfo?.permissions || [], [userInfo?.permissions]);
@@ -105,13 +120,15 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile && !collapsed) setCollapsed(true);
+      if (mobile) {
+        setPreferences({ sidebar: { hidden: true } });
+      }
     };
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, [collapsed, setCollapsed, setIsMobile]);
+  }, [setIsMobile, setPreferences]);
 
   // 根据当前路径计算选中的菜单项
   const selectedKeys = useMemo(() => {
@@ -181,9 +198,9 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     return (
       <HeaderContent
         userInfo={userInfo}
-        collapsed={collapsed}
+        collapsed={sidebarHidden}
         isFullscreen={isFullscreen}
-        onToggleCollapse={() => setCollapsed(!collapsed)}
+        onToggleCollapse={() => setSidebarHidden(!sidebarHidden)}
         onRefresh={triggerPageRefresh}
         onToggleFullscreen={() => {
           if (!document.fullscreenElement) {
@@ -200,7 +217,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         onOpenSettings={() => setSettingsOpen(true)}
       />
     );
-  }, [userInfo, collapsed, isFullscreen, logout, isDark, setPreferences, triggerPageRefresh]);
+  }, [userInfo, sidebarHidden, isFullscreen, logout, isDark, setPreferences, triggerPageRefresh]);
 
   // 主题切换
   useCallback(() => {
@@ -222,12 +239,10 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         {/* ===== 左侧：侧边栏 ===== */}
         <SiderMenu
           menuData={menuData}
-          collapsed={collapsed}
           isMobile={isMobile}
           isDark={isDark}
           openKeys={openKeys}
           selectedKeys={selectedKeys}
-          onCollapse={setCollapsed}
           onOpenChange={setOpenKeys}
         />
 

@@ -1,36 +1,43 @@
-import { useMemo, useCallback, useState, useEffect } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
+
 import { usePreferencesStore } from '@/core/preferences/store';
-import { getIconFromName } from '../utils/iconResolver';
+import { getIconFromName } from '../../utils/iconResolver';
 import ControlPanel from './ControlPanel';
+import './SiderMenu.style.less';
 
 interface SiderMenuProps {
   menuData: any[];
-  collapsed: boolean;
   isMobile: boolean;
   isDark: boolean;
   openKeys: string[];
   selectedKeys: string[];
-  onCollapse: (collapsed: boolean) => void;
   onOpenChange: (keys: string[]) => void;
 }
 
-export const SiderMenu = ({
+export const Index = ({
   menuData,
-  collapsed,
   isMobile,
   isDark,
   openKeys,
   selectedKeys,
-  onCollapse,
   onOpenChange,
 }: SiderMenuProps) => {
   const navigate = useNavigate();
   const preferences = usePreferencesStore((state) => state.preferences);
+  const setPreferences = usePreferencesStore((state) => state.setPreferences);
 
-  // 固定状态：pinned=true 时始终显示完整列表，不允许折叠
-  const [pinned, setPinned] = useState(false);
+  // 从 preferences 获取侧边栏配置
+  const sidebarConfig = preferences.sidebar;
+  const sidebarCollapsed = sidebarConfig?.collapsed ?? false;
+  const collapsedShowTitle = sidebarConfig?.collapsedShowTitle ?? false;
+  const expandOnHover = sidebarConfig?.expandOnHover ?? true;
+  const sidebarEnable = sidebarConfig?.enable ?? true;
+  const sidebarHidden = sidebarConfig?.hidden ?? false;
+
+  // 鼠标悬停状态（用于 expandOnHover）
+  const [isHovering, setIsHovering] = useState(false);
 
   // 转换菜单数据为 Ant Design Menu items 格式
   const menuItems = useMemo(() => {
@@ -50,26 +57,53 @@ export const SiderMenu = ({
     (info: { key: string }) => {
       if (info.key) {
         navigate(info.key);
-        if (isMobile) onCollapse(true);
+        if (isMobile) {
+          setPreferences({ sidebar: { collapsed: true } });
+        }
       }
     },
-    [navigate, isMobile, onCollapse],
+    [navigate, isMobile, setPreferences],
   );
 
-  // 固定菜单时强制展开
-  useEffect(() => {
-    if (pinned && collapsed) {
-      onCollapse(false);
+  // 完全隐藏侧边栏（sidebar.enable = false 或 sidebar.hidden = true）
+  if (!sidebarEnable || sidebarHidden) return null;
+
+  // 计算是否折叠：sidebarCollapsed 为 true 且不在 hover 状态
+  const isCollapsed = sidebarCollapsed && !isHovering;
+
+  // 计算侧边栏宽度：使用括号确保正确的运算符优先级
+  const sidebarWidth = isCollapsed ? 60 : (sidebarConfig?.width ?? 224);
+
+  // 鼠标进入/离开事件处理
+  const handleMouseEnter = () => {
+    if (expandOnHover && sidebarCollapsed) {
+      setIsHovering(true);
     }
-  }, [pinned, collapsed, onCollapse]);
+  };
 
-  // pinned 为 true 时不允许折叠
-  const effectiveCollapsed = pinned ? false : collapsed;
+  const handleMouseLeave = () => {
+    if (expandOnHover && sidebarCollapsed) {
+      setIsHovering(false);
+    }
+  };
 
-  // collapsed 为 true 且未固定时完全隐藏侧边栏
-  if (effectiveCollapsed) return null;
+  // 切换折叠状态
+  const handleToggleCollapse = () => {
+    setPreferences({ sidebar: { collapsed: !sidebarCollapsed } });
+  };
 
-  const sidebarWidth = preferences.sidebar?.width || 224;
+  // 切换 expandOnHover 状态（固定/自动模式）
+  const handleToggleExpandOnHover = () => {
+    const newExpandOnHover = !expandOnHover;
+    setPreferences({ sidebar: { expandOnHover: newExpandOnHover } });
+    if (newExpandOnHover) {
+      // 切换到自动模式时，如果当前是折叠状态，允许 hover 展开
+      // 不做任何操作
+    } else {
+      // 切换到手动模式时，取消 hover 状态
+      setIsHovering(false);
+    }
+  };
 
   return (
     <div
@@ -84,6 +118,8 @@ export const SiderMenu = ({
         flexShrink: 0,
         overflow: 'hidden',
       }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Logo 区域 */}
       <div
@@ -91,8 +127,8 @@ export const SiderMenu = ({
           height: 56,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
-          padding: '0 16px',
+          justifyContent: isCollapsed && !collapsedShowTitle ? 'center' : 'flex-start',
+          padding: isCollapsed && !collapsedShowTitle ? '0' : '0 16px',
           gap: 8,
           borderBottom: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
           cursor: 'pointer',
@@ -108,7 +144,7 @@ export const SiderMenu = ({
             style={{ height: 32, width: 32, flexShrink: 0 }}
           />
         )}
-        {preferences.app.dynamicTitle && (
+        {(!isCollapsed || collapsedShowTitle) && preferences.app.dynamicTitle && (
           <span
             style={{
               fontWeight: 700,
@@ -129,7 +165,7 @@ export const SiderMenu = ({
         <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: '4px 0' }}>
           <Menu
             mode="inline"
-            inlineCollapsed={false}
+            inlineCollapsed={isCollapsed && !collapsedShowTitle}
             selectedKeys={selectedKeys}
             openKeys={openKeys}
             onOpenChange={onOpenChange}
@@ -138,22 +174,25 @@ export const SiderMenu = ({
             style={{
               background: 'transparent',
               borderInlineEnd: 'none',
+              width: '100%',
             }}
             theme={isDark ? 'dark' : 'light'}
+            // 当 collapsedShowTitle=true 时，覆盖默认的折叠样式
+            className={collapsedShowTitle && isCollapsed ? 'menu-collapsed-show-title' : ''}
           />
         </div>
       </div>
 
       {/* 底部控制面板 */}
       <ControlPanel
-        collapsed={collapsed}
+        collapsed={sidebarCollapsed}
         isDark={isDark}
-        onToggleCollapse={() => onCollapse(!collapsed)}
-        pinned={pinned}
-        onTogglePin={() => setPinned(!pinned)}
+        expandOnHover={expandOnHover}
+        onToggleExpandOnHover={handleToggleExpandOnHover}
+        onToggleCollapse={handleToggleCollapse}
       />
     </div>
   );
 };
 
-export default SiderMenu;
+export default Index;
