@@ -70,18 +70,17 @@ export const useDynamicI18n = (options: UseDynamicI18nOptions) => {
 
   // 合并 t 函数：优先动态文案，降级到静态
   const t = useCallback(
-    (key: string, options?: any): string => {
-      // 尝试动态命名空间
-      const dynamicKey = `${namespace}:${key}`;
-      const dynamicValue = staticT(dynamicKey, { ...options, defaultValue: undefined });
+    (key: string, defaultValue?: string): string => {
+      // 使用指定的 namespace 查找翻译
+      const dynamicValue = staticT(key, { ns: namespace, defaultValue: undefined });
 
       // 如果动态文案存在且不是 key 本身，返回动态值
-      if (dynamicValue && dynamicValue !== dynamicKey) {
+      if (dynamicValue && dynamicValue !== key) {
         return String(dynamicValue);
       }
 
-      // 降级：使用静态文案
-      return String(staticT(key, options));
+      // 降级：使用 defaultValue 或 key 本身
+      return defaultValue ?? key;
     },
     [namespace, staticT],
   );

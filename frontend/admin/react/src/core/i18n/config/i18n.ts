@@ -23,12 +23,15 @@ export const initI18n = async (initialLang: SupportedLocale) => {
 
     // 命名空间配置
     defaultNS: 'common',
-    ns: ['common', 'auth', 'menu'], // 只预加载核心命名空间
+    ns: ['common', 'auth', 'menu', 'routes'], // 添加 routes 到命名空间列表
 
     // 后端动态词条（可选）
     backend: {
       loadPath: '/api/i18n/{{lng}}/{{ns}}',
     },
+
+    // 关键：允许动态加载未声明的 namespace
+    load: 'all',
 
     // 缺失 key 处理（开发环境）
     missingKeyHandler: import.meta.env.DEV
@@ -45,8 +48,11 @@ export const initI18n = async (initialLang: SupportedLocale) => {
       ns: string,
       callback: (error: any, data?: any) => void,
     ) => {
+      console.log(`[i18n] backendConnector.read called for: ${ns}@${lng}`);
+      
       // 核心命名空间已由 resources 预加载，跳过
       if (['common', 'auth', 'menu'].includes(ns)) {
+        console.log(`[i18n] Skipping core namespace: ${ns}`);
         callback(null, {});
         return;
       }
@@ -54,6 +60,7 @@ export const initI18n = async (initialLang: SupportedLocale) => {
       // 扩展命名空间：按需加载（支持所有扩展模块，不只是 preferences）
       loadModule(lng, ns)
         .then((data) => {
+          console.log(`[i18n] Loaded module ${ns}@${lng}:`, data ? 'success' : 'failed');
           if (data) {
             callback(null, data);
           } else {

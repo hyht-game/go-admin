@@ -17,7 +17,7 @@ export const authRoutes: AppRouteObject[] = [
     path: '/auth',
     element: <UserLayout requireAuth={false} />,
     errorElement: <RouteErrorFallback />,
-    meta: { title: '认证', ignoreAccess: true, hideInMenu: true, hideInTab: true },
+    meta: { title: 'routes.auth', ignoreAccess: true, hideInMenu: true, hideInTab: true },
     children: [
       {
         name: 'login',
@@ -27,7 +27,7 @@ export const authRoutes: AppRouteObject[] = [
             <Login />
           </GuestGuard>
         ),
-        meta: { title: '登录', ignoreAccess: true },
+        meta: { title: 'routes.login', ignoreAccess: true },
       },
       {
         name: 'register',
@@ -37,7 +37,7 @@ export const authRoutes: AppRouteObject[] = [
             <Register />
           </GuestGuard>
         ),
-        meta: { title: '注册', ignoreAccess: true },
+        meta: { title: 'routes.register', ignoreAccess: true },
       },
     ],
   },

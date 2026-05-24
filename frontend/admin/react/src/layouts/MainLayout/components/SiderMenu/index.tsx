@@ -1,11 +1,13 @@
 import { useMemo, useCallback, useState } from 'react';
 import { Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { usePreferencesStore } from '@/core/preferences/store';
 import { getIconFromName } from '../../utils/iconResolver';
 import ControlPanel from './ControlPanel';
 import './SiderMenu.style.less';
+import { useDynamicI18n } from '@/core/i18n';
 
 interface SiderMenuProps {
   menuData: any[];
@@ -25,6 +27,10 @@ export const Index = ({
   onOpenChange,
 }: SiderMenuProps) => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation('routes'); // 直接使用 routes namespace
+
+  const { t } = useDynamicI18n({ namespace: 'routes' });
+
   const preferences = usePreferencesStore((state) => state.preferences);
   const setPreferences = usePreferencesStore((state) => state.setPreferences);
 
@@ -41,16 +47,34 @@ export const Index = ({
 
   // 转换菜单数据为 Ant Design Menu items 格式
   const menuItems = useMemo(() => {
+    /**
+     * 翻译菜单标题
+     * @param label - 可能是 i18n key 或普通文本
+     * @returns 翻译后的文本
+     */
+    const translateLabel = (label: string | undefined): string => {
+      if (!label) return '';
+
+      // 如果是以 'routes.' 开头的 i18n key，提取 key 名称后翻译
+      if (label.startsWith('routes.')) {
+        const keyName = label.substring(7); // 去掉 'routes.' 前缀，得到 'dashboard'
+        return t(keyName, label);
+      }
+
+      // 否则直接尝试翻译（可能已经是简化的 key）
+      return t(label, label);
+    };
+
     const transformItem = (items: any[]): any[] => {
       return items.map((item) => ({
         key: item.path || item.key,
         icon: getIconFromName(item.icon),
-        label: item.name || item.label,
+        label: translateLabel(item.name || item.label), // 翻译标题
         children: item.children ? transformItem(item.children) : undefined,
       }));
     };
     return transformItem(menuData);
-  }, [menuData]);
+  }, [menuData, t, i18n.language]); // 添加 i18n.language 依赖，语言切换时重新翻译
 
   // 菜单点击
   const handleMenuClick = useCallback(
@@ -71,9 +95,9 @@ export const Index = ({
   // 计算是否折叠：
   // - expandOnHover=true: 根据 hover 状态动态切换
   // - expandOnHover=false: 根据 collapsed 状态决定
-  const isCollapsed = expandOnHover 
-    ? (!isHovering)  // 自动模式：只看 hover 状态
-    : sidebarCollapsed;  // 手动模式：看 collapsed 状态
+  const isCollapsed = expandOnHover
+    ? !isHovering // 自动模式：只看 hover 状态
+    : sidebarCollapsed; // 手动模式：看 collapsed 状态
 
   // 计算侧边栏宽度
   const sidebarWidth = isCollapsed ? 60 : (sidebarConfig?.width ?? 224);
@@ -99,7 +123,7 @@ export const Index = ({
   // 切换 expandOnHover 状态（固定/自动模式）
   const handleToggleExpandOnHover = () => {
     const newExpandOnHover = !expandOnHover;
-    
+
     // 关键：切换模式时，同步更新 hover 状态以保持当前视觉效果
     if (newExpandOnHover) {
       // 切换到自动模式：根据当前 collapsed 状态设置 hover
@@ -110,7 +134,7 @@ export const Index = ({
       // 切换到手动模式：取消 hover 状态
       setIsHovering(false);
     }
-    
+
     setPreferences({ sidebar: { expandOnHover: newExpandOnHover } });
   };
 

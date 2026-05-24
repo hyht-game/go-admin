@@ -75,7 +75,7 @@ export const AppRouter = () => {
   }, [isAuthenticated, permissions]);
 
   if (loading || !router)
-    return <div className="h-screen flex items-center justify-center">初始化中...</div>;
+    return <ThemeLoading fullScreen text="初始化中" subText="正在加载路由配置..." />;
 
   return <RouterProvider router={router} />;
 };
