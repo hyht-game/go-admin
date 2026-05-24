@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button, Card, Form, Input, Select, Space, Table, Tag, message, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useListTenants, useDeleteTenant } from '@/api/hooks/tenant';
@@ -11,20 +11,37 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
  */
 const TenantList = () => {
   const [form] = Form.useForm();
-  const [pagination, setPagination] = useState({
+  const [searchParams, setSearchParams] = useState({
     page: 1,
     pageSize: 10,
+    formValues: {} as Record<string, unknown>,
   });
 
+  // 构建查询对象
+  const query = useMemo(
+    () =>
+      new PaginationQuery({
+        paging: {
+          page: searchParams.page,
+          pageSize: searchParams.pageSize,
+        },
+        formValues: searchParams.formValues,
+      }),
+    [searchParams],
+  );
+
   // 获取租户列表
-  const listTenantsMutation = useListTenants({
-    onSuccess: (data) => {
-      console.log('租户列表:', data);
-    },
-    onError: () => {
+  const listTenantsQuery = useListTenants(query);
+
+  // 监听数据变化
+  useEffect(() => {
+    if (listTenantsQuery.data) {
+      console.log('租户列表:', listTenantsQuery.data);
+    }
+    if (listTenantsQuery.error) {
       message.error('获取租户列表失败');
-    },
-  });
+    }
+  }, [listTenantsQuery.data, listTenantsQuery.error]);
 
   // 删除租户
   const deleteTenantMutation = useDeleteTenant({
@@ -41,34 +58,31 @@ const TenantList = () => {
   // 搜索
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    const query = new PaginationQuery({
+    setSearchParams({
       page: 1,
-      pageSize: pagination.pageSize,
-      ...values,
+      pageSize: searchParams.pageSize,
+      formValues: values,
     });
-    listTenantsMutation.mutate(query);
   };
 
   // 重置
   const handleReset = () => {
     form.resetFields();
-    setPagination({ page: 1, pageSize: 10 });
-    handleSearch();
+    setSearchParams({
+      page: 1,
+      pageSize: 10,
+      formValues: {},
+    });
   };
 
   // 分页变化
   const handleTableChange = (newPagination: any) => {
-    setPagination({
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
     const values = form.getFieldsValue();
-    const query = new PaginationQuery({
+    setSearchParams({
       page: newPagination.current,
       pageSize: newPagination.pageSize,
-      ...values,
+      formValues: values,
     });
-    listTenantsMutation.mutate(query);
   };
 
   // 删除租户
@@ -83,7 +97,7 @@ const TenantList = () => {
       dataIndex: 'id',
       width: 80,
       render: (_: any, __: any, index: number) => {
-        return (pagination.page - 1) * pagination.pageSize + index + 1;
+        return (searchParams.page - 1) * searchParams.pageSize + index + 1;
       },
     },
     {
@@ -217,7 +231,7 @@ const TenantList = () => {
         <Form.Item>
           <Space>
             <Button onClick={handleReset}>重置</Button>
-            <Button type="primary" onClick={handleSearch} loading={listTenantsMutation.isPending}>
+            <Button type="primary" onClick={handleSearch} loading={listTenantsQuery.isPending}>
               查询
             </Button>
           </Space>
@@ -227,13 +241,13 @@ const TenantList = () => {
       {/* 数据表格 */}
       <Table
         columns={columns}
-        dataSource={listTenantsMutation.data?.items || []}
+        dataSource={listTenantsQuery.data?.items || []}
         rowKey="id"
-        loading={listTenantsMutation.isPending}
+        loading={listTenantsQuery.isPending}
         pagination={{
-          current: pagination.page,
-          pageSize: pagination.pageSize,
-          total: listTenantsMutation.data?.total || 0,
+          current: searchParams.page,
+          pageSize: searchParams.pageSize,
+          total: listTenantsQuery.data?.total || 0,
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total) => `共 ${total} 条`,
