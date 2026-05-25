@@ -71,7 +71,7 @@ export const Index = () => {
   }, [preferences.theme.mode]);
 
   const { t } = useI18n('common');
-  const { t: tRoutes, i18n } = useTranslation('menu');
+  const { t: tRoutes, i18n } = useTranslation('routes');
 
   // 翻译标题的工具函数
   const translateTitle = useCallback(

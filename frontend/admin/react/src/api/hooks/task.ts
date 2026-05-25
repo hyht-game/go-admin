@@ -12,7 +12,18 @@ import {
   type taskservicev1_Task,
 } from '@/api/generated/admin/service/v1';
 import { makeUpdateMask, type PaginationQuery, queryClient } from '@/core';
-import { listTasks, getTask, createTask, updateTask, deleteTask } from '@/api/service/task';
+import {
+  listTasks,
+  getTask,
+  createTask,
+  updateTask,
+  deleteTask,
+  listTaskTypeNames,
+  controlTask,
+  startAllTasks,
+  stopAllTasks,
+  restartAllTasks,
+} from '@/api/service/task';
 
 // ==============================
 // 任务管理
@@ -76,6 +87,53 @@ export function useDeleteTask(
 ) {
   return useMutation({
     mutationFn: (req) => deleteTask(req),
+    ...options,
+  });
+}
+
+// ==============================
+// 任务控制
+// ==============================
+
+/** 获取任务类型名称列表 */
+export async function fetchListTaskTypeNames() {
+  return queryClient.fetchQuery({
+    queryKey: ['listTaskTypeNames'],
+    queryFn: () => listTaskTypeNames(),
+    retry: 0,
+  });
+}
+
+/** 控制单个任务 */
+export function useControlTask(
+  options?: UseMutationOptions<{}, Error, { typeName: string; controlType: string }>,
+) {
+  return useMutation({
+    mutationFn: ({ typeName, controlType }) => controlTask(typeName, controlType),
+    ...options,
+  });
+}
+
+/** 启动所有任务 */
+export function useStartAllTasks(options?: UseMutationOptions<{}, Error, void>) {
+  return useMutation({
+    mutationFn: () => startAllTasks(),
+    ...options,
+  });
+}
+
+/** 停止所有任务 */
+export function useStopAllTasks(options?: UseMutationOptions<{}, Error, void>) {
+  return useMutation({
+    mutationFn: () => stopAllTasks(),
+    ...options,
+  });
+}
+
+/** 重启所有任务 */
+export function useRestartAllTasks(options?: UseMutationOptions<{}, Error, void>) {
+  return useMutation({
+    mutationFn: () => restartAllTasks(),
     ...options,
   });
 }

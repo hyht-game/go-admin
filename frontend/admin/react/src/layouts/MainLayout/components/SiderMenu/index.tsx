@@ -27,6 +27,7 @@ export const Index = ({
 }: SiderMenuProps) => {
   const navigate = useNavigate();
   const { i18n, t } = useTranslation();
+  const { t: tRoutes } = useTranslation('routes');
 
   const preferences = usePreferencesStore((state) => state.preferences);
   const setPreferences = usePreferencesStore((state) => state.setPreferences);
@@ -51,6 +52,11 @@ export const Index = ({
      */
     const translateLabel = (label: string | undefined): string => {
       if (!label) return '';
+      // 处理 'menu:xxx' 或 'routes:xxx' 前缀的 i18n key
+      if (label.startsWith('menu:') || label.startsWith('routes:')) {
+        const keyName = label.includes(':') ? label.substring(label.indexOf(':') + 1) : label;
+        return tRoutes(keyName, { defaultValue: label });
+      }
       // 否则直接尝试翻译（可能已经是简化的 key）
       return t(label, label);
     };

@@ -25,7 +25,7 @@ export const usePageTitle = ({
 }: UsePageTitleOptions): React.ReactNode => {
   const { app } = usePreferencesStore((state) => state.preferences);
   const { t } = useI18n('common');
-  const { t: tMenu } = useTranslation('menu');
+  const { t: tMenu } = useTranslation('routes');
   const resolvedDefaultTitle = defaultTitle ?? t('pageContainer.defaultTitle');
 
   // 翻译标题的工具函数

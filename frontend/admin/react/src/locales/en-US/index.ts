@@ -19,7 +19,7 @@ const toNs = (path: string): string | null => {
 const buildMap = (glob: Record<string, any>) =>
     Object.entries(glob).reduce((map, [path, data]) => {
         const ns = toNs(path);
-        if (ns) map[ns] = data;
+        if (ns) map[ns] = data?.default ?? data;
         return map;
     }, {} as Record<string, Record<string, any>>);
 

@@ -5,12 +5,7 @@ import { Tag, Button, Popconfirm, App } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type {
-  identityservicev1_Tenant,
-  identityservicev1_Tenant_Type,
-  identityservicev1_Tenant_Status,
-  identityservicev1_Tenant_AuditStatus,
-} from '@/api/generated/admin/service/v1';
+import type { identityservicev1_Tenant } from '@/api/generated/admin/service/v1';
 import { PaginationQuery } from '@/core';
 import { TABLE } from '@/config/constants';
 import { fetchListTenants, useDeleteTenant } from '@/api/hooks/tenant';
@@ -102,11 +97,14 @@ const TenantList = () => {
       valueEnum: Object.fromEntries(
         Object.entries(TENANT_TYPE_STATUS).map(([key, status]) => [
           key,
-          { text: tenantTypeMap[key]?.text || t('typeUnknown'), status },
+          {
+            text: tenantTypeMap[key as keyof typeof tenantTypeMap]?.text || t('typeUnknown'),
+            status,
+          },
         ]),
       ),
       render: (_, record) => {
-        const type = record.type as identityservicev1_Tenant_Type;
+        const type = record.type as keyof typeof tenantTypeMap;
         const config = tenantTypeMap[type] || { text: t('typeUnknown'), color: 'default' };
         return <Tag color={config.color}>{config.text}</Tag>;
       },
@@ -119,11 +117,14 @@ const TenantList = () => {
       valueEnum: Object.fromEntries(
         Object.entries(AUDIT_STATUS_STATUS).map(([key, status]) => [
           key,
-          { text: auditStatusMap[key]?.text || t('auditUnknown'), status },
+          {
+            text: auditStatusMap[key as keyof typeof auditStatusMap]?.text || t('auditUnknown'),
+            status,
+          },
         ]),
       ),
       render: (_, record) => {
-        const status = record.auditStatus as identityservicev1_Tenant_AuditStatus;
+        const status = record.auditStatus as keyof typeof auditStatusMap;
         const config = auditStatusMap[status] || { text: t('auditUnknown'), color: 'default' };
         return <Tag color={config.color}>{config.text}</Tag>;
       },
@@ -136,11 +137,14 @@ const TenantList = () => {
       valueEnum: Object.fromEntries(
         Object.entries(TENANT_STATUS_STATUS).map(([key, status]) => [
           key,
-          { text: tenantStatusMap[key]?.text || t('statusUnknown'), status },
+          {
+            text: tenantStatusMap[key as keyof typeof tenantStatusMap]?.text || t('statusUnknown'),
+            status,
+          },
         ]),
       ),
       render: (_, record) => {
-        const status = record.status as identityservicev1_Tenant_Status;
+        const status = record.status as keyof typeof tenantStatusMap;
         const config = tenantStatusMap[status] || { text: t('statusUnknown'), color: 'default' };
         return <Tag color={config.color}>{config.text}</Tag>;
       },
@@ -207,7 +211,9 @@ const TenantList = () => {
                     pageSize: params.pageSize || 10,
                   },
                   formValues: Object.fromEntries(
-                    Object.entries(params).filter(([key]) => !['current', 'pageSize'].includes(key)),
+                    Object.entries(params).filter(
+                      ([key]) => !['current', 'pageSize'].includes(key),
+                    ),
                   ),
                   orderBy:
                     sorter && Object.keys(sorter).length > 0
