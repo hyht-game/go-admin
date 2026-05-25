@@ -6,7 +6,6 @@ import {autoImportPlugin} from './autoImport';
 import {versionUpdatePlugin} from './version';
 import react from '@vitejs/plugin-react-swc';
 import unocss from 'unocss/vite';
-import legacy from '@vitejs/plugin-legacy';
 import viteCompression from 'vite-plugin-compression';
 
 export function createVitePlugins() {
@@ -27,32 +26,27 @@ export function createVitePlugins() {
     // 生产环境才启用这些插件
     if (!isDev) {
         vitePlugins.push(
-            // 压缩包
-            viteCompression(),
-            // 兼容低版本
-            legacy({
-                targets: [
-                    'Android > 39',
-                    'Chrome >= 60',
-                    'Safari >= 10.1',
-                    'iOS >= 10.3',
-                    'Firefox >= 54',
-                    'Edge >= 15',
-                ],
-                additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-            }),
             // 版本控制
             versionUpdatePlugin(),
             // 生成 .nojekyll 空文件
             nojekyllPlugin(),
-            // 包分析
-            visualizer({
-                gzipSize: true,
-                brotliSize: true,
-            }),
             // 打包时间
             timePlugin(),
         );
+
+        // 按需启用：Gzip 压缩（设置 ANALYZE=true 启用包分析时一起启用）
+        const enableAnalyze = process.env.ANALYZE === 'true';
+        if (enableAnalyze) {
+            vitePlugins.push(
+                // 压缩包
+                viteCompression(),
+                // 包分析
+                visualizer({
+                    gzipSize: true,
+                    brotliSize: true,
+                }),
+            );
+        }
     }
 
     return vitePlugins;
