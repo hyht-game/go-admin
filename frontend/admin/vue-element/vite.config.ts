@@ -204,6 +204,28 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         : undefined,
       rollupOptions: {
         output: {
+          // 手动分块：将 Vue 相关包分离到独立 chunk，避免 Rolldown 产生循环依赖
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              // Vue 核心 & 生态
+              if (
+                id.includes("/vue/") ||
+                id.includes("\\vue\\") ||
+                id.includes("/@vue/") ||
+                id.includes("\\@vue\\") ||
+                id.includes("/vue-router/") ||
+                id.includes("\\vue-router\\") ||
+                id.includes("/pinia/") ||
+                id.includes("\\pinia\\") ||
+                id.includes("/vue-i18n/") ||
+                id.includes("\\vue-i18n\\") ||
+                id.includes("/@vueuse/") ||
+                id.includes("\\@vueuse\\")
+              ) {
+                return "vue-vendor";
+              }
+            }
+          },
           // manualChunks: {
           //   "vue-i18n": ["vue-i18n"],
           // },
