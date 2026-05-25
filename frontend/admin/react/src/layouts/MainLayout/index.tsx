@@ -314,9 +314,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
               }}
             >
               {/* 使用 refreshTrigger 作为 key，触发页面重新渲染 */}
-              <div key={refreshTrigger}>
-                <Outlet />
-              </div>
+              <Outlet key={refreshTrigger} />
             </PageContainer>
           </div>
 

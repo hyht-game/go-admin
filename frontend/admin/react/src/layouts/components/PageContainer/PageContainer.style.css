@@ -1,27 +1,48 @@
 /**
  * PageContainer 组件样式
- * 负责页面容器的布局和 ProTable 的高度适配
  */
 
-/* PageContainer 内容区域 Flex 布局 */
+/* ProPageContainer 根元素：确保占满父容器高度 */
+.page-container-root {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* ========================================
+ * ProTable 在 ContentContainer 中占满高度
+ *
+ * 使用方式：ContentContainer > .page-container-content > ProTable
+ *
+ * 注意：scroll.y 由 useProTableScrollY 动态计算，
+ * CSS 不干预 .ant-table-wrapper 内部布局，避免与 antd scroll.y 冲突。
+ * ======================================== */
+
+/* 中间容器：占满 ContentContainer 的内容区 */
 .page-container-content {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* 关键：允许 flex 子项收缩 */
+  overflow: hidden;
 }
 
-/* ProTable 占满父容器 */
-.page-container-content > .ant-pro-table,
-.page-container-content > div > .ant-pro-table {
+/* ProTable 根元素：占满中间容器 */
+.page-container-content > .ant-pro-table {
   flex: 1;
-  height: 100%;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 确保 ProTable 的内部容器也占满高度 */
-.page-container-content > .ant-pro-table > div,
-.page-container-content > div > .ant-pro-table > div {
-  height: 100%;
+/* 搜索表单保持自适应高度，绝不被拉伸 */
+.page-container-content > .ant-pro-table > .ant-pro-table-search {
+  flex: none;
+}
+
+/* ProTable 内部内容区 div（排除搜索表单） */
+.page-container-content > .ant-pro-table > div:not(.ant-pro-table-search) {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }

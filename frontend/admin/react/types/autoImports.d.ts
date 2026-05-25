@@ -124,6 +124,7 @@ declare global {
   const useOutletContext: typeof import('react-router-dom').useOutletContext
   const usePageRefreshStore: typeof import('../src/stores/pageRefresh').usePageRefreshStore
   const useParams: typeof import('react-router-dom').useParams
+  const useProTableScrollY: typeof import('../src/hooks/useProTableScrollY').useProTableScrollY
   const useReducer: typeof import('react').useReducer
   const useRef: typeof import('react').useRef
   const useResolvedPath: typeof import('react-router-dom').useResolvedPath

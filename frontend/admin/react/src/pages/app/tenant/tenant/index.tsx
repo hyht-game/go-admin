@@ -13,6 +13,8 @@ import type {
 import { PaginationQuery } from '@/core';
 import { TABLE } from '@/config/constants';
 import { listTenants, deleteTenant } from '@/api/service/tenant';
+import { useProTableScrollY } from '@/hooks/useProTableScrollY';
+import ContentContainer from '@/layouts/components/PageContainer/ContentContainer';
 import TenantDrawer from './components/TenantDrawer';
 
 /**
@@ -23,6 +25,9 @@ const TenantList = () => {
   const queryClient = useQueryClient();
 
   const { message } = App.useApp();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tableScrollY = useProTableScrollY(containerRef);
 
   // Drawer 状态管理
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -195,95 +200,88 @@ const TenantList = () => {
 
   return (
     <>
-      {/* 直接返回 ProTable，不需要外层 div */}
-      <ProTable<identityservicev1_Tenant>
-        actionRef={actionRef}
-        columns={columns}
-        // 核心：request 属性自动处理请求
-        request={async (params, sorter, _filter) => {
-          try {
-            // 构建查询对象
-            const query = new PaginationQuery({
-              paging: {
-                page: params.current || 1,
-                pageSize: params.pageSize || 10,
-              },
-              formValues: Object.fromEntries(
-                Object.entries(params).filter(([key]) => !['current', 'pageSize'].includes(key)),
-              ),
-              orderBy:
-                sorter && Object.keys(sorter).length > 0
-                  ? Object.entries(sorter).map(([key, value]) =>
-                      value === 'ascend' ? key : `-${key}`,
-                    )
-                  : undefined,
-            });
+      <ContentContainer heightMode="fixed" padding="16px" bottomMargin={0}>
+        <div ref={containerRef} className="page-container-content">
+          <ProTable<identityservicev1_Tenant>
+            actionRef={actionRef}
+            columns={columns}
+            request={async (params, sorter, _filter) => {
+              try {
+                // 构建查询对象
+                const query = new PaginationQuery({
+                  paging: {
+                    page: params.current || 1,
+                    pageSize: params.pageSize || 10,
+                  },
+                  formValues: Object.fromEntries(
+                    Object.entries(params).filter(([key]) => !['current', 'pageSize'].includes(key)),
+                  ),
+                  orderBy:
+                    sorter && Object.keys(sorter).length > 0
+                      ? Object.entries(sorter).map(([key, value]) =>
+                          value === 'ascend' ? key : `-${key}`,
+                        )
+                      : undefined,
+                });
 
-            // 调用 API
-            const response = await listTenants(query);
+                // 调用 API
+                const response = await listTenants(query);
 
-            // ProTable 要求返回格式：{ data, total, success }
-            return {
-              data: response.items || [],
-              total: response.total || 0,
-              success: true,
-            };
-          } catch (error: any) {
-            message.error(error.message || '获取数据失败');
-            return {
-              data: [],
-              total: 0,
-              success: false,
-            };
-          }
-        }}
-        // 行键
-        rowKey="id"
-        // 搜索表单配置
-        search={{
-          labelWidth: 'auto',
-          defaultCollapsed: false,
-        }}
-        // 分页配置
-        pagination={{
-          defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          position: ['bottomRight'],
-        }}
-        // 工具栏配置
-        toolBarRender={() => [
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setDrawerMode('create');
-              setSelectedTenant(undefined);
-              setDrawerOpen(true);
+                // ProTable 要求返回格式：{ data, total, success }
+                return {
+                  data: response.items || [],
+                  total: response.total || 0,
+                  success: true,
+                };
+              } catch (error: any) {
+                message.error(error.message || '获取数据失败');
+                return {
+                  data: [],
+                  total: 0,
+                  success: false,
+                };
+              }
             }}
-          >
-            新建租户
-          </Button>,
-        ]}
-        // 其他配置
-        options={{
-          density: true,
-          fullScreen: true,
-          setting: true,
-          reload: true,
-        }}
-        size="middle"
-        bordered
-        style={{
-          height: '100%', // 让表格占据父容器全部空间
-          minHeight: 0, // 防止 flex 溢出
-        }}
-        scroll={{
-          y: '100%', // 启用纵向滚动（表头固定）
-          x: 1300,
-        }}
-      />
+            rowKey="id"
+            search={{
+              labelWidth: 'auto',
+              defaultCollapsed: false,
+            }}
+            pagination={{
+              defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              position: ['bottomRight'],
+            }}
+            toolBarRender={() => [
+              <Button
+                key="create"
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setDrawerMode('create');
+                  setSelectedTenant(undefined);
+                  setDrawerOpen(true);
+                }}
+              >
+                新建租户
+              </Button>,
+            ]}
+            options={{
+              density: true,
+              fullScreen: true,
+              setting: true,
+              reload: true,
+            }}
+            size="middle"
+            bordered
+            scroll={{
+              y: tableScrollY,
+              x: 1300,
+            }}
+          />
+        </div>
+      </ContentContainer>
 
       {/* 租户编辑/创建 Drawer */}
       <TenantDrawer

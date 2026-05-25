@@ -276,6 +276,7 @@ export const PageContainer = ({
   // 正常渲染
   return (
     <ProPageContainer
+      className="page-container-root"
       ghost={ghost}
       header={effectiveHeader === false ? undefined : (effectiveHeader as any)}
       title={effectiveHeader === false ? undefined : pageTitle}
@@ -284,31 +285,27 @@ export const PageContainer = ({
       footer={footer}
       style={{
         ...fullscreenStyles,
-        minHeight: '100vh', // 占满整个视口
-        display: 'flex',
-        flexDirection: 'column',
+        position: 'relative',
+        height: '100%',
       }}
       {...restProps}
     >
-      {/* 内容区域增强 */}
+      {/*
+       * 用绝对定位绕过 ProPageContainer 内部的未知 flex 层级
+       * 这样不管 ProPageContainer 内部包了多少层 div，都不影响
+       */}
       <div
-        className={`
-          page-container-content
-          ${isFullscreen ? '' : contentPadding ? 'px-4 md:px-6 py-3 md:py-4' : ''}
-          ${contentClassName || ''}
-        `.trim()}
         style={{
-          flex: 1, // 占据剩余空间
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           display: 'flex',
           flexDirection: 'column',
-          minHeight: 0, // 关键：防止 flex 子项溢出
-          padding: contentPadding ? '16px' : '0',
-          boxSizing: 'border-box',
+          overflow: 'hidden',
         }}
-        data-page-key={pageKey}
-        data-keep-alive={keepAlive || undefined}
       >
-        {/* 优先使用 content，否则用 children */}
         {content ?? children}
       </div>
     </ProPageContainer>

@@ -8,6 +8,8 @@ import type { resourceservicev1_Api as Api } from '@/api/generated/admin/service
 import { PaginationQuery } from '@/core';
 import { TABLE } from '@/config/constants';
 import { listApis, deleteApi } from '@/api/service/api';
+import { useProTableScrollY } from '@/hooks/useProTableScrollY';
+import ContentContainer from '@/layouts/components/PageContainer/ContentContainer';
 import ApiDrawer from './components/ApiDrawer';
 
 /**
@@ -31,6 +33,9 @@ const ApiManagement = () => {
   const queryClient = useQueryClient();
 
   const { message } = App.useApp();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tableScrollY = useProTableScrollY(containerRef);
 
   // Drawer 状态管理
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -176,98 +181,100 @@ const ApiManagement = () => {
 
   return (
     <>
-      {/* 直接返回 ProTable，不需要外层 div */}
-      <ProTable<Api>
-      actionRef={actionRef}
-      columns={columns}
-      request={async (params, sorter, _filter) => {
-        try {
-          const query = new PaginationQuery({
-            paging: {
-              page: params.current || 1,
-              pageSize: params.pageSize || 10,
-            },
-            formValues: Object.fromEntries(
-              Object.entries(params).filter(([key]) => !['current', 'pageSize'].includes(key)),
-            ),
-            orderBy:
-              sorter && Object.keys(sorter).length > 0
-                ? Object.entries(sorter).map(([key, value]) =>
-                    value === 'ascend' ? key : `-${key}`,
-                  )
-                : undefined,
-          });
+      <ContentContainer heightMode="fixed" padding="16px" bottomMargin={0}>
+        <div ref={containerRef} className="page-container-content">
+          <ProTable<Api>
+            actionRef={actionRef}
+            columns={columns}
+            request={async (params, sorter, _filter) => {
+              try {
+                // 构建查询对象
+                const query = new PaginationQuery({
+                  paging: {
+                    page: params.current || 1,
+                    pageSize: params.pageSize || 10,
+                  },
+                  formValues: Object.fromEntries(
+                    Object.entries(params).filter(([key]) => !['current', 'pageSize'].includes(key)),
+                  ),
+                  orderBy:
+                    sorter && Object.keys(sorter).length > 0
+                      ? Object.entries(sorter).map(([key, value]) =>
+                          value === 'ascend' ? key : `-${key}`,
+                        )
+                      : undefined,
+                });
 
-          const response = await listApis(query);
+                // 调用 API
+                const response = await listApis(query);
 
-          return {
-            data: response.items || [],
-            total: response.total || 0,
-            success: true,
-          };
-        } catch (error: any) {
-          message.error(error.message || '获取数据失败');
-          return {
-            data: [],
-            total: 0,
-            success: false,
-          };
-        }
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-        defaultCollapsed: false,
-      }}
-      pagination={{
-        defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        position: ['bottomRight'],
-      }}
-      toolBarRender={() => [
-        <Button
-          key="create"
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setDrawerMode('create');
-            setSelectedApi(undefined);
-            setDrawerOpen(true);
-          }}
-        >
-          新建 API
-        </Button>,
-        <Popconfirm
-          key="sync"
-          title="确认同步"
-          description="确定要同步 API 吗？这将从后端重新扫描并同步所有 API 接口。"
-          onConfirm={handleSync}
-          okText="确定"
-          cancelText="取消"
-        >
-          <Button type="primary" danger icon={<SyncOutlined />}>
-            同步 API
-          </Button>
-        </Popconfirm>,
-      ]}
-      options={{
-        density: true,
-        fullScreen: true,
-        setting: true,
-        reload: true,
-      }}
-      size="middle"
-      bordered
-      style={{
-        height: '100%', // 让表格占据父容器全部空间
-        minHeight: 0, // 防止 flex 溢出
-      }}
-      scroll={{
-        y: '100%', // 启用纵向滚动（表头固定）
-        x: 1300,
-      }}
-    />
+                // ProTable 要求返回格式：{ data, total, success }
+                return {
+                  data: response.items || [],
+                  total: response.total || 0,
+                  success: true,
+                };
+              } catch (error: any) {
+                message.error(error.message || '获取数据失败');
+                return {
+                  data: [],
+                  total: 0,
+                  success: false,
+                };
+              }
+            }}
+            rowKey="id"
+            search={{
+              labelWidth: 'auto',
+              defaultCollapsed: false,
+            }}
+            pagination={{
+              defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              position: ['bottomRight'],
+            }}
+            toolBarRender={() => [
+              <Button
+                key="create"
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setDrawerMode('create');
+                  setSelectedApi(undefined);
+                  setDrawerOpen(true);
+                }}
+              >
+                新建 API
+              </Button>,
+              <Popconfirm
+                key="sync"
+                title="确认同步"
+                description="确定要同步 API 吗？这将从后端重新扫描并同步所有 API 接口。"
+                onConfirm={handleSync}
+                okText="确定"
+                cancelText="取消"
+              >
+                <Button type="primary" danger icon={<SyncOutlined />}>
+                  同步 API
+                </Button>
+              </Popconfirm>,
+            ]}
+            options={{
+              density: true,
+              fullScreen: true,
+              setting: true,
+              reload: true,
+            }}
+            size="middle"
+            bordered
+            scroll={{
+              y: tableScrollY,
+              x: 1300,
+            }}
+          />
+        </div>
+      </ContentContainer>
 
       {/* API 编辑/创建 Drawer */}
       <ApiDrawer
