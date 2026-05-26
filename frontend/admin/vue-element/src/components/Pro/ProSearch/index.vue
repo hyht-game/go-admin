@@ -1,6 +1,6 @@
 <template>
-  <div v-show="visible" class="pro-search">
-    <ElCard v-bind="cardAttrs" class="pro-search__card" shadow="never">
+  <div v-show="visible">
+    <ElCard v-bind="cardAttrs">
       <ElForm
         ref="formRef"
         :model="queryParams"
@@ -12,7 +12,7 @@
           <ElFormItem
             :label="field.label"
             :prop="String(field.field)"
-            :class="{ 'pro-search__item--stretch': grid }"
+            :class="{ 'form-item-stretch': grid }"
           >
             <template #label>
               <span class="flex items-center gap-1">
@@ -165,7 +165,7 @@ const hasHiddenFields = computed(() => props.fields.length > props.showNumber);
 
 // 卡片属性
 const cardAttrs = computed(() => ({
-  shadow: "never",
+  shadow: "never" as const,
   bodyStyle: { padding: "16px" },
   ...props.cardAttrs,
 }));
@@ -178,19 +178,17 @@ const formAttrs = computed<Record<string, any>>(() => ({
   ...props.form,
 }));
 
-// 表单 class
-const formClass = computed(() => ({
-  "pro-search__form--grid": props.grid,
-  "pro-search__form--flex": !props.grid,
-  "pro-search__form--inline": props.inline,
-}));
+// 表单 class（对齐 CURD PageSearch）
+const formClass = computed(() =>
+  props.grid
+    ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6 gap-5"
+    : "flex flex-wrap gap-x-8 gap-y-4"
+);
 
 // 按钮 class
 const buttonClass = computed(() => ({
-  "pro-search__buttons": true,
-  "pro-search__buttons--grid": props.grid === true || props.grid === "right",
-  "pro-search__buttons--left": props.grid === "left",
-  "pro-search__buttons--right": props.grid === "right",
+  "button-group": props.grid === true || props.grid === "right",
+  "col-[auto/-1] justify-self-end": props.grid === "right",
 }));
 
 // 动态解析组件
@@ -292,57 +290,49 @@ defineExpose({
 });
 </script>
 
-<style scoped lang="scss">
-.pro-search {
-  &__card {
-    margin-bottom: 12px;
-  }
+<style lang="scss" scoped>
+:deep(.el-input-number .el-input__inner) {
+  text-align: left;
+}
 
-  &__form {
-    &--grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-    }
+.el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+}
 
-    &--flex {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    &--inline {
-      :deep(.el-form-item) {
-        margin-bottom: 16px;
-      }
-    }
-
-    &--stretch {
-      :deep(.el-form-item__content) {
-        flex: 1;
+// 全局样式：按钮固定在右下角，输入框拉伸
+:deep(.el-form) {
+  // Grid 布局模式（对齐 CURD）
+  &.grid {
+    .el-form-item:not(.button-group) {
+      .el-form-item__content {
+        flex: 1 !important;
         min-width: 0;
+        width: 100% !important;
+      }
+    }
+
+    .button-group {
+      grid-column: -1 !important;
+      justify-self: end !important;
+      align-self: end !important;
+      margin-left: auto !important;
+
+      .el-form-item__content {
+        justify-content: flex-end !important;
+        gap: 8px;
       }
     }
   }
 
-  &__buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 0;
-
-    &--grid {
-      grid-column: -1;
-      justify-self: end;
-    }
-
-    &--left {
-      justify-content: flex-start;
-    }
-
-    &--right {
-      justify-content: flex-end;
-      margin-left: auto;
+  // Flex 布局模式
+  &.flex {
+    .form-item-stretch {
+      .el-form-item__content {
+        flex: 1 !important;
+        min-width: 0;
+        width: 100% !important;
+      }
     }
   }
 }

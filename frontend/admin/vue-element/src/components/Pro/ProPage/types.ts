@@ -1,6 +1,6 @@
 import type { DialogProps, DrawerProps } from "element-plus";
 import type { ProFormField } from "../ProForm/types";
-import type { ProTableColumn } from "../ProTable/types";
+import type { ProTableColumn, TableEngine } from "../ProTable/types";
 
 // 工具栏按钮类型
 export type ToolbarLeft = "add" | "delete" | "import" | "export";
@@ -23,6 +23,8 @@ export type ListAction<TItem = any, TQuery = any> = (
 export interface ProPageConfig<T = any, Q = any> {
   // 权限前缀
   permPrefix?: string;
+  // 表格引擎 (默认vxe)
+  engine?: TableEngine;
   // 主键名(默认id)
   rowKey?: string;
 

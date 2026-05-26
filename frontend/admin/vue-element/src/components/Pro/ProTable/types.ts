@@ -16,6 +16,8 @@ export type CellType =
 
 export type TableColumnType = "default" | "selection" | "index" | "expand";
 
+export type TableEngine = "vxe" | "element";
+
 export interface ProTableColumn<T = any> {
   // 列类型
   type?: TableColumnType;
@@ -85,8 +87,11 @@ export interface ProTableProps<T = any> {
   columns: ProTableColumn<T>[];
   data?: T[];
   loading?: boolean;
+  // 表格引擎
+  engine?: TableEngine;
   rowKey?: string;
-  table?: Partial<TableProps<any>>;
+  // 透传表格属性（根据 engine 不同）
+  table?: Record<string, any>;
 
   // === 分页 ===
   pagination?: boolean;

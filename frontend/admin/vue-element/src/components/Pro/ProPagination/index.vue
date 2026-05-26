@@ -51,16 +51,14 @@ const emit = defineEmits<PaginationEmits>();
 const currentPage = ref(props.currentPage);
 const pageSize = ref(props.pageSize);
 
-// 自动计算 layout
+// 自动计算 layout（对齐 CURD PageContent）
 const computedLayout = computed(() => {
   if (props.layout) return props.layout;
-
-  const parts = ["total"];
-  if (props.showSizes) parts.push("sizes");
-  parts.push("prev", "pager", "next");
-  if (props.showJump) parts.push("jump");
-
-  return parts.join(" -> ");
+  const left: string[] = ["total"];
+  if (props.showSizes) left.push("sizes");
+  const right: string[] = ["prev", "pager", "next"];
+  if (props.showJump) right.push("jumper");
+  return left.join(", ") + " -> " + right.join(", ");
 });
 
 const showPagination = computed(() => {
@@ -124,9 +122,8 @@ defineExpose({
 
 <style scoped lang="scss">
 .pro-pagination {
-  padding: 12px 0;
-  display: flex;
-  justify-content: flex-end;
+  padding: 4px 0 0 0;
+  background-color: var(--el-bg-color);
 
   &--hidden {
     display: none;
@@ -135,10 +132,14 @@ defineExpose({
   :deep(.el-pagination) {
     display: flex;
     align-items: center;
-    gap: 8px;
 
-    .el-pagination__total {
+    .el-pagination__total,
+    .el-pagination__sizes {
       margin-right: auto;
+    }
+
+    .el-pagination__jump {
+      margin-left: auto;
     }
   }
 }

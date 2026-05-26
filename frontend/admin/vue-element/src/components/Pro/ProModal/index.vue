@@ -7,7 +7,7 @@
   >
     <ProForm
       ref="formRef"
-      v-model="formData"
+      :model-value="formData"
       :fields="fields"
       :disabled="mode === 'view'"
       :colon="config.colon"
@@ -60,8 +60,8 @@ const visible = computed({
 });
 const containerProps = computed(() =>
   props.config.component === "drawer"
-    ? { destroyOnClose: true, ...props.config.drawer }
-    : { destroyOnClose: true, alignCenter: true, ...props.config.dialog }
+    ? { destroyOnClose: true, appendToBody: true, ...props.config.drawer }
+    : { destroyOnClose: true, alignCenter: true, appendTo: true, ...props.config.dialog }
 );
 const formProps = computed(() => ({
   labelWidth: "auto",

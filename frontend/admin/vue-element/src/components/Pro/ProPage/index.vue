@@ -13,7 +13,7 @@
     />
 
     <!-- 表格区 -->
-    <ElCard shadow="never" class="pro-page__table-card">
+    <div class="pro-page__content">
       <!-- 工具栏 -->
       <ProToolbar
         :left-buttons="leftButtons"
@@ -33,6 +33,7 @@
       <!-- 表格 -->
       <ProTable
         ref="tableRef"
+        :engine="config.engine"
         :columns="config.table.columns"
         :data="tableData"
         :loading="tableState.loading.value"
@@ -54,7 +55,7 @@
           <slot :name="name" v-bind="slotProps" />
         </template>
       </ProTable>
-    </ElCard>
+    </div>
 
     <!-- 弹窗 -->
     <ProModal
@@ -74,7 +75,7 @@
 
 <script setup lang="ts" generic="T extends Record<string, any>, Q extends Record<string, any>">
 import { reactive, computed, ref, useSlots } from "vue";
-import { ElMessage, ElMessageBox, ElCard } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useI18n } from "@/i18n";
 
 import ProSearch from "../ProSearch/index.vue";
@@ -137,14 +138,15 @@ const modalSlots = computed(() => {
 });
 
 // === 工具栏按钮转换（参考CURD createToolbar） ===
-const builtinButtons: Record<string, { textKey: string; attrs: Record<string, any> }> = {
-  add: { textKey: "common.button.add", attrs: { icon: "plus", type: "success" } },
+const builtinButtons: Record<string, { textKey: string; icon: string; attrs: Record<string, any> }> = {
+  add: { textKey: "common.button.add", icon: "plus", attrs: { type: "success" } },
   delete: {
     textKey: "common.button.delete",
-    attrs: { icon: "delete", type: "danger" },
+    icon: "delete",
+    attrs: { type: "danger" },
   },
-  import: { textKey: "common.button.import", attrs: { icon: "upload" } },
-  export: { textKey: "common.button.export", attrs: { icon: "download" } },
+  import: { textKey: "common.button.import", icon: "upload", attrs: {} },
+  export: { textKey: "common.button.export", icon: "download", attrs: {} },
 };
 
 function toToolbarButtons(
@@ -159,7 +161,7 @@ function toToolbarButtons(
         name: item,
         text: cfg ? t(cfg.textKey) : item,
         type: item as ToolbarButton["type"],
-        icon: cfg?.attrs?.icon,
+        icon: cfg?.icon,
         attrs: { ...defaultAttrs, ...cfg?.attrs },
       };
     }
@@ -388,18 +390,23 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pro-page {
   display: flex;
   flex-direction: column;
   gap: 12px;
   height: 100%;
-}
 
-.pro-page__table-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: auto;
+    padding: 8px 12px;
+    background: var(--el-bg-color);
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+  }
 }
 </style>

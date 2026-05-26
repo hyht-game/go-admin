@@ -1,55 +1,43 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <!-- 搜索 -->
-    <PageSearch
-      ref="searchRef"
-      :search-config="searchConfig"
-      @query-click="handleQueryClick"
-      @reset-click="handleResetClick"
-    />
-
-    <!-- 列表 -->
-    <PageContent
-      ref="contentRef"
-      :content-config="contentConfig"
-      @add-click="handleAddClick"
-      @operate-click="handleOperateClick"
-      @toolbar-click="handleToolbarClick"
-    >
+    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
       <!-- 类型 -->
-      <template #type="{ row }">
-        <ElTag size="small" effect="dark" round :color="tenantTypeToColor(row.type)">
-          {{ tenantTypeToName(row.type) }}
+      <template #type="scope: any">
+        <ElTag size="small" effect="dark" round :color="tenantTypeToColor(scope.row.type)">
+          {{ tenantTypeToName(scope.row.type) }}
         </ElTag>
       </template>
 
       <!-- 审核状态 -->
-      <template #auditStatus="{ row }">
-        <ElTag size="small" effect="dark" round :color="tenantAuditStatusToColor(row.auditStatus)">
-          {{ tenantAuditStatusToName(row.auditStatus) }}
+      <template #auditStatus="scope: any">
+        <ElTag
+          size="small"
+          effect="dark"
+          round
+          :color="tenantAuditStatusToColor(scope.row.auditStatus)"
+        >
+          {{ tenantAuditStatusToName(scope.row.auditStatus) }}
         </ElTag>
       </template>
 
       <!-- 状态 -->
-      <template #status="{ row }">
-        <ElTag size="small" effect="dark" round :color="tenantStatusToColor(row.status)">
-          {{ tenantStatusToName(row.status) }}
+      <template #status="scope: any">
+        <ElTag size="small" effect="dark" round :color="tenantStatusToColor(scope.row.status)">
+          {{ tenantStatusToName(scope.row.status) }}
         </ElTag>
       </template>
-    </PageContent>
+    </ProPage>
 
-    <!-- 新增/编辑弹窗 -->
+    <!-- 新增/编辑抽屉 -->
     <TenantDrawer ref="drawerRef" @success="handleSuccess" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ElTag, ElMessage, ElMessageBox } from "element-plus";
-
-import PageContent from "@/components/CURD/PageContent.vue";
-import PageSearch from "@/components/CURD/PageSearch.vue";
-import usePage from "@/components/CURD/usePage";
-import type { IOperateData, ISearchConfig, IContentConfig } from "@/components/CURD/types";
+import { ref } from "vue";
+import { ElTag } from "element-plus";
+import ProPage from "@/components/Pro/ProPage/index.vue";
+import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 import TenantDrawer from "./tenant-drawer.vue";
 
 import {
@@ -70,188 +58,119 @@ import { $t } from "@/i18n";
 
 const { mutateAsync: deleteTenant } = useDeleteTenant();
 
-// 使用 CURD hook
-const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
-
-// 抽屉引用
+const pageRef = ref();
 const drawerRef = ref();
 
-// 搜索配置
-const searchConfig: ISearchConfig = {
-  grid: true, // 启用 Grid 布局
-  formItems: [
-    {
-      type: "input",
-      label: $t("pages.tenant.name"),
-      prop: "name",
-      attrs: {
-        placeholder: $t("common.placeholder.input"),
-        clearable: true,
-      },
-    },
-    {
-      type: "input",
-      label: $t("pages.tenant.code"),
-      prop: "code",
-      attrs: {
-        placeholder: $t("common.placeholder.input"),
-        clearable: true,
-      },
-    },
-    {
-      type: "select",
-      label: $t("pages.tenant.type"),
-      prop: "type",
-      attrs: {
-        placeholder: $t("common.placeholder.select"),
-        clearable: true,
-      },
-      options: tenantTypeList.value,
-    },
-    {
-      type: "select",
-      label: $t("pages.tenant.auditStatus"),
-      prop: "auditStatus",
-      attrs: {
-        placeholder: $t("common.placeholder.select"),
-        clearable: true,
-      },
-      options: tenantAuditStatusList.value,
-    },
-    {
-      type: "select",
-      label: $t("common.table.status"),
-      prop: "status",
-      attrs: {
-        placeholder: $t("common.placeholder.select"),
-        clearable: true,
-      },
-      options: tenantStatusList.value,
-    },
-  ],
-};
+// === 页面配置 ===
+const pageConfig: ProPageConfig = {
+  permPrefix: "sys:manage_tenants",
 
-// 表格配置
-const contentConfig: IContentConfig = {
-  permPrefix: "sys:manage_tenants", // 使用已有的租户管理权限
-  toolbarRight: ["add"], // 右侧自定义按钮（在defaultToolbar左侧）
-  defaultToolbar: ["refresh", "exports", "imports", "filter"], // 右侧默认工具栏
-  table: {
-    border: true,
-    stripe: false,
-  },
-  indexAction: async (query: any) => {
-    const { page, pageSize, ...queryParams } = query;
-    const result = await fetchListTenants(
-      new PaginationQuery({
-        paging: { page: page || 1, pageSize: pageSize || 10 },
-        formValues: queryParams,
-      })
-    );
-    // 转换数据格式：将 items 转换为 list
-    return {
-      items: result.items || [],
-      total: result.total || 0,
-    };
-  },
-  columns: [
-    { type: "index", label: $t("common.table.seq"), width: 60 },
-    { prop: "name", label: $t("pages.tenant.name"), minWidth: 120 },
-    { prop: "code", label: $t("pages.tenant.code"), minWidth: 120 },
-    { prop: "adminUserName", label: $t("pages.tenant.adminUserName"), minWidth: 120 },
-    {
-      prop: "type",
-      label: $t("pages.tenant.type"),
-      minWidth: 100,
-      slotName: "type",
-    },
-    {
-      prop: "auditStatus",
-      label: $t("pages.tenant.auditStatus"),
-      minWidth: 100,
-      slotName: "auditStatus",
-    },
-    {
-      prop: "status",
-      label: $t("common.table.status"),
-      minWidth: 100,
-      slotName: "status",
-    },
-    {
-      prop: "createdAt",
-      label: $t("common.table.createdAt"),
-      minWidth: 160,
-      template: "date",
-      dateFormat: "YYYY-MM-DD HH:mm:ss",
-    },
-    { prop: "remark", label: $t("common.table.remark"), minWidth: 150 },
-    {
-      prop: "action",
-      label: $t("common.table.action"),
-      fixed: "right",
-      width: 150,
-      template: "tool",
-      action: [
-        {
-          name: "edit",
-          text: $t("common.button.edit"),
-        },
-        {
-          name: "delete",
-          text: $t("common.button.delete"),
-          attrs: {
-            type: "danger",
-          },
-        },
-      ],
-    },
-  ],
-};
-
-// 处理操作点击
-const handleOperateClick = (data: IOperateData) => {
-  const { name, row } = data;
-
-  if (name === "edit") {
-    // 编辑
-    drawerRef.value?.open(row);
-  } else if (name === "delete") {
-    // 删除
-    ElMessageBox.confirm(
-      $t("common.confirm.do_you_want_delete", { moduleName: $t("pages.tenant.moduleName") }),
-      $t("common.title.confirm"),
+  // 搜索配置
+  search: {
+    fields: [
       {
-        confirmButtonText: $t("common.button.confirm"),
-        cancelButtonText: $t("common.button.cancel"),
-        type: "warning",
-      }
-    ).then(async () => {
-      try {
-        await deleteTenant({ id: row.id });
-        ElMessage.success($t("common.notification.delete_success"));
-        contentRef.value?.fetchPageData({}, true);
-      } catch {
-        ElMessage.error($t("common.notification.delete_failed"));
-      }
-    });
-  }
+        type: "input",
+        label: $t("pages.tenant.name"),
+        field: "name",
+        attrs: { placeholder: $t("common.placeholder.input"), clearable: true },
+      },
+      {
+        type: "input",
+        label: $t("pages.tenant.code"),
+        field: "code",
+        attrs: { placeholder: $t("common.placeholder.input"), clearable: true },
+      },
+      {
+        type: "select",
+        label: $t("pages.tenant.type"),
+        field: "type",
+        attrs: { placeholder: $t("common.placeholder.select"), clearable: true },
+        options: tenantTypeList.value,
+      },
+      {
+        type: "select",
+        label: $t("pages.tenant.auditStatus"),
+        field: "auditStatus",
+        attrs: { placeholder: $t("common.placeholder.select"), clearable: true },
+        options: tenantAuditStatusList.value,
+      },
+      {
+        type: "select",
+        label: $t("common.table.status"),
+        field: "status",
+        attrs: { placeholder: $t("common.placeholder.select"), clearable: true },
+        options: tenantStatusList.value,
+      },
+    ],
+    grid: true,
+  },
+
+  // 表格配置
+  table: {
+    listAction: async (query: any) => {
+      const { page, pageSize, ...queryParams } = query;
+      const result = await fetchListTenants(
+        new PaginationQuery({
+          paging: { page: page || 1, pageSize: pageSize || 10 },
+          formValues: queryParams,
+        })
+      );
+      return { items: result.items || [], total: result.total || 0 };
+    },
+    deleteAction: async (ids: string) => {
+      await deleteTenant({ id: ids as any });
+    },
+    toolbar: ["add"],
+    defaultToolbar: ["refresh", "exports", "imports", "filter"],
+    tableAttrs: { border: true, stripe: false },
+    columns: [
+      { type: "index", label: $t("common.table.seq"), width: 60 },
+      { prop: "name", label: $t("pages.tenant.name"), minWidth: 120 },
+      { prop: "code", label: $t("pages.tenant.code"), minWidth: 120 },
+      { prop: "adminUserName", label: $t("pages.tenant.adminUserName"), minWidth: 120 },
+      { prop: "type", label: $t("pages.tenant.type"), minWidth: 100, slotName: "type" },
+      {
+        prop: "auditStatus",
+        label: $t("pages.tenant.auditStatus"),
+        minWidth: 100,
+        slotName: "auditStatus",
+      },
+      { prop: "status", label: $t("common.table.status"), minWidth: 100, slotName: "status" },
+      {
+        prop: "createdAt",
+        label: $t("common.table.createdAt"),
+        minWidth: 160,
+        cellType: "date",
+        dateFormat: "YYYY-MM-DD HH:mm:ss",
+      },
+      { prop: "remark", label: $t("common.table.remark"), minWidth: 150 },
+      {
+        prop: "action",
+        label: $t("common.table.action"),
+        fixed: "right",
+        width: 150,
+        cellType: "tool",
+        buttons: [
+          { name: "edit", text: $t("common.button.edit") },
+          { name: "delete", text: $t("common.button.delete"), attrs: { type: "danger" } },
+        ],
+      },
+    ],
+  },
 };
 
-// 处理新增点击
-const handleAddClick = () => {
+// === 事件处理 ===
+function handleAdd() {
   drawerRef.value?.open();
-};
+}
 
-// 处理成功回调
-const handleSuccess = () => {
-  contentRef.value?.fetchPageData({}, true);
-};
+function handleEdit(row: any) {
+  drawerRef.value?.open(row);
+}
 
-// 处理工具栏点击
-const handleToolbarClick = (name: string) => {
-  console.log("Toolbar clicked:", name);
-  // 可以根据需要处理不同的工具栏按钮点击事件
-};
+function handleSuccess() {
+  pageRef.value?.refresh();
+}
 </script>
 
 <style lang="scss" scoped>

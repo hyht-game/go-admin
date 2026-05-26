@@ -41,7 +41,7 @@ export function useTableState<T = any, Q = any>(config: UseTableConfig) {
       const res = await config.indexAction(params as Q);
       if (showPagination && !Array.isArray(res)) {
         data.value = (res as PagingResult<T>).items ?? [];
-        pagination.total = (res as PagingResult<T>).total ?? 0;
+        pagination.total = Number((res as PagingResult<T>).total) || 0;
       } else {
         data.value = Array.isArray(res) ? res : ((res as PagingResult<T>).items ?? []);
       }

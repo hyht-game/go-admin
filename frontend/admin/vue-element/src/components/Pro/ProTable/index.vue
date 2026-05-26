@@ -1,6 +1,72 @@
 <template>
   <div class="pro-table">
+    <!-- ======================== vxe-table 引擎 ======================== -->
+    <vxe-table
+      v-if="engine === 'vxe'"
+      ref="tableRef"
+      v-loading="loading ?? false"
+      :row-config="{ keyField: rowKey, isHover: true, isCurrent: true }"
+      :data="data"
+      class="w-full"
+      v-bind="tableAttrs"
+      @checkbox-change="handleVxeSelectionChange"
+      @checkbox-all="handleVxeSelectionChange"
+    >
+      <template v-for="col in resolvedColumns" :key="col.prop ?? col.type">
+        <!-- 复选框列 -->
+        <vxe-column
+          v-if="col.type === 'selection'"
+          type="checkbox"
+          width="50"
+          align="center"
+        />
+        <!-- 序号列 -->
+        <vxe-column v-else-if="col.type === 'index'" type="seq" width="60" align="center" />
+        <!-- 展开列 -->
+        <vxe-column v-else-if="col.type === 'expand'" type="expand">
+          <template #default="scope">
+            <slot name="expand" v-bind="scope" />
+          </template>
+        </vxe-column>
+        <!-- 普通列 -->
+        <vxe-column
+          v-else-if="col.show !== false"
+          :field="col.prop"
+          :title="col.label"
+          :width="col.width"
+          :min-width="col.minWidth"
+          :fixed="col.fixed === 'left' || col.fixed === 'right' ? col.fixed : col.fixed === true ? 'left' : undefined"
+          :align="col.align || 'center'"
+          :sortable="col.sortable === true"
+          :tree-node="col.treeNode"
+          v-bind="col.attrs"
+        >
+          <template #default="scope">
+            <!-- 自定义插槽 -->
+            <slot
+              v-if="col.cellType === 'custom' || col.slotName"
+              :name="col.slotName ?? col.prop"
+              :row="scope.row"
+              :column="scope.column"
+              :index="scope.rowIndex"
+            />
+            <!-- 共享单元格渲染 -->
+            <ProTableCellContent
+              v-else
+              :col="col"
+              :row="scope.row"
+              :row-index="scope.rowIndex"
+              @modify="(d: any) => emit('modify', d)"
+              @operate="(d: any) => emit('operate', d)"
+            />
+          </template>
+        </vxe-column>
+      </template>
+    </vxe-table>
+
+    <!-- ======================== el-table 引擎 ======================== -->
     <ElTable
+      v-else
       ref="tableRef"
       v-loading="loading ?? false"
       :data="data"
@@ -8,7 +74,7 @@
       border
       style="width: 100%"
       v-bind="tableAttrs"
-      @selection-change="handleSelectionChange"
+      @selection-change="handleElSelectionChange"
     >
       <template v-for="col in resolvedColumns" :key="col.prop ?? col.type">
         <!-- 复选框列 -->
@@ -48,103 +114,15 @@
               :column="scope.column"
               :index="scope.$index"
             />
-
-            <!-- 图片模板 -->
-            <template v-else-if="col.cellType === 'image'">
-              <template v-if="col.prop">
-                <template v-if="Array.isArray(scope.row[col.prop])">
-                  <ElImage
-                    v-for="(item, idx) in scope.row[col.prop]"
-                    :key="idx"
-                    :src="item"
-                    :preview-src-list="scope.row[col.prop]"
-                    :initial-index="Number(idx)"
-                    :preview-teleported="true"
-                    :style="`width: ${col.imageWidth ?? 40}px; height: ${col.imageHeight ?? 40}px`"
-                  />
-                </template>
-                <template v-else>
-                  <ElImage
-                    :src="scope.row[col.prop]"
-                    :preview-src-list="[scope.row[col.prop]]"
-                    :preview-teleported="true"
-                    :style="`width: ${col.imageWidth ?? 40}px; height: ${col.imageHeight ?? 40}px`"
-                  />
-                </template>
-              </template>
-            </template>
-
-            <!-- 标签/列表模板 -->
-            <template v-else-if="col.cellType === 'tag'">
-              <ElTag :type="getTagType(scope.row[col.prop], col)">
-                {{ (col.labelMap ?? {})[scope.row[col.prop]] ?? scope.row[col.prop] }}
-              </ElTag>
-            </template>
-
-            <!-- 开关模板 -->
-            <template v-else-if="col.cellType === 'switch'">
-              <ElSwitch
-                v-if="col.prop"
-                v-model="scope.row[col.prop]"
-                :active-value="col.activeValue ?? 1"
-                :inactive-value="col.inactiveValue ?? 0"
-                :inline-prompt="true"
-                :active-text="col.activeText ?? ''"
-                :inactive-text="col.inactiveText ?? ''"
-                :validate-event="false"
-                @change="
-                  (val: any) => emit('modify', { row: scope.row, field: col.prop!, value: val })
-                "
-              />
-            </template>
-
-            <!-- 日期模板 -->
-            <template v-else-if="col.cellType === 'date'">
-              {{
-                scope.row[col.prop]
-                  ? useDateFormat(scope.row[col.prop], col.dateFormat ?? "YYYY-MM-DD HH:mm:ss")
-                      .value
-                  : ""
-              }}
-            </template>
-
-            <!-- 链接模板 -->
-            <template v-else-if="col.cellType === 'link'">
-              <ElLink type="primary" :href="scope.row[col.prop]" target="_blank">
-                {{ scope.row[col.prop] }}
-              </ElLink>
-            </template>
-
-            <!-- 价格模板 -->
-            <template v-else-if="col.cellType === 'price'">
-              {{ `${col.pricePrefix ?? ""}${scope.row[col.prop]}` }}
-            </template>
-
-            <!-- 百分比模板 -->
-            <template v-else-if="col.cellType === 'percent'">{{ scope.row[col.prop] }}%</template>
-
-            <!-- 图标模板 -->
-            <template v-else-if="col.cellType === 'icon'">
-              <ElIcon><component :is="scope.row[col.prop]" /></ElIcon>
-            </template>
-
-            <!-- 操作列模板 -->
-            <template v-else-if="col.cellType === 'tool'">
-              <template v-for="(btn, idx) in col.buttons" :key="idx">
-                <ElButton
-                  v-if="btn.visible === undefined || btn.visible(scope.row)"
-                  v-bind="{ link: true, size: 'small', ...btn.attrs }"
-                  @click="emit('operate', { name: btn.name, row: scope.row, $index: scope.$index })"
-                >
-                  {{ btn.text ?? btn.name }}
-                </ElButton>
-              </template>
-            </template>
-
-            <!-- 默认显示 -->
-            <template v-else>
-              {{ col.prop ? scope.row[col.prop] : "" }}
-            </template>
+            <!-- 共享单元格渲染 -->
+            <ProTableCellContent
+              v-else
+              :col="col"
+              :row="scope.row"
+              :row-index="scope.$index"
+              @modify="(d: any) => emit('modify', d)"
+              @operate="(d: any) => emit('operate', d)"
+            />
           </template>
         </ElTableColumn>
       </template>
@@ -165,21 +143,13 @@
 
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { ref } from "vue";
-import { useDateFormat } from "@vueuse/core";
-import {
-  ElTable,
-  ElTableColumn,
-  ElImage,
-  ElTag,
-  ElSwitch,
-  ElLink,
-  ElButton,
-  ElIcon,
-} from "element-plus";
+import { ElTable, ElTableColumn } from "element-plus";
 import ProPagination from "../ProPagination/index.vue";
-import type { ProTableProps, ProTableColumn } from "./types";
+import ProTableCellContent from "./ProTableCellContent.vue";
+import type { ProTableProps } from "./types";
 
 const props = withDefaults(defineProps<ProTableProps<T>>(), {
+  engine: "vxe",
   rowKey: "id",
   total: 0,
   currentPage: 1,
@@ -193,7 +163,8 @@ const emit = defineEmits<{
   "size-change": [pageSize: number];
 }>();
 
-const tableRef = ref<InstanceType<typeof ElTable>>();
+const tableRef = ref<any>(null);
+const engine = props.engine;
 
 // 解析列（支持 initFn 和 show 默认值）
 const resolvedColumns = ref(
@@ -208,31 +179,144 @@ const resolvedColumns = ref(
 const tableAttrs = props.table ?? {};
 const rowKey = props.rowKey;
 
-// 选中处理
-function handleSelectionChange(rows: T[]) {
+// === vxe-table 选中处理 ===
+function handleVxeSelectionChange({ records }: { records: T[] }) {
+  emit("selection-change", records);
+}
+
+// === el-table 选中处理 ===
+function handleElSelectionChange(rows: T[]) {
   emit("selection-change", rows);
 }
 
-// Tag 类型判断
-function getTagType(
-  value: any,
-  col: ProTableColumn<T>
-): "primary" | "success" | "warning" | "danger" | "info" {
-  if (col.tagType) return col.tagType as any;
-  return value ? "success" : "danger";
-}
-
+// === 统一 expose API ===
 defineExpose({
   tableRef,
-  getSelectionRows: () => tableRef.value?.getSelectionRows(),
-  clearSelection: () => tableRef.value?.clearSelection(),
-  toggleRowSelection: (row: T, selected?: boolean) =>
-    tableRef.value?.toggleRowSelection(row, selected),
+  getSelectionRows: () => {
+    if (engine === "vxe") {
+      return tableRef.value?.getCheckboxRecords?.();
+    }
+    return tableRef.value?.getSelectionRows?.();
+  },
+  clearSelection: () => {
+    if (engine === "vxe") {
+      tableRef.value?.clearCheckboxRow?.();
+    } else {
+      tableRef.value?.clearSelection?.();
+    }
+  },
+  toggleRowSelection: (row: T, selected?: boolean) => {
+    if (engine === "vxe") {
+      tableRef.value?.setCheckboxRow?.(row, selected ?? true);
+    } else {
+      tableRef.value?.toggleRowSelection?.(row, selected);
+    }
+  },
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .pro-table {
-  margin-top: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+// vxe-table 样式优化（对齐 CURD PageContent）
+:deep(.vxe-table) {
+  border-radius: 4px;
+  overflow: hidden;
+
+  // 表头样式
+  .vxe-table--header-wrapper {
+    background-color: var(--el-fill-color-light);
+
+    .vxe-header--column {
+      height: 45px !important;
+      line-height: 45px !important;
+
+      .vxe-cell {
+        height: 45px !important;
+        line-height: 45px !important;
+      }
+    }
+
+    .vxe-cell {
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
+  }
+
+  // 表格主体样式
+  .vxe-table--body-wrapper {
+    background-color: var(--el-bg-color);
+  }
+
+  // 去掉列之间的分割线
+  .vxe-body--column,
+  .vxe-header--column,
+  .vxe-footer--column {
+    border-right: none !important;
+  }
+
+  // 表格行样式
+  .vxe-body--row {
+    background-color: var(--el-bg-color);
+
+    .vxe-body--column {
+      height: 40px !important;
+      line-height: 40px !important;
+
+      .vxe-cell {
+        height: 40px !important;
+        line-height: 40px !important;
+      }
+    }
+
+    &.row--hover {
+      background-color: var(--el-fill-color-light);
+    }
+
+    &.row--current {
+      background-color: var(--el-fill-color);
+    }
+  }
+
+  // 暗黑模式下的悬停效果增强
+  html.dark & .vxe-body--row {
+    background-color: #1a1a1a !important;
+    transition: background-color 0.2s ease !important;
+
+    &:hover,
+    &.row--hover {
+      background-color: #2a2a2a !important;
+
+      > td {
+        background-color: transparent !important;
+      }
+    }
+
+    &.row--current {
+      background-color: #333333 !important;
+
+      > td {
+        background-color: transparent !important;
+      }
+    }
+
+    &.row--hover.row--current {
+      background-color: #333333 !important;
+    }
+  }
+
+  // 表格单元格
+  .vxe-cell {
+    color: var(--el-text-color-regular);
+  }
+
+  // 表格边框
+  &.vxe-table--border-line--inner {
+    border-color: var(--el-border-color);
+  }
 }
 </style>

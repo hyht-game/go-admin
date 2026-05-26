@@ -1,93 +1,81 @@
 <template>
   <div v-if="visible" class="pro-toolbar" :class="props.class">
-    <!-- 左侧按钮 -->
-    <div class="pro-toolbar__left flex gap-2">
-      <template v-for="btn in leftButtons" :key="btn.name">
-        <ElButton
-          v-if="shouldShow(btn)"
-          v-bind="btn.attrs"
-          :disabled="btn.disabled"
-          :loading="btn.loading"
-          @click="handleButtonClick(btn)"
-        >
-          <ElIcon v-if="btn.icon"><component :is="btn.icon" /></ElIcon>
-          {{ btn.text }}
-        </ElButton>
-      </template>
+    <div class="flex flex-col md:flex-row justify-between gap-y-2">
+      <!-- 左侧按钮 -->
+      <div class="toolbar-left flex gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
+        <template v-for="btn in leftButtons" :key="btn.name">
+          <ElButton
+            v-if="shouldShow(btn)"
+            v-bind="btn.attrs"
+            :disabled="btn.disabled"
+            :loading="btn.loading"
+            @click="handleButtonClick(btn)"
+          >
+            <ElIcon v-if="btn.icon"><component :is="btn.icon" /></ElIcon>
+            {{ btn.text }}
+          </ElButton>
+        </template>
+        <slot name="left" />
+      </div>
 
-      <!-- 插槽：左侧自定义 -->
-      <slot name="left" />
-    </div>
+      <!-- 右侧按钮 -->
+      <div class="toolbar-right flex gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
+        <template v-for="btn in rightButtons" :key="'right-' + btn.name">
+          <ElButton
+            v-if="shouldShow(btn)"
+            v-bind="btn.attrs"
+            :disabled="btn.disabled"
+            :loading="btn.loading"
+            @click="handleButtonClick(btn)"
+          >
+            <ElIcon v-if="btn.icon"><component :is="btn.icon" /></ElIcon>
+            {{ btn.text }}
+          </ElButton>
+        </template>
 
-    <!-- 右侧按钮 -->
-    <div class="pro-toolbar__right flex gap-2">
-      <!-- 自定义右侧按钮 -->
-      <template v-for="btn in rightButtons" :key="'right-' + btn.name">
-        <ElButton
-          v-if="shouldShow(btn)"
-          v-bind="btn.attrs"
-          :disabled="btn.disabled"
-          :loading="btn.loading"
-          @click="handleButtonClick(btn)"
-        >
-          <ElIcon v-if="btn.icon"><component :is="btn.icon" /></ElIcon>
-          {{ btn.text }}
-        </ElButton>
-      </template>
-
-      <!-- 默认工具栏 -->
-      <template v-for="tool in defaultToolbar" :key="tool">
-        <!-- 刷新 -->
-        <ElButton
-          v-if="tool === 'refresh'"
-          circle
-          :icon="Refresh"
-          @click="handleDefaultTool('refresh')"
-        />
-
-        <!-- 筛选 -->
-        <ElPopover v-if="tool === 'filter'" placement="bottom" trigger="click" :width="200">
-          <template #reference>
-            <ElButton circle :icon="Operation" />
-          </template>
-          <div class="pro-toolbar__filter-popover">
-            <slot name="filter" />
-          </div>
-        </ElPopover>
-
-        <!-- 搜索 -->
-        <ElButton
-          v-if="tool === 'search'"
-          circle
-          :icon="Search"
-          @click="handleDefaultTool('search')"
-        />
-
-        <!-- 导出 -->
-        <ElButton
-          v-if="tool === 'exports'"
-          circle
-          :icon="Download"
-          @click="handleDefaultTool('export')"
-        />
-
-        <!-- 导入 -->
-        <ElButton
-          v-if="tool === 'imports'"
-          circle
-          :icon="Upload"
-          @click="handleDefaultTool('import')"
-        />
-      </template>
-
-      <!-- 插槽：右侧自定义 -->
-      <slot name="right" />
+        <!-- 默认工具栏 -->
+        <template v-for="tool in defaultToolbar" :key="tool">
+          <ElButton
+            v-if="tool === 'refresh'"
+            circle
+            :icon="Refresh"
+            @click="handleDefaultTool('refresh')"
+          />
+          <ElPopover v-if="tool === 'filter'" placement="bottom" trigger="click" :width="200">
+            <template #reference>
+              <ElButton circle :icon="Operation" />
+            </template>
+            <ElScrollbar max-height="350px">
+              <slot name="filter" />
+            </ElScrollbar>
+          </ElPopover>
+          <ElButton
+            v-if="tool === 'search'"
+            circle
+            :icon="Search"
+            @click="handleDefaultTool('search')"
+          />
+          <ElButton
+            v-if="tool === 'exports'"
+            circle
+            :icon="Download"
+            @click="handleDefaultTool('export')"
+          />
+          <ElButton
+            v-if="tool === 'imports'"
+            circle
+            :icon="Upload"
+            @click="handleDefaultTool('import')"
+          />
+        </template>
+        <slot name="right" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElButton, ElIcon, ElPopover } from "element-plus";
+import { ElButton, ElIcon, ElPopover, ElScrollbar } from "element-plus";
 import { Refresh, Operation, Search, Download, Upload } from "@element-plus/icons-vue";
 import type { ProToolbarProps, ProToolbarEmits, ToolbarButton } from "./types";
 import { useAccess } from "@/core/access"; // 假设你有权限 Hook
@@ -178,37 +166,14 @@ defineExpose({
 
 <style scoped lang="scss">
 .pro-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  margin-bottom: 12px;
-
-  &__left,
-  &__right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  &__filter-popover {
-    padding: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
+  margin-bottom: 8px;
 }
 
-@media (max-width: 768px) {
-  .pro-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-
-    &__left,
-    &__right {
-      justify-content: flex-start;
-    }
+.toolbar-left,
+.toolbar-right {
+  :deep(.el-button) {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
   }
 }
 </style>
