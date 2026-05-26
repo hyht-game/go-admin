@@ -5,5 +5,6 @@ export * from "./preset-interceptors";
 
 export * from "./utils";
 export * from "./request";
+export * from "./pagination";
 
 export * from "axios";

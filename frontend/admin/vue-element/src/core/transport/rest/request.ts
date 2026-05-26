@@ -122,3 +122,18 @@ export function requestClientRequestHandler({ path, method, body }: Request) {
     data: body,
   } as any);
 }
+
+export function requestApi({
+  path,
+  method,
+  body,
+}: {
+  path: string;
+  method: string;
+  body: null | string;
+}) {
+  return requestClient.request(path, {
+    method,
+    data: body,
+  } as never);
+}
