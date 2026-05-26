@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import React from 'react';
-import { Avatar, Dropdown, Badge, Tooltip, Button, Breadcrumb, Input, Popover } from 'antd';
+import { Avatar, Dropdown, Badge, Tooltip, Button, Breadcrumb, Input, Popover, List, Empty, Spin } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   UserOutlined,
@@ -25,6 +25,10 @@ import { getIconFromName } from '@/layouts/MainLayout/utils/iconResolver';
 import { useI18n } from '@/core/i18n';
 import { usePreferencesStore } from '@/core/preferences/store';
 import type { SupportedLanguagesType } from '@/core/preferences/types/layout';
+import { fetchListUserInbox } from '@/api/hooks/internal-message';
+import { useQuery } from '@tanstack/react-query';
+import type { internal_messageservicev1_InternalMessageRecipient as InboxItem } from '@/api/generated/admin/service/v1';
+import { PaginationQuery } from '@/core';
 
 interface HeaderContentProps {
   userInfo: BasicUserInfo | null;
@@ -170,7 +174,7 @@ export const HeaderContent = ({
       icon: <UserOutlined />,
       label: t('header.profile'),
       onClick: () => {
-        /* 跳转个人中心 */
+        navigate('/opm/profile');
       },
     },
     {
@@ -197,6 +201,78 @@ export const HeaderContent = ({
     alignItems: 'center',
     justifyContent: 'center',
   };
+
+  // 通知弹出框数据
+  const { t: tInbox } = useTranslation('inbox');
+  const { data: inboxPreview, isLoading: inboxLoading } = useQuery({
+    queryKey: ['inboxPreview'],
+    queryFn: async () => {
+      const query = new PaginationQuery({
+        formValues: { status: 'RECEIVED' },
+      });
+      const response = await fetchListUserInbox(query);
+      return (response.items || []) as InboxItem[];
+    },
+    // 每 60 秒轮询一次
+    refetchInterval: 60_000,
+    // 窗口不聚焦时不轮询
+    refetchIntervalInBackground: false,
+  });
+
+  const unreadCount = inboxPreview?.length ?? 0;
+
+  const inboxContent = (
+    <div style={{ width: 320 }}>
+      <Spin spinning={inboxLoading}>
+        {inboxPreview && inboxPreview.length > 0 ? (
+          <List
+            dataSource={inboxPreview.slice(0, 5)}
+            renderItem={(item) => (
+              <List.Item
+                style={{ padding: '8px 0', cursor: 'pointer' }}
+                onClick={() => navigate('/internal-message/inbox')}
+              >
+                <List.Item.Meta
+                  title={
+                    <span style={{ fontSize: 13 }}>
+                      {item.title || tInbox('noUnread')}
+                    </span>
+                  }
+                  description={
+                    <span style={{ fontSize: 12, color: isDark ? '#8c8c8c' : '#8c8c8c' }}>
+                      {item.createdAt}
+                    </span>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <Empty
+            description={tInbox('noUnread')}
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            style={{ padding: '16px 0' }}
+          />
+        )}
+      </Spin>
+      <div
+        style={{
+          borderTop: `1px solid ${isDark ? '#303030' : '#f0f0f0'}`,
+          textAlign: 'center',
+          padding: '8px 0 0',
+          marginTop: 4,
+        }}
+      >
+        <Button
+          type="link"
+          size="small"
+          onClick={() => navigate('/internal-message/inbox')}
+        >
+          {tInbox('goToInbox')}
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -434,11 +510,18 @@ export const HeaderContent = ({
 
         {/* 通知 */}
         {widgetConfig.notification && (
-          <Badge count={3} size="small" offset={[0, 4]}>
-            <Tooltip title={t('header.notification')}>
-              <Button type="text" icon={<BellOutlined />} size="small" style={btnStyle} />
-            </Tooltip>
-          </Badge>
+          <Popover
+            content={inboxContent}
+            trigger="click"
+            placement="bottomRight"
+            title={tInbox('pageTitle')}
+          >
+            <Badge count={unreadCount} size="small" offset={[0, 4]}>
+              <Tooltip title={t('header.notification')}>
+                <Button type="text" icon={<BellOutlined />} size="small" style={btnStyle} />
+              </Tooltip>
+            </Badge>
+          </Popover>
         )}
 
         {/* 用户头像 + 下拉菜单 */}

@@ -60,6 +60,17 @@ export const opmRoutes: AppRouteObject[] = [
           // permission: 'sys:platform_admin', // 平台管理员或租户管理员权限（开发阶段暂时注释）
         },
       },
+      {
+        name: 'user-profile',
+        path: 'profile', // 相对路径，最终为 /opm/profile
+        element: createLazyRoute(() => import('@/pages/app/opm/user/profile')),
+        meta: {
+          title: 'routes:user-profile',
+          hideInMenu: true, // 左侧菜单不可见，由顶部栏下拉菜单触发
+          hideInTab: false,
+          // permission: 'sys:platform_admin', // 平台管理员或租户管理员权限（开发阶段暂时注释）
+        },
+      },
     ],
   },
 ];

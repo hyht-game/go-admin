@@ -39,6 +39,17 @@ export const internalMessageRoutes: AppRouteObject[] = [
           // permission: 'sys:platform_admin', // 仅平台管理员权限（开发阶段暂时注释）
         },
       },
+      {
+        name: 'inbox',
+        path: 'inbox', // 相对路径，最终为 /internal-message/inbox
+        element: createLazyRoute(() => import('@/pages/app/internal-message/inbox')),
+        meta: {
+          title: 'routes:inbox',
+          hideInMenu: true, // 左侧菜单不可见，由顶部栏通知按钮触发
+          hideInTab: false,
+          // permission: 'sys:platform_admin', // 平台管理员或租户管理员权限（开发阶段暂时注释）
+        },
+      },
     ],
   },
 ];

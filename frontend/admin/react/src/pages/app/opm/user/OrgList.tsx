@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Tree, Select, Input, Space, Button, App } from 'antd';
+import { Tree, Select, Input, Button, App, theme } from 'antd';
 import {
   ExpandOutlined,
   ShrinkOutlined,
   CloseCircleOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -172,43 +173,68 @@ const OrgList: React.FC<OrgListProps> = ({
     onOrgSelect(undefined);
   };
 
+  const { token } = theme.useToken();
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0 4px', overflow: 'hidden' }}>
-      {/* 租户选择器（仅非租户用户可见） */}
-      {!isTenantUser && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px', flex: '0 0 auto' }}>
-          <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>{t('tenantId')}</span>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden',
+        borderRadius: token.borderRadiusLG,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        backgroundColor: token.colorBgContainer,
+      }}
+    >
+      {/* 头部标题栏 */}
+      <div
+        style={{
+          flex: '0 0 auto',
+          padding: '10px 12px 8px',
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+        }}
+      >
+        <div style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: token.colorTextHeading,
+          marginBottom: 8,
+        }}>
+          {t('searchOrg')}
+        </div>
+
+        {/* 租户选择器（仅非租户用户可见） */}
+        {!isTenantUser && (
           <Select
             showSearch
             allowClear
-            style={{ flex: 1 }}
+            style={{ width: '100%', marginBottom: 8 }}
             placeholder={t('tenantIdPlaceholder')}
             value={selectedTenantValue || undefined}
             options={tenantOptions}
             onChange={(value) => handleTenantChanged(value != null ? Number(value) : undefined)}
           />
-        </div>
-      )}
+        )}
 
-      {/* 搜索 + 工具栏 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px', flex: '0 0 auto' }}>
-        <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>{t('searchOrg')}</span>
-        <Input
-          allowClear
-          style={{ flex: 1 }}
-          placeholder={t('searchOrg')}
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        <Space size={2}>
+        {/* 搜索栏 + 工具按钮 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
+            style={{ flex: 1 }}
+            placeholder={t('searchOrg')}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
           <Button type="text" size="small" icon={<ExpandOutlined />} onClick={handleExpandAll} title={t('expandAll')} />
           <Button type="text" size="small" icon={<ShrinkOutlined />} onClick={handleCollapseAll} title={t('collapseAll')} />
           <Button type="text" size="small" icon={<CloseCircleOutlined />} onClick={handleClearSelect} title={t('clearSelect')} />
-        </Space>
+        </div>
       </div>
 
       {/* 组织树 */}
-      <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+      <div style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: '4px 4px 8px' }}>
         <Tree
           blockNode
           expandedKeys={expandedKeys}
@@ -229,7 +255,7 @@ const OrgList: React.FC<OrgListProps> = ({
             return (
               <span>
                 {title.substring(0, idx)}
-                <span style={{ color: '#f50' }}>{title.substring(idx, idx + q.length)}</span>
+                <span style={{ color: token.colorPrimary }}>{title.substring(idx, idx + q.length)}</span>
                 {title.substring(idx + q.length)}
               </span>
             );
