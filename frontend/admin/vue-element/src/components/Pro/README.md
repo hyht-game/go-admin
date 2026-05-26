@@ -17,7 +17,9 @@ Pro/
 ├── ProPage/          # 页面编排（组合以上所有组件）
 ├── composables/      # 状态管理 hooks
 │   ├── useTableState.ts
-│   └── useModalState.ts
+│   ├── useModalState.ts
+│   ├── useProPage.ts   # Level 2: 命令式 Api 控制
+│   └── ProPageApi.ts   # ProPage Api 类
 ├── constants/        # 默认值常量
 ├── index.ts          # 统一导出
 └── README.md
@@ -213,6 +215,99 @@ const pageConfig: ProPageConfig = {
 - 搜索、工具栏、表格、分页、弹窗全自动联动
 - 新增/编辑/删除/导出/导入均内置
 - 零模板代码，纯声明式
+
+---
+
+### Level 2：useProPage 命令式控制（外部联动）
+
+**适用场景**：需要在页面外部（其他组件、watch、定时器等）命令式控制 ProPage 的行为。
+
+通过 `useProPage(config)` 返回 `[Page, api]`，
+通过 `api` 对象命令式控制刷新、弹窗、查询等，无需 `ref` + `value`。
+
+```vue
+<template>
+  <div class="flex gap-4 h-full">
+    <!-- 左侧部门树 -->
+    <ElCard class="w-64 shrink-0" shadow="never">
+      <ElTree :data="treeData" @node-click="handleNodeClick" />
+    </ElCard>
+
+    <!-- 右侧表格 -->
+    <div class="flex-1 min-w-0">
+      <Page #status="scope">
+        <ElTag :type="scope.row.status === 1 ? 'success' : 'danger'">
+          {{ scope.row.status === 1 ? '启用' : '禁用' }}
+        </ElTag>
+      </Page>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { ElCard, ElTree, ElTag } from "element-plus";
+import { useProPage, type ProPageConfig } from "@/components/Pro";
+
+// useProPage 返回 [组件, api]
+const [Page, pageApi] = useProPage({
+  table: {
+    listAction: async (params) => {
+      const { page, pageSize, ...query } = params;
+      const res = await fetchList({ page, pageSize, ...query });
+      return { items: res.items, total: res.total };
+    },
+    columns: [
+      { type: "index", label: "序号", width: 60 },
+      { prop: "name", label: "名称", minWidth: 120 },
+      { prop: "status", label: "状态", minWidth: 80, slotName: "status" },
+      { prop: "action", label: "操作", fixed: "right", width: 150, cellType: "tool",
+        buttons: [{ name: "edit", text: "编辑" }, { name: "delete", text: "删除" }],
+      },
+    ],
+  },
+});
+
+// 树节点点击时，通过 api 命令式查询
+const treeData = ref([]);
+function handleNodeClick(node: any) {
+  pageApi.reload({ deptId: node.id }); // 重新查询
+}
+
+// 也可以在 watch / 定时器 / 其他组件回调中调用
+// pageApi.refresh()     // 刷新当前页
+// pageApi.openAdd()     // 打开新增弹窗
+// pageApi.openEdit(row) // 打开编辑弹窗
+// pageApi.query({ keyword: 'xxx' }) // 追加参数查询
+// pageApi.getSelectionIds() // 获取选中行 ID
+// pageApi.getSearchParams() // 获取当前搜索参数
+</script>
+```
+
+#### ProPageApi 方法一览
+
+| 方法 | 说明 |
+|------|------|
+| `refresh()` | 刷新当前页数据 |
+| `reload(params?)` | 重置到第 1 页重新查询，可选追加参数 |
+| `query(params)` | 追加查询参数并刷新当前页 |
+| `getData()` | 获取当前表格数据 |
+| `getSelection()` | 获取选中行 |
+| `getSelectionIds()` | 获取选中行 ID 数组 |
+| `clearSelection()` | 清空选中 |
+| `isLoading()` | 获取加载状态 |
+| `getPagination()` | 获取分页信息 `{ currentPage, pageSize, total }` |
+| `openAdd()` | 打开新增弹窗 |
+| `openEdit(row)` | 打开编辑弹窗 |
+| `openView(row)` | 打开查看弹窗 |
+| `closeModal()` | 关闭弹窗 |
+| `getSearchParams()` | 获取当前搜索参数快照 |
+
+**要点**：
+- `useProPage` 和 `<ProPage :config>` **完全等价**，只是控制方式不同
+- 适合需要在外部联动控制表格的场景（树点击、Tab 切换、watch 联动等）
+- 无需 `ref` + `value`，api 直接调用方法
+- 插槽、事件、配置均与 Level 1 完全相同
 
 ---
 
@@ -487,16 +582,18 @@ function handleNodeClick(node: any) {
 
 ### 层级对比
 
-| | Level 1 | Level 3 | Level 4 |
-|---|---|---|---|
-| **核心** | `<ProPage :config />` | ProPage + 插槽 + 事件 | 原子组件 + Composables |
-| **模板代码** | 零 | 少量（插槽模板） | 中等（自行组装） |
-| **配置化程度** | 完全配置 | 配置为主、插槽补充 | 配置 + 自由编排 |
-| **适用场景** | 标准 CRUD | 带特殊列/交互的 CRUD | 非标准布局/复杂交互 |
-| **弹窗控制** | 内置 ProModal | 外部接管弹窗 | 完全自行控制 |
-| **学习成本** | 最低 | 低 | 中 |
+| | Level 1 | Level 2 | Level 3 | Level 4 |
+|---|---|---|---|---|
+| **核心** | `<ProPage :config />` | `useProPage(config)` → `[Page, api]` | ProPage + 插槽 + 事件 | 原子组件 + Composables |
+| **模板代码** | 零 | 零 | 少量（插槽模板） | 中等（自行组装） |
+| **配置化程度** | 完全配置 | 完全配置 + 命令式 api | 配置为主、插槽补充 | 配置 + 自由编排 |
+| **控制方式** | 声明式（ref） | 命令式（api） | 声明式 + 事件 | 完全自行控制 |
+| **适用场景** | 标准 CRUD | 外部联动控制 | 带特殊列/交互的 CRUD | 非标准布局/复杂交互 |
+| **外部操作** | `pageRef.value?.refresh()` | `pageApi.refresh()` | 同 Level 1 | 完全自行控制 |
+| **弹窗控制** | 内置 ProModal | 内置 + api 命令式 | 外部接管弹窗 | 完全自行控制 |
+| **学习成本** | 最低 | 低 | 低 | 中 |
 
-> **建议**：80% 的页面用 Level 1，15% 用 Level 3，5% 用 Level 4。
+> **建议**：70% 的页面用 Level 1，15% 用 Level 2（外部联动），10% 用 Level 3，5% 用 Level 4。
 
 ---
 
@@ -887,6 +984,37 @@ modalState.formData // Reactive             表单数据
 modalState.open(mode, row?) // 打开弹窗
 ```
 
+### useProPage
+
+命令式 Api 控制。
+
+```typescript
+import { useProPage } from "@/components/Pro";
+
+const [Page, pageApi] = useProPage({
+  table: {
+    listAction: (params) => fetchList(params),
+    columns: [ /* ... */ ],
+  },
+});
+
+// api 方法
+pageApi.refresh()              // 刷新当前页
+pageApi.reload({ deptId: 1 })  // 重置到第 1 页重新查询
+pageApi.query({ keyword: '' }) // 追加参数查询
+pageApi.getData()              // 获取表格数据
+pageApi.getSelection()         // 获取选中行
+pageApi.getSelectionIds()      // 获取选中行 ID
+pageApi.clearSelection()       // 清空选中
+pageApi.isLoading()            // 加载状态
+pageApi.getPagination()        // 分页信息
+pageApi.openAdd()              // 打开新增弹窗
+pageApi.openEdit(row)          // 打开编辑弹窗
+pageApi.openView(row)          // 打开查看弹窗
+pageApi.closeModal()           // 关闭弹窗
+pageApi.getSearchParams()      // 获取搜索参数
+```
+
 ---
 
 ## 表格引擎
@@ -987,4 +1115,4 @@ columns: [
 2. **按需使用**：ProPage 是编排层，各子组件可独立使用
 3. **双引擎支持**：vxe-table / el-table 一键切换，API 统一
 4. **插槽开放**：所有渲染点都支持插槽覆盖，配置化与自定义并存
-5. **CURD 兼容**：API 设计参考现有 CURD 组件，迁移成本低
+5. **平滑迁移**：API 设计与现有 CURD 组件对齐，迁移成本低
