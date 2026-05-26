@@ -3,16 +3,16 @@
     <!-- 左侧按钮 -->
     <div class="pro-toolbar__left flex gap-2">
       <template v-for="btn in leftButtons" :key="btn.name">
-        <el-button
+        <ElButton
           v-if="shouldShow(btn)"
           v-bind="btn.attrs"
           :disabled="btn.disabled"
           :loading="btn.loading"
           @click="handleButtonClick(btn)"
         >
-          <el-icon v-if="btn.icon"><component :is="btn.icon" /></el-icon>
+          <ElIcon v-if="btn.icon"><component :is="btn.icon" /></ElIcon>
           {{ btn.text }}
-        </el-button>
+        </ElButton>
       </template>
 
       <!-- 插槽：左侧自定义 -->
@@ -23,22 +23,22 @@
     <div class="pro-toolbar__right flex gap-2">
       <!-- 自定义右侧按钮 -->
       <template v-for="btn in rightButtons" :key="'right-' + btn.name">
-        <el-button
+        <ElButton
           v-if="shouldShow(btn)"
           v-bind="btn.attrs"
           :disabled="btn.disabled"
           :loading="btn.loading"
           @click="handleButtonClick(btn)"
         >
-          <el-icon v-if="btn.icon"><component :is="btn.icon" /></el-icon>
+          <ElIcon v-if="btn.icon"><component :is="btn.icon" /></ElIcon>
           {{ btn.text }}
-        </el-button>
+        </ElButton>
       </template>
 
       <!-- 默认工具栏 -->
       <template v-for="tool in defaultToolbar" :key="tool">
         <!-- 刷新 -->
-        <el-button
+        <ElButton
           v-if="tool === 'refresh'"
           circle
           :icon="Refresh"
@@ -46,17 +46,17 @@
         />
 
         <!-- 筛选 -->
-        <el-popover v-if="tool === 'filter'" placement="bottom" trigger="click" :width="200">
+        <ElPopover v-if="tool === 'filter'" placement="bottom" trigger="click" :width="200">
           <template #reference>
-            <el-button circle :icon="Operation" />
+            <ElButton circle :icon="Operation" />
           </template>
           <div class="pro-toolbar__filter-popover">
             <slot name="filter" />
           </div>
-        </el-popover>
+        </ElPopover>
 
         <!-- 搜索 -->
-        <el-button
+        <ElButton
           v-if="tool === 'search'"
           circle
           :icon="Search"
@@ -64,7 +64,7 @@
         />
 
         <!-- 导出 -->
-        <el-button
+        <ElButton
           v-if="tool === 'exports'"
           circle
           :icon="Download"
@@ -72,7 +72,7 @@
         />
 
         <!-- 导入 -->
-        <el-button
+        <ElButton
           v-if="tool === 'imports'"
           circle
           :icon="Upload"
@@ -87,7 +87,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { ElButton, ElIcon, ElPopover } from "element-plus";
 import { Refresh, Operation, Search, Download, Upload } from "@element-plus/icons-vue";
 import type { ProToolbarProps, ProToolbarEmits, ToolbarButton } from "./types";

@@ -2,7 +2,7 @@
   <div
     v-if="showPagination"
     class="pro-pagination"
-    :class="{ 'pro-pagination--hidden': hideOnSinglePage && total <= pageSize }"
+    :class="{ 'pro-pagination--hidden': hideOnSinglePage && (total ?? 0) <= (pageSize ?? DEFAULT_PAGE_SIZE) }"
   >
     <ElPagination
       v-model:current-page="currentPage"
@@ -26,14 +26,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { ElPagination } from "element-plus";
+import { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZES } from "../constants";
 import type { ProPaginationProps, PaginationEmits } from "./types";
 
 defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(defineProps<ProPaginationProps>(), {
-  currentPage: 1,
-  pageSize: 20,
-  pageSizes: () => [10, 20, 30, 50, 100],
+  currentPage: DEFAULT_CURRENT_PAGE,
+  pageSize: DEFAULT_PAGE_SIZE,
+  pageSizes: () => DEFAULT_PAGE_SIZES,
   total: 0,
   background: true,
   disabled: false,

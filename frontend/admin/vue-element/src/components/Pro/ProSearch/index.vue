@@ -1,15 +1,15 @@
 <template>
   <div v-show="visible" class="pro-search">
-    <el-card v-bind="cardAttrs" class="pro-search__card" shadow="never">
-      <el-form
+    <ElCard v-bind="cardAttrs" class="pro-search__card" shadow="never">
+      <ElForm
         ref="formRef"
         :model="queryParams"
         :inline="inline"
         v-bind="formAttrs"
         :class="formClass"
       >
-        <template v-for="(field, index) in visibleFields" :key="field.field">
-          <el-form-item
+        <template v-for="field in visibleFields" :key="field.field">
+          <ElFormItem
             :label="field.label"
             :prop="String(field.field)"
             :class="{ 'pro-search__item--stretch': grid }"
@@ -17,38 +17,49 @@
             <template #label>
               <span class="flex items-center gap-1">
                 {{ field.label }}
-                <el-tooltip v-if="field.tips" :content="field.tips" placement="top">
-                  <el-icon class="text-gray-400"><QuestionFilled /></el-icon>
-                </el-tooltip>
+                <ElTooltip
+                  v-if="field.tips"
+                  :content="typeof field.tips === 'string' ? field.tips : ''"
+                  placement="top"
+                >
+                  <ElIcon class="text-gray-400"><QuestionFilled /></ElIcon>
+                </ElTooltip>
                 <span v-if="colon" class="ml-0.5">:</span>
               </span>
             </template>
 
             <!-- 自定义插槽 -->
             <slot
-              v-if="field.slotName"
-              :name="field.slotName"
+              v-if="field.slotName || field.type === 'custom'"
+              :name="field.slotName ?? field.field"
               :model="queryParams"
               :field="field.field"
+              :attrs="{ style: { width: '100%' }, ...field.attrs }"
+            />
+
+            <!-- api-tree-select -->
+            <ElTreeSelect
+              v-else-if="field.type === 'api-tree-select'"
+              v-model="queryParams[field.field]"
+              v-bind="{ style: { width: '100%' }, clearable: true, ...field.attrs }"
             />
 
             <!-- 动态组件 -->
             <component
-              v-else
               :is="resolveComponent(field.type)"
+              v-else
               v-model="queryParams[field.field]"
-              v-bind="field.attrs"
-              clearable
+              v-bind="{ style: { width: '100%' }, clearable: true, ...field.attrs }"
               @keyup.enter="handleSearch"
             >
               <template v-if="['select', 'radio', 'checkbox'].includes(field.type ?? '')">
                 <component
                   :is="
                     field.type === 'select'
-                      ? 'el-option'
+                      ? ElOption
                       : field.type === 'radio'
-                        ? 'el-radio'
-                        : 'el-checkbox'
+                        ? ElRadio
+                        : ElCheckbox
                   "
                   v-for="opt in field.options"
                   :key="opt.value"
@@ -58,12 +69,12 @@
                 />
               </template>
             </component>
-          </el-form-item>
+          </ElFormItem>
         </template>
 
         <!-- 按钮区域 -->
-        <el-form-item :class="buttonClass">
-          <el-button
+        <ElFormItem :class="buttonClass">
+          <ElButton
             v-if="showSearchButton"
             type="primary"
             :icon="Search"
@@ -71,48 +82,55 @@
             @click="handleSearch"
           >
             {{ searchButtonText }}
-          </el-button>
+          </ElButton>
 
-          <el-button v-if="showResetButton" :icon="Refresh" @click="handleReset">
+          <ElButton v-if="showResetButton" :icon="Refresh" @click="handleReset">
             {{ resetButtonText }}
-          </el-button>
+          </ElButton>
 
           <!-- 展开/收起 -->
-          <el-link
+          <ElLink
             v-if="isExpandable && hasHiddenFields"
             type="primary"
             class="ml-2"
             @click="toggleExpand"
           >
             {{ expanded ? "收起" : "展开" }}
-            <el-icon class="ml-1">
+            <ElIcon class="ml-1">
               <component :is="expanded ? ArrowUp : ArrowDown" />
-            </el-icon>
-          </el-link>
-        </el-form-item>
-      </el-form>
-    </el-card>
+            </ElIcon>
+          </ElLink>
+        </ElFormItem>
+      </ElForm>
+    </ElCard>
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { computed, ref, reactive, onMounted } from "vue";
+import { computed, ref, reactive, onMounted, markRaw, h } from "vue";
 import {
   ElCard,
   ElForm,
   ElFormItem,
   ElInput,
+  ElInputNumber,
   ElSelect,
   ElOption,
+  ElRadio,
+  ElCheckbox,
+  ElCascader,
+  ElTreeSelect,
   ElDatePicker,
+  ElTimePicker,
+  ElTimeSelect,
   ElButton,
   ElLink,
   ElIcon,
   ElTooltip,
 } from "element-plus";
 import { Search, Refresh, ArrowUp, ArrowDown, QuestionFilled } from "@element-plus/icons-vue";
+import InputTag from "@/components/InputTag/index.vue";
 import type { ProSearchConfig, ProSearchEmits } from "./types";
-import type { ProFormField } from "../ProForm/types";
 
 defineOptions({ inheritAttrs: false });
 
@@ -130,7 +148,7 @@ const props = withDefaults(defineProps<ProSearchConfig<T>>(), {
 const emit = defineEmits<ProSearchEmits<T>>();
 
 const formRef = ref<InstanceType<typeof ElForm>>();
-const queryParams = reactive<T>({} as T);
+const queryParams = reactive<Record<string, any>>({});
 const expanded = ref(false);
 const searching = ref(false);
 const visible = ref(true);
@@ -153,8 +171,8 @@ const cardAttrs = computed(() => ({
 }));
 
 // 表单属性
-const formAttrs = computed(() => ({
-  labelPosition: "right",
+const formAttrs = computed<Record<string, any>>(() => ({
+  labelPosition: "right" as const,
   labelWidth: "auto",
   size: "default",
   ...props.form,
@@ -178,12 +196,20 @@ const buttonClass = computed(() => ({
 // 动态解析组件
 const resolveComponent = (type?: string) => {
   const map: Record<string, any> = {
-    input: ElInput,
-    select: ElSelect,
-    date: ElDatePicker,
+    input: markRaw(ElInput),
+    select: markRaw(ElSelect),
+    "input-number": markRaw(ElInputNumber),
+    "date-picker": markRaw(ElDatePicker),
+    "time-picker": markRaw(ElTimePicker),
+    "time-select": markRaw(ElTimeSelect),
+    cascader: markRaw(ElCascader),
+    "tree-select": markRaw(ElTreeSelect),
+    "input-tag": markRaw(InputTag),
+    "custom-tag": markRaw(InputTag),
+    date: markRaw(ElDatePicker),
     datetime: () => h(ElDatePicker, { type: "datetime" }),
     daterange: () => h(ElDatePicker, { type: "daterange" }),
-    number: () => h(ElInput, { type: "number" }),
+    number: markRaw(ElInputNumber),
   };
   return map[type ?? "input"] || ElInput;
 };
@@ -193,14 +219,14 @@ async function handleSearch() {
   try {
     searching.value = true;
     // 过滤空值
-    const params = {} as T;
+    const params = {} as Record<string, any>;
     Object.keys(queryParams).forEach((key) => {
       const val = queryParams[key];
       if (val !== "" && val !== null && val !== undefined) {
         params[key] = val;
       }
     });
-    emit("search", params);
+    emit("search", params as T);
   } finally {
     searching.value = false;
   }
@@ -210,14 +236,12 @@ async function handleSearch() {
 function handleReset() {
   formRef.value?.resetFields();
   // 恢复初始值
-  onMounted(() => {
-    props.fields.forEach((field) => {
-      if (field.initialValue !== undefined) {
-        queryParams[field.field] = field.initialValue;
-      }
-    });
+  props.fields.forEach((field) => {
+    if (field.initialValue !== undefined) {
+      (queryParams as any)[field.field] = field.initialValue;
+    }
   });
-  emit("reset", queryParams);
+  emit("reset", { ...queryParams } as T);
 }
 
 // 展开/收起
@@ -229,7 +253,24 @@ function toggleExpand() {
 // 初始化
 onMounted(() => {
   props.fields.forEach((field) => {
-    queryParams[field.field] = field.initialValue ?? "";
+    if (field.initFn) field.initFn(field as any);
+    // api-tree-select: 异步加载数据
+    if (field.type === "api-tree-select" && typeof field.api === "function") {
+      field.api().then((data) => {
+        if (!field.attrs) field.attrs = {};
+        field.attrs.data = data;
+      });
+    }
+    // 初始值
+    if (["input-tag", "custom-tag", "cascader"].includes(field.type ?? "")) {
+      (queryParams as any)[field.field] = Array.isArray(field.initialValue)
+        ? field.initialValue
+        : [];
+    } else if (field.type === "input-number" || field.type === "number") {
+      (queryParams as any)[field.field] = field.initialValue ?? null;
+    } else {
+      (queryParams as any)[field.field] = field.initialValue ?? "";
+    }
   });
 });
 

@@ -1,11 +1,9 @@
 import { ref, reactive } from "vue";
-import { ProModalConfig } from "../ProModal/types";
 
-export function useModalState<T>(config: ProModalConfig<T>) {
+export function useModalState<T = any>(pk = "id") {
   const visible = ref(false);
   const mode = ref<"add" | "edit" | "view">("add");
   const formData = reactive<Record<string, any>>({});
-  const pk = config.pk ?? "id";
 
   function open(m: typeof mode.value, row?: T) {
     mode.value = m;
@@ -18,12 +16,5 @@ export function useModalState<T>(config: ProModalConfig<T>) {
     visible.value = true;
   }
 
-  async function submit() {
-    if (config.submitAction && mode.value !== "view") {
-      await config.submitAction(formData as T);
-    }
-    visible.value = false;
-  }
-
-  return { visible, mode, formData, open, submit, pk };
+  return { visible, mode, formData, open, pk };
 }

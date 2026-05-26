@@ -1,34 +1,50 @@
-import { ref, reactive, computed } from "vue";
-import { ProTableConfig } from "../ProTable/types";
+import { shallowRef, ref, reactive } from "vue";
+import type { PagingResult } from "@/core/transport/rest";
+import { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZES } from "../constants";
 
-export function useTableState<T, Q>(config: ProTableConfig<T, Q>) {
-  const data = ref<T[]>([]);
+export interface UseTableConfig {
+  indexAction: (queryParams: any) => Promise<PagingResult<any> | any[]>;
+  pk?: string;
+  pagination?: boolean;
+  request?: { pageName: string; limitName: string };
+}
+
+export function useTableState<T = any, Q = any>(config: UseTableConfig) {
+  const data = shallowRef<T[]>([]);
   const loading = ref(false);
-  const selection = ref<T[]>([]);
+  const selection = shallowRef<T[]>([]);
+  const pk = config.pk ?? "id";
+  const showPagination = config.pagination !== false;
+  const request = config.request ?? { pageName: "page", limitName: "pageSize" };
+
   const pagination = reactive({
-    currentPage: 1,
-    pageSize: 20,
+    currentPage: DEFAULT_CURRENT_PAGE,
+    pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
-    ...((typeof config.pagination === "object" ? config.pagination : {}) as any),
+    pageSizes: [...DEFAULT_PAGE_SIZES] as number[],
+    background: true,
   });
 
-  const pk = config.pk ?? "id";
-  const reqParams = config.requestParams ?? { pageName: "page", limitName: "pageSize" };
-
-  async function fetch(queryParams: Q = {}, resetPage = false) {
+  async function fetch(queryParams: any = {}, resetPage = false) {
     loading.value = true;
     if (resetPage) pagination.currentPage = 1;
 
-    const params = {
-      [reqParams.pageName]: pagination.currentPage,
-      [reqParams.limitName]: pagination.pageSize,
-      ...queryParams,
-    } as any;
+    const params = showPagination
+      ? {
+          [request.pageName]: pagination.currentPage,
+          [request.limitName]: pagination.pageSize,
+          ...queryParams,
+        }
+      : { ...queryParams };
 
     try {
-      const res = await config.request(params);
-      data.value = res.list;
-      pagination.total = res.total;
+      const res = await config.indexAction(params as Q);
+      if (showPagination && !Array.isArray(res)) {
+        data.value = (res as PagingResult<T>).items ?? [];
+        pagination.total = (res as PagingResult<T>).total ?? 0;
+      } else {
+        data.value = Array.isArray(res) ? res : ((res as PagingResult<T>).items ?? []);
+      }
     } finally {
       loading.value = false;
     }
@@ -37,6 +53,7 @@ export function useTableState<T, Q>(config: ProTableConfig<T, Q>) {
   function handleSelectionChange(rows: T[]) {
     selection.value = rows;
   }
+
   function getSelectionIds() {
     return selection.value.map((r) => (r as any)[pk]);
   }
@@ -46,6 +63,7 @@ export function useTableState<T, Q>(config: ProTableConfig<T, Q>) {
     loading,
     pagination,
     selection,
+    showPagination,
     fetch,
     handleSelectionChange,
     getSelectionIds,
