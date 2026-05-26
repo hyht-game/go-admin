@@ -1,10 +1,14 @@
 import { useQuery, type UseQueryOptions } from "@tanstack/vue-query";
-import {
-  type InitialContextResponse,
-  type ListPermissionCodeResponse,
-  type ListRouteResponse,
+import type {
+  InitialContextResponse,
+  ListPermissionCodeResponse,
+  ListRouteResponse,
 } from "@/api/generated/admin/service/v1";
 import { getNavigation, getMyPermissionCode, getInitialContext } from "@/api/service/admin-portal";
+
+// 直接导出 service 层函数，供非 Vue 上下文使用
+export { getMyPermissionCode };
+
 import { queryClient } from "@/plugins/vue-query";
 
 // ------------------------------

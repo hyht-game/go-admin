@@ -21,6 +21,9 @@ import {
   uploadMyAvatar,
   verifyMyContact,
 } from "@/api/service/user-profile";
+
+// 直接导出 service 层函数，供非 Vue 上下文使用
+export { getMe };
 import { makeUpdateMask } from "@/core/transport/rest";
 import { queryClient } from "@/plugins/vue-query";
 

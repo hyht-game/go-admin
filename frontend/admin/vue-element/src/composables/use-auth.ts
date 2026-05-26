@@ -3,7 +3,7 @@
  * 替代 authentication.store.ts，提供登录/登出/注册/验证码/获取用户信息/权限码等功能
  */
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { router } from "@/router";
 
 import { DEFAULT_HOME_PATH } from "@/constants";
 import { resetAllStores, useAccessStore, useAppUserStore } from "@/stores";
@@ -12,11 +12,13 @@ import { ElNotification } from "element-plus";
 import CryptoJS from "crypto-js";
 
 import {
-  createAuthenticationServiceClient,
-  createAdminPortalServiceClient,
-  createUserProfileServiceClient,
-} from "@/api/generated/admin/service/v1";
-import { requestClientRequestHandler } from "@/core/transport/rest";
+  login as authLogin,
+  logout as authLogout,
+  registerUser as authRegisterUser,
+  generateCaptcha as authGenerateCaptcha,
+  getMyPermissionCode,
+  getMe,
+} from "@/api/composables";
 import { i18n } from "@/i18n/setup";
 import {
   startRefreshTimer,
@@ -26,14 +28,6 @@ import {
 } from "@/composables/use-token-refresh";
 
 const t = i18n.global.t;
-
-// ==============================
-// 服务客户端（单例）
-// ==============================
-
-const authnService = createAuthenticationServiceClient(requestClientRequestHandler);
-const adminPortalService = createAdminPortalServiceClient(requestClientRequestHandler);
-const userProfileService = createUserProfileServiceClient(requestClientRequestHandler);
 
 // ==============================
 // 登录加载状态（模块级单例）
@@ -77,7 +71,7 @@ const REFRESH_TOKEN_REFRESH_INTERVAL = 12 * 60 * 60 * 1000;
 
 async function fetchUserInfo() {
   try {
-    return (await userProfileService.GetUser({})) as unknown as UserInfo;
+    return (await getMe()) as unknown as UserInfo;
   } catch (error) {
     console.error("fetchUserInfo failed:", error);
     await _doLogout();
@@ -86,7 +80,7 @@ async function fetchUserInfo() {
 }
 
 async function fetchAccessCodes() {
-  return await adminPortalService.GetMyPermissionCode({});
+  return await getMyPermissionCode();
 }
 
 async function login(
@@ -97,7 +91,7 @@ async function login(
   try {
     loginLoading.value = true;
 
-    const resp = await authnService.Login({
+    const resp = await authLogin({
       username: params.username,
       password: encryptPassword(params.password),
       grant_type: "password",
@@ -149,7 +143,6 @@ async function login(
       if (accessStore.loginExpired) {
         accessStore.setLoginExpired(false);
       } else {
-        const router = useRouter();
         onSuccess ? await onSuccess?.() : await router.push(userInfo.homePath || DEFAULT_HOME_PATH);
       }
 
@@ -200,7 +193,7 @@ async function logout(redirect: boolean = true) {
   const accessStore = useAccessStore();
   try {
     if (accessStore.accessToken !== null && accessStore.accessToken !== "") {
-      await authnService.Logout({});
+      await authLogout();
     }
   } catch {
     // 忽略错误
@@ -209,7 +202,7 @@ async function logout(redirect: boolean = true) {
 }
 
 async function register(username: string, password: string) {
-  return await authnService.RegisterUser({
+  return await authRegisterUser({
     username,
     password: encryptPassword(password),
     tenantCode: "master",
@@ -217,7 +210,7 @@ async function register(username: string, password: string) {
 }
 
 async function getCaptcha() {
-  return await authnService.GenerateCaptcha({});
+  return await authGenerateCaptcha();
 }
 
 async function getUserPermissionCodes() {

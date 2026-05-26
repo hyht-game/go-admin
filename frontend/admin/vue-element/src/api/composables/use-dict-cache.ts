@@ -27,8 +27,12 @@ export async function fetchAllDictEntries() {
     return;
   }
 
-  const types = await fetchListDictTypes(new PaginationQuery({ paging: { page: 1, pageSize: 9999 } }));
-  const result = await fetchListDictEntries(new PaginationQuery({ paging: { page: 1, pageSize: 99999 } }));
+  const types = await fetchListDictTypes(
+    new PaginationQuery({ paging: { page: 1, pageSize: 9999 } })
+  );
+  const result = await fetchListDictEntries(
+    new PaginationQuery({ paging: { page: 1, pageSize: 99999 } })
+  );
   const items = result?.items || [];
 
   for (const item of items) {

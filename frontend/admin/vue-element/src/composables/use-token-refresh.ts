@@ -1,10 +1,9 @@
-import { createAuthenticationServiceClient } from "@/api/generated/admin/service/v1";
+import { refreshToken as refreshTokenService } from "@/api/composables";
 import { LOGIN_PATH } from "@/constants";
 import { preferences } from "@/core/preferences";
 import { globalSSEClient } from "@/core/transport/sse";
-import { requestClientRequestHandler } from "@/core/transport/rest";
 import { resetAllStores, useAccessStore } from "@/stores";
-import { useRouter } from "vue-router";
+import { router } from "@/router";
 
 // ==============================
 // 常量
@@ -31,19 +30,6 @@ let isReauthenticating = false;
 type RefreshTokenFunc = () => Promise<string> | string;
 
 // ==============================
-// 认证服务客户端（单例）
-// ==============================
-
-let _authnService: ReturnType<typeof createAuthenticationServiceClient> | null = null;
-
-function getAuthnService() {
-  if (!_authnService) {
-    _authnService = createAuthenticationServiceClient(requestClientRequestHandler);
-  }
-  return _authnService;
-}
-
-// ==============================
 // 核心：刷新 Access Token
 // ==============================
 
@@ -60,10 +46,7 @@ export async function refreshToken(): Promise<string> {
   }
 
   try {
-    const resp = await getAuthnService().RefreshToken({
-      grant_type: "refresh_token",
-      refresh_token: accessStore.refreshToken ?? "",
-    });
+    const resp = await refreshTokenService(accessStore.refreshToken ?? "");
 
     const newAccessToken = (resp as any).access_token;
     const newRefreshToken = (resp as any).refresh_token;
@@ -151,8 +134,6 @@ export async function logoutToLoginPage(redirect: boolean = true): Promise<void>
   accessStore.setLoginExpired(false);
 
   globalSSEClient.close();
-
-  const router = useRouter();
 
   console.log("currentRoute", router.currentRoute.value);
   if (router.currentRoute.value.path === LOGIN_PATH) return;

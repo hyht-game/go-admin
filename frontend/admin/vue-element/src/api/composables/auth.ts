@@ -12,6 +12,9 @@ import type {
   authenticationservicev1_RegisterUserResponse,
 } from "@/api/generated/admin/service/v1";
 import { login, logout, refreshToken, generateCaptcha, registerUser } from "@/api/service/auth";
+
+// 直接导出 service 层函数，供非 Vue 上下文使用
+export { login, logout, refreshToken, generateCaptcha, registerUser };
 import { queryClient } from "@/plugins/vue-query";
 
 // ------------------------------
