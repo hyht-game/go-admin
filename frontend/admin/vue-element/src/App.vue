@@ -9,14 +9,19 @@
     >
       <router-view />
     </el-watermark>
+    <!-- Vue Query Devtools（仅开发环境） -->
+    <TanstackQueryDevtools v-if="isDev" />
   </el-config-provider>
 </template>
 
 <script setup lang="ts">
+import { TanstackQueryDevtools } from "@/plugins/vue-query";
 import { APP_PREFIX } from "@/constants";
 import { preferences, usePreferences } from "@/core/preferences";
 
 const { isDark, getElementPlusLocale } = usePreferences();
+
+const isDev = import.meta.env.DEV;
 
 const locale = computed(() => getElementPlusLocale.value);
 const showWatermark = computed(() => preferences.app.watermark);
