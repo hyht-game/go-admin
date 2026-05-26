@@ -110,95 +110,92 @@ const PermissionList: React.FC<PermissionListProps> = ({ groupId }) => {
     },
   ];
 
-  // 如果没有选中分组，显示提示
-  if (!groupId) {
-    return (
-      <div className="page-container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-        <Empty description={t('selectGroupFirst')} />
-      </div>
-    );
-  }
-
   return (
     <>
       <div ref={containerRef} className="page-container-content" style={{ padding: '0 8px', height: '100%' }}>
-        <ProTable<any>
-          actionRef={actionRef}
-          columns={columns}
-          headerTitle={false}
-          params={{ groupId }}
-          request={async (params) => {
-            try {
-              const query = new PaginationQuery({
-                paging: {
-                  page: params.current || 1,
-                  pageSize: params.pageSize || TABLE.DEFAULT_PAGE_SIZE,
-                },
-                formValues: {
-                  ...Object.fromEntries(
-                    Object.entries(params).filter(
-                      ([key]) => !['current', 'pageSize', 'groupId'].includes(key),
+        {groupId ? (
+          <ProTable<any>
+            actionRef={actionRef}
+            columns={columns}
+            headerTitle={false}
+            params={{ groupId }}
+            request={async (params) => {
+              try {
+                const query = new PaginationQuery({
+                  paging: {
+                    page: params.current || 1,
+                    pageSize: params.pageSize || TABLE.DEFAULT_PAGE_SIZE,
+                  },
+                  formValues: {
+                    ...Object.fromEntries(
+                      Object.entries(params).filter(
+                        ([key]) => !['current', 'pageSize', 'groupId'].includes(key),
+                      ),
                     ),
-                  ),
-                  group_id: groupId,
-                },
-              });
+                    group_id: groupId,
+                  },
+                });
 
-              const response = await fetchListPermissions(query);
+                const response = await fetchListPermissions(query);
 
-              return {
-                data: response.items || [],
-                total: response.total || 0,
-                success: true,
-              };
-            } catch (error: any) {
-              message.error(error.message || t('fetchFailed'));
-              return { data: [], total: 0, success: false };
-            }
-          }}
-          rowKey="id"
-          search={{
-            labelWidth: 'auto',
-            defaultCollapsed: false,
-          }}
-          pagination={{
-            defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
-          toolBarRender={() => [
-            <Button
-              key="create"
-              type="primary"
-              icon={<PlusOutlined />}
-              size="small"
-              onClick={() => {
-                setEditingPermission(null);
-                setDrawerMode('create');
-                setDrawerOpen(true);
-              }}
-            >
-              {t('create')}
-            </Button>,
-          ]}
-          options={{
-            density: true,
-            fullScreen: true,
-            setting: true,
-            reload: true,
-          }}
-          size="small"
-          bordered
-          cardBordered={false}
-          scroll={{ y: tableScrollY, x: 650 }}
-        />
+                return {
+                  data: response.items || [],
+                  total: response.total || 0,
+                  success: true,
+                };
+              } catch (error: any) {
+                message.error(error.message || t('fetchFailed'));
+                return { data: [], total: 0, success: false };
+              }
+            }}
+            rowKey="id"
+            search={{
+              labelWidth: 'auto',
+              defaultCollapsed: false,
+            }}
+            pagination={{
+              defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
+              showSizeChanger: true,
+              showQuickJumper: true,
+            }}
+            toolBarRender={() => [
+              <Button
+                key="create"
+                type="primary"
+                icon={<PlusOutlined />}
+                size="small"
+                onClick={() => {
+                  setEditingPermission(null);
+                  setDrawerMode('create');
+                  setDrawerOpen(true);
+                }}
+              >
+                {t('create')}
+              </Button>,
+            ]}
+            options={{
+              density: true,
+              fullScreen: true,
+              setting: true,
+              reload: true,
+            }}
+            size="small"
+            bordered
+            cardBordered={false}
+            scroll={{ y: tableScrollY, x: 650 }}
+          />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <Empty description={t('selectGroupFirst')} />
+          </div>
+        )}
       </div>
 
       <PermissionDrawer
         open={drawerOpen}
         mode={drawerMode}
         data={editingPermission}
-        groupId={groupId}
+        groupId={groupId!}
         onClose={() => {
           setDrawerOpen(false);
           setEditingPermission(null);

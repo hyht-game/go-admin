@@ -17,6 +17,8 @@
   "edit": "编辑分组",
   "expandAll": "展开全部",
   "collapseAll": "折叠全部",
+  "selectAll": "全选",
+  "deselectAll": "取选",
   "action": "操作",
   "deleteConfirmTitle": "确认删除",
   "deleteConfirmDesc": "确定要删除该{{moduleName}}吗？",

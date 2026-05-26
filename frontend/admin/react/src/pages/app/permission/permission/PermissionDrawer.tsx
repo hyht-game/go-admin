@@ -5,9 +5,15 @@ import {
   ProFormText,
   ProFormRadio,
 } from '@ant-design/pro-components';
-import { App, TreeSelect, Form, Tree, Spin } from 'antd';
+import { App, TreeSelect, Form, Tree, Spin, Button, Space } from 'antd';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import {
+  NodeExpandOutlined,
+  NodeCollapseOutlined,
+  CheckSquareOutlined,
+  BorderOutlined,
+} from '@ant-design/icons';
 
 import { PaginationQuery } from '@/core';
 import { useCreatePermission, useUpdatePermission } from '@/api/hooks/permission';
@@ -52,14 +58,16 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
   // 分组下拉数据
   const [groupTreeData, setGroupTreeData] = useState<any[]>([]);
 
-  // 菜单树数据 + 勾选
+  // 菜单树数据 + 勾选 + 展开
   const [menuTreeData, setMenuTreeData] = useState<any[]>([]);
   const [menuCheckedKeys, setMenuCheckedKeys] = useState<number[]>([]);
+  const [menuExpandedKeys, setMenuExpandedKeys] = useState<React.Key[]>([]);
   const [menuTreeLoading, setMenuTreeLoading] = useState(false);
 
-  // API 树数据 + 勾选
+  // API 树数据 + 勾选 + 展开
   const [apiTreeData, setApiTreeData] = useState<any[]>([]);
   const [apiCheckedKeys, setApiCheckedKeys] = useState<number[]>([]);
+  const [apiExpandedKeys, setApiExpandedKeys] = useState<React.Key[]>([]);
   const [apiTreeLoading, setApiTreeLoading] = useState(false);
 
   // 加载树形数据
@@ -76,7 +84,11 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
       setMenuTreeLoading(true);
       fetchListMenus(new PaginationQuery({ formValues: { status: 'ON' } }))
         .then((res) => {
-          setMenuTreeData(buildMenuTree(res?.items));
+          const tree = buildMenuTree(res?.items);
+          setMenuTreeData(tree);
+          // 默认展开全部
+          const keys = collectAllKeys(tree);
+          setMenuExpandedKeys(keys);
         })
         .catch(() => setMenuTreeData([]))
         .finally(() => setMenuTreeLoading(false));
@@ -85,7 +97,11 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
       setApiTreeLoading(true);
       fetchListApis(new PaginationQuery({}))
         .then((res) => {
-          setApiTreeData(buildApiTree(res?.items, t));
+          const tree = buildApiTree(res?.items, t);
+          setApiTreeData(tree);
+          // 默认展开全部
+          const keys = collectAllKeys(tree);
+          setApiExpandedKeys(keys);
         })
         .catch(() => setApiTreeData([]))
         .finally(() => setApiTreeLoading(false));
@@ -113,6 +129,96 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
       }
     }
   }, [open, mode, data, groupId]);
+
+  // 收集树所有节点的 key
+  const collectAllKeys = (tree: any[]): React.Key[] => {
+    const keys: React.Key[] = [];
+    const walk = (nodes: any[]) => {
+      nodes.forEach((n) => {
+        keys.push(n.key ?? n.value ?? n.id);
+        if (n.children?.length) walk(n.children);
+      });
+    };
+    walk(tree);
+    return keys;
+  };
+
+  // 收集树所有叶子节点 key（用于全选勾选）
+  const collectLeafKeys = (tree: any[]): React.Key[] => {
+    const keys: React.Key[] = [];
+    const walk = (nodes: any[]) => {
+      nodes.forEach((n) => {
+        if (n.children?.length) {
+          walk(n.children);
+        } else {
+          keys.push(n.key ?? n.value ?? n.id);
+        }
+      });
+    };
+    walk(tree);
+    return keys;
+  };
+
+  // 收集树所有节点 key（含父子，用于全选勾选）
+  const collectAllNodeKeys = (tree: any[]): React.Key[] => {
+    const keys: React.Key[] = [];
+    const walk = (nodes: any[]) => {
+      nodes.forEach((n) => {
+        keys.push(n.key ?? n.value ?? n.id);
+        if (n.children?.length) walk(n.children);
+      });
+    };
+    walk(tree);
+    return keys;
+  };
+
+  // 树工具栏渲染
+  const renderTreeToolbar = (
+    treeData: any[],
+    expandedKeys: React.Key[],
+    checkedKeys: React.Key[],
+    onExpand: (keys: React.Key[]) => void,
+    onCheck: (keys: React.Key[]) => void,
+  ) => (
+    <Space size={4} style={{ marginBottom: 4 }}>
+      <Button
+        type="link"
+        size="small"
+        icon={<NodeExpandOutlined />}
+        onClick={() => onExpand(collectAllKeys(treeData))}
+        style={{ padding: '0 4px', fontSize: 12 }}
+      >
+        {t('treeExpandAll')}
+      </Button>
+      <Button
+        type="link"
+        size="small"
+        icon={<NodeCollapseOutlined />}
+        onClick={() => onExpand([])}
+        style={{ padding: '0 4px', fontSize: 12 }}
+      >
+        {t('treeCollapseAll')}
+      </Button>
+      <Button
+        type="link"
+        size="small"
+        icon={<CheckSquareOutlined />}
+        onClick={() => onCheck(collectAllNodeKeys(treeData))}
+        style={{ padding: '0 4px', fontSize: 12 }}
+      >
+        {t('selectAll')}
+      </Button>
+      <Button
+        type="link"
+        size="small"
+        icon={<BorderOutlined />}
+        onClick={() => onCheck([])}
+        style={{ padding: '0 4px', fontSize: 12 }}
+      >
+        {t('deselectAll')}
+      </Button>
+    </Space>
+  );
 
   // 创建 mutation
   const createMutation = useCreatePermission({
@@ -240,22 +346,32 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
         </label>
         <Spin spinning={menuTreeLoading}>
           {menuTreeData.length > 0 ? (
-            <Tree
-              checkable
-              checkedKeys={menuCheckedKeys}
-              onCheck={(checked) => {
-                setMenuCheckedKeys(checked as number[]);
-              }}
-              treeData={menuTreeData}
-              defaultExpandAll
-              style={{
-                maxHeight: 300,
-                overflow: 'auto',
-                border: '1px solid var(--ant-color-border)',
-                borderRadius: 6,
-                padding: 8,
-              }}
-            />
+            <>
+              {renderTreeToolbar(
+                menuTreeData,
+                menuExpandedKeys,
+                menuCheckedKeys,
+                (keys) => setMenuExpandedKeys(keys),
+                (keys) => setMenuCheckedKeys(keys as number[]),
+              )}
+              <Tree
+                checkable
+                checkedKeys={menuCheckedKeys}
+                onCheck={(checked) => {
+                  setMenuCheckedKeys(checked as number[]);
+                }}
+                expandedKeys={menuExpandedKeys}
+                onExpand={(keys) => setMenuExpandedKeys(keys as React.Key[])}
+                treeData={menuTreeData}
+                style={{
+                  maxHeight: 300,
+                  overflow: 'auto',
+                  border: '1px solid var(--ant-color-border)',
+                  borderRadius: 6,
+                  padding: 8,
+                }}
+              />
+            </>
           ) : (
             <div
               style={{
@@ -279,22 +395,32 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
         </label>
         <Spin spinning={apiTreeLoading}>
           {apiTreeData.length > 0 ? (
-            <Tree
-              checkable
-              checkedKeys={apiCheckedKeys}
-              onCheck={(checked) => {
-                setApiCheckedKeys(checked as number[]);
-              }}
-              treeData={apiTreeData}
-              defaultExpandAll
-              style={{
-                maxHeight: 300,
-                overflow: 'auto',
-                border: '1px solid var(--ant-color-border)',
-                borderRadius: 6,
-                padding: 8,
-              }}
-            />
+            <>
+              {renderTreeToolbar(
+                apiTreeData,
+                apiExpandedKeys,
+                apiCheckedKeys,
+                (keys) => setApiExpandedKeys(keys),
+                (keys) => setApiCheckedKeys(keys as number[]),
+              )}
+              <Tree
+                checkable
+                checkedKeys={apiCheckedKeys}
+                onCheck={(checked) => {
+                  setApiCheckedKeys(checked as number[]);
+                }}
+                expandedKeys={apiExpandedKeys}
+                onExpand={(keys) => setApiExpandedKeys(keys as React.Key[])}
+                treeData={apiTreeData}
+                style={{
+                  maxHeight: 300,
+                  overflow: 'auto',
+                  border: '1px solid var(--ant-color-border)',
+                  borderRadius: 6,
+                  padding: 8,
+                }}
+              />
+            </>
           ) : (
             <div
               style={{

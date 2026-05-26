@@ -17,6 +17,8 @@
   "edit": "Edit Group",
   "expandAll": "Expand All",
   "collapseAll": "Collapse All",
+  "selectAll": "Select All",
+  "deselectAll": "Deselect",
   "action": "Action",
   "deleteConfirmTitle": "Confirm Delete",
   "deleteConfirmDesc": "Are you sure you want to delete this {{moduleName}}?",
