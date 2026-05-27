@@ -32,6 +32,7 @@ import type { MenuInstance } from "element-plus";
 import type { RouteRecordRaw } from "vue-router";
 
 import { usePreferences } from "@/core/preferences";
+import { preferences } from "@/core/preferences";
 import { isExternal } from "@/utils";
 
 import LayoutSidebarItem from "./LayoutSidebarItem.vue";
@@ -65,13 +66,21 @@ const navigationStyle = computed(() => navigationPreferences.value.styleType);
 const expandedMenuIndexes = ref<string[]>([]);
 
 // 菜单主题属性
+// 深色主题或半深色侧边栏模式下，使用深色菜单配色
+const useDarkMenuColors = computed(() => {
+  if (theme.value === "dark") return true;
+  // 浅色主题下 semiDarkSidebar 开启时也使用深色配色
+  if (preferences.theme.semiDarkSidebar) return true;
+  return false;
+});
 const menuThemeProps = computed(() => {
-  const isDarkOrClassicBlue = theme.value === "dark";
-
+  if (!useDarkMenuColors.value) {
+    return { backgroundColor: undefined, textColor: undefined, activeTextColor: undefined };
+  }
   return {
-    backgroundColor: isDarkOrClassicBlue ? variables["menu-background"] : undefined,
-    textColor: isDarkOrClassicBlue ? variables["menu-text"] : undefined,
-    activeTextColor: isDarkOrClassicBlue ? variables["menu-active-text"] : undefined,
+    backgroundColor: variables["menu-background"],
+    textColor: variables["menu-text"],
+    activeTextColor: variables["menu-active-text"],
   };
 });
 

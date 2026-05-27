@@ -76,6 +76,16 @@ const BUILT_IN_THEME_PRESETS: BuiltinThemePreset[] = [
     type: "gray",
   },
   {
+    color: "hsl(0 72% 51%)",
+    type: "red",
+  },
+  {
+    color: "hsl(25 5% 45%)",
+    darkPrimaryColor: "hsl(0 0% 98%)",
+    primaryColor: "hsl(240 5.9% 10%)",
+    type: "stone",
+  },
+  {
     color: "",
     type: "custom",
   },

@@ -236,8 +236,8 @@ function navigateToFirstMenu(menus: RouteRecordRaw[]) {
     z-index: 999;
     width: 100%;
     height: $navbar-height;
-    background-color: var(--menu-background);
-    border-bottom: 1px solid var(--el-border-color-lighter);
+    background-color: var(--navbar-background);
+    border-bottom: 1px solid var(--navbar-border-color);
 
     &-content {
       display: flex;

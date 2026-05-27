@@ -30,6 +30,7 @@
       <div class="preference-item">
         <span>{{ t("preferences.appearance.darkSidebar") }}</span>
         <ElSwitch
+          :disabled="preferences.theme.mode !== 'light'"
           :model-value="preferences.theme.semiDarkSidebar"
           @change="
             (val: string | number | boolean) =>
@@ -40,6 +41,7 @@
       <div class="preference-item">
         <span>{{ t("preferences.appearance.darkHeader") }}</span>
         <ElSwitch
+          :disabled="preferences.theme.mode !== 'light'"
           :model-value="preferences.theme.semiDarkHeader"
           @change="
             (val: string | number | boolean) =>
@@ -145,6 +147,8 @@ const BUILTIN_THEMES: { nameKey: string; color: string; type: BuiltinThemeType }
   { nameKey: "appearance.themes.neutral", color: "#595959", type: "neutral" },
   { nameKey: "appearance.themes.slate", color: "#54687a", type: "slate" },
   { nameKey: "appearance.themes.gray", color: "#595959", type: "gray" },
+  { nameKey: "appearance.themes.red", color: "#e6393b", type: "red" },
+  { nameKey: "appearance.themes.stone", color: "#6b6b6b", type: "stone" },
   { nameKey: "appearance.themes.custom", color: "custom", type: "custom" },
 ];
 
@@ -157,6 +161,10 @@ const RADIUS_OPTIONS = [
 ];
 
 function handleBuiltinThemeChange(type: BuiltinThemeType) {
+  if (type === "custom") {
+    updatePreferences({ theme: { builtinType: "custom" } });
+    return;
+  }
   const theme = BUILTIN_THEMES.find((item) => item.type === type);
   if (theme) {
     updatePreferences({ theme: { builtinType: type, colorPrimary: theme.color } });

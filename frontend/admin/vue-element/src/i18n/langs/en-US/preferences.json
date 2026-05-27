@@ -45,6 +45,8 @@
       "neutral": "Neutral",
       "slate": "Slate",
       "gray": "Gray",
+      "red": "Red",
+      "stone": "Stone",
       "custom": "Custom"
     }
   },
