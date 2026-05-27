@@ -240,9 +240,11 @@ const pageConfig: ProPageConfig = {
 
 <style lang="scss" scoped>
 .app-container {
-  padding: 20px;
+  height: 100%;
+  padding: 0;
   width: 100%;
   min-width: 0;
-  flex-shrink: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 </style>

@@ -3,7 +3,7 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-left">
-        <ElButton type="text" @click="goBack">
+        <ElButton link @click="goBack">
           <template #icon>
             <ArrowLeft />
           </template>
@@ -169,15 +169,26 @@ function handlePasswordSuccess() {
 
 .page-content {
   flex: 1;
+  min-height: 0;
   padding: 16px 20px;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   .detail-tabs {
+    flex-shrink: 0;
     margin-bottom: 16px;
   }
 
   .tab-content {
-    // 内容区样式
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+
+    :deep(.el-card__body) {
+      height: 100%;
+      overflow: hidden;
+    }
   }
 }
 </style>
