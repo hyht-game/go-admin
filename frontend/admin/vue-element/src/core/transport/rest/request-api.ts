@@ -1,4 +1,4 @@
-import { requestClient } from "./rest-client";
+import { RequestClient } from "./request-client";
 
 export function requestApi({
   path,
@@ -9,7 +9,7 @@ export function requestApi({
   method: string;
   body: null | string;
 }) {
-  return requestClient.request(path, {
+  return RequestClient.getInstance().request(path, {
     method,
     data: body,
   } as never);

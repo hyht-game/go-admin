@@ -1,29 +1,4 @@
-import { HttpResponse } from "@/core/transport/rest/types";
-import { $t, $te } from "@/i18n";
-
-/**
- * 从对象中省略指定键，返回新对象
- * @example 用法示例
- * const original = { a: 1, b: 2, c: 3 };
- * const result = omit(original, ['b', 'c']);
- * // result 的值为 { a: 1 }
- * @param obj 原始对象
- * @param keys 需要省略的键或键数组
- */
-export function omit<T extends Record<string, unknown>, K extends string>(
-  obj: null | T | undefined,
-  keys: K | K[]
-): Omit<T, K> {
-  if (obj === null || typeof obj !== "object") return obj as unknown as T;
-  const result = { ...obj } as Record<string, unknown>;
-  const keysArr = Array.isArray(keys) ? keys : [keys];
-  for (const key of keysArr) {
-    if (Object.prototype.hasOwnProperty.call(result, key)) {
-      delete result[key];
-    }
-  }
-  return result as Omit<T, K>;
-}
+import type { HttpResponse } from "./types";
 
 /**
  * 创建更新掩码字符串
@@ -31,8 +6,7 @@ export function omit<T extends Record<string, unknown>, K extends string>(
  * @returns 逗号分隔的字符串
  */
 export function makeUpdateMask(keys: string[]): string {
-  keys.push("id");
-  return keys.join(",");
+  return [...keys, "id"].join(",");
 }
 
 /**
@@ -53,19 +27,15 @@ export function defaultIdGenerator(): string {
 }
 
 /**
- * 按优先级获取错误提示文本
- * 1. reason → i18n error.xxx
- * 2. reason 无翻译 → 使用 message
- * 3. 都无 → 使用 status → i18n status.xxx
- * 4. 都无 → fallback
+ * 默认的错误消息提取（不依赖 i18n，纯逻辑 fallback）
+ * 按优先级：reason → message → status code → 兜底
+ * 如需 i18n 翻译，通过 RequestClientCallbacks.getErrorMsg 注入
  */
-export function getErrorMsg(error: unknown) {
-  const i18nPrefix = "common.request.";
-
+export function getDefaultErrorMsg(error: unknown): string {
   // 网络错误
   const errStr = String(error ?? "");
   if (errStr.includes("Network Error")) {
-    return $t(i18nPrefix + "error.networkError");
+    return "Network Error";
   }
 
   // 超时
@@ -75,7 +45,7 @@ export function getErrorMsg(error: unknown) {
     "message" in error &&
     String(error.message).includes("timeout")
   ) {
-    return $t(i18nPrefix + "error.timeout");
+    return "Request Timeout";
   }
 
   // 获取后端返回数据
@@ -90,40 +60,46 @@ export function getErrorMsg(error: unknown) {
       : undefined;
 
   if (!resData) {
-    return $t(i18nPrefix + "error.unknownError");
+    return "Unknown Error";
   }
 
   const { reason, message, code } = resData;
 
-  // =========================================
-  // 1. 优先：reason → common.request.reason.xxx
-  // =========================================
+  // 1. 优先使用 reason
   if (reason) {
-    const key = `${i18nPrefix}reason.${reason}`;
-    if ($te(key)) {
-      return $t(key);
-    }
+    return reason;
   }
 
-  // =========================================
-  // 2. reason 无翻译 → 使用后端 message
-  // =========================================
+  // 2. 使用后端 message
   if (message?.trim()) {
     return message.trim();
   }
 
-  // =========================================
-  // 3. 都没有 → 使用 code 查 status
-  // =========================================
+  // 3. 使用 code
   if (code) {
-    const statusKey = `${i18nPrefix}status.${code}`;
-    if ($te(statusKey)) {
-      return $t(statusKey);
-    }
+    return `Error ${code}`;
   }
 
-  // =========================================
-  // 4. 全部失败 → 兜底
-  // =========================================
-  return $t(`${i18nPrefix}error.unknownError`);
+  // 4. 兜底
+  return "Unknown Error";
+}
+
+export function bindMethods<T extends object>(instance: T): void {
+  const prototype = Object.getPrototypeOf(instance);
+  const propertyNames = Object.getOwnPropertyNames(prototype);
+
+  propertyNames.forEach((propertyName) => {
+    const descriptor = Object.getOwnPropertyDescriptor(prototype, propertyName);
+    const propertyValue = instance[propertyName as keyof T];
+
+    if (
+      typeof propertyValue === "function" &&
+      propertyName !== "constructor" &&
+      descriptor &&
+      !descriptor.get &&
+      !descriptor.set
+    ) {
+      instance[propertyName as keyof T] = propertyValue.bind(instance);
+    }
+  });
 }

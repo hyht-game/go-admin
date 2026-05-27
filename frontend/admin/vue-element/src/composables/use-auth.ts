@@ -27,7 +27,10 @@ import {
   logoutToLoginPage,
 } from "@/composables/use-token-refresh";
 
+import { createI18nGetErrorMsg } from "@/composables/use-request-error-msg";
+
 const t = i18n.global.t;
+const getErrorMsg = createI18nGetErrorMsg();
 
 // ==============================
 // 登录加载状态（模块级单例）
@@ -158,19 +161,13 @@ async function login(
   } catch (error) {
     await _doLogout();
 
-    if (error instanceof Error) {
-      ElNotification({
-        title: t("core.authentication.loginFailed"),
-        message: error.message,
-        type: "error",
-      });
-    } else {
-      ElNotification({
-        title: t("core.authentication.loginFailed"),
-        message: t("core.authentication.loginFailedDesc"),
-        type: "error",
-      });
-    }
+    // 使用 i18n 翻译错误消息（与 RequestClient 的 getErrorMsg 一致）
+    const errorMsg = getErrorMsg(error);
+    ElNotification({
+      title: t("core.authentication.loginFailed"),
+      message: errorMsg,
+      type: "error",
+    });
     return null;
   } finally {
     loginLoading.value = false;
