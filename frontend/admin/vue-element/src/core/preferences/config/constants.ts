@@ -1,3 +1,5 @@
+import type { BuiltinThemeType } from "../types";
+
 interface BuiltinThemePreset {
   color: string;
   darkPrimaryColor?: string;

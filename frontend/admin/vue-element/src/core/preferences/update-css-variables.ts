@@ -1,4 +1,5 @@
-import { BUILT_IN_THEME_PRESETS } from "./constants";
+import { BUILT_IN_THEME_PRESETS } from "./config/constants";
+import type { Preferences } from "./types";
 import { generatorColorVariables } from "@/utils/theme";
 
 /**

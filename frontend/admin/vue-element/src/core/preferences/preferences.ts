@@ -2,7 +2,8 @@ import { markRaw, reactive, readonly, watch } from "vue";
 
 import { breakpointsTailwind, useBreakpoints, useDebounceFn } from "@vueuse/core";
 
-import { defaultPreferences } from "./config";
+import { defaultPreferences } from "./config/default";
+import type { DeepPartial, InitialOptions, Preferences } from "./types";
 import { updateCSSVariables } from "./update-css-variables";
 import { StorageManager } from "@/core/storage";
 import { merge } from "@/utils/merge";

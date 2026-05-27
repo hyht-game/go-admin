@@ -1,3 +1,5 @@
+import type { Preferences } from "../types";
+
 const defaultPreferences: Preferences = {
   app: {
     accessMode: "frontend",
@@ -7,7 +9,7 @@ const defaultPreferences: Preferences = {
     colorWeakMode: false,
     compact: false,
     contentCompact: "wide",
-    defaultAvatar: "/default-avatar.webp",
+    defaultAvatar: "/default-avatar.png",
     dynamicTitle: true,
     enableCheckUpdates: false,
     enablePreferences: true,
@@ -25,7 +27,7 @@ const defaultPreferences: Preferences = {
   breadcrumb: {
     enable: true,
     hideOnlyOne: false,
-    showHome: false,
+    showHome: true,
     showIcon: true,
     styleType: "normal",
   },
@@ -67,7 +69,7 @@ const defaultPreferences: Preferences = {
     collapsed: false,
     collapsedShowTitle: false,
     enable: true,
-    expandOnHover: true,
+    expandOnHover: false,
     extraCollapse: true,
     hidden: false,
     width: 224,

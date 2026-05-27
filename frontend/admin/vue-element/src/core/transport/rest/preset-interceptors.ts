@@ -35,9 +35,13 @@ export const authenticateResponseInterceptor = ({
         throw error;
       }
 
+      // 刷新 token 请求本身返回 401 → refresh_token 已失效，直接重新认证
+      // 避免将 refresh 请求加入队列导致死锁（队列等待 refresh 完成，但 refresh 本身在队列中）
+      const isRefreshTokenRequest = config.url?.includes("/refresh-token");
+
       // 判断是否启用了 refreshToken 功能
       // 如果没有启用或者已经是重试请求了，直接跳转到重新登录
-      if (!enableRefreshToken || config.__isRetryRequest) {
+      if (!enableRefreshToken || config.__isRetryRequest || isRefreshTokenRequest) {
         await doReAuthenticate();
         // 标记错误已由认证拦截器处理
 
