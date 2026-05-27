@@ -171,7 +171,8 @@
     "expand_all": "Expand All",
     "collapse_all": "Collapse All",
     "select_all": "Select All",
-    "unselect_all": "Unselect All"
+    "unselect_all": "Unselect All",
+    "no_data": "No data"
   },
   "editor": {
     "please_input_content": "Please enter content",

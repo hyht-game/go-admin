@@ -169,7 +169,8 @@
     "expand_all": "展开全部",
     "collapse_all": "折叠全部",
     "select_all": "全选",
-    "unselect_all": "取消全选"
+    "unselect_all": "取消全选",
+    "no_data": "暂无数据"
   },
   "editor": {
     "please_input_content": "请输入内容",

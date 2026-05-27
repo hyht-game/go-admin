@@ -1,6 +1,12 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
+    <ProPage
+      ref="pageRef"
+      :config="pageConfig"
+      @add="handleAdd"
+      @edit="handleEdit"
+      @toolbar="handleToolbar"
+    >
       <!-- 标题 -->
       <template #title="scope: any">
         <div class="flex w-full items-center gap-1">
@@ -62,7 +68,7 @@ import { ElTag } from "element-plus";
 import { Icon as IconifyIcon } from "@iconify/vue";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
-import type { ProPageConfig } from "@/components/Pro/ProPage/types";
+import type { ProPageConfig, ToolsButton } from "@/components/Pro/ProPage/types";
 import MenuDrawer from "./menu-drawer.vue";
 
 import {
@@ -128,7 +134,18 @@ const pageConfig: ProPageConfig = {
     deleteAction: async (ids: string) => {
       await deleteMenu({ id: ids as any });
     },
-    toolbar: [],
+    toolbar: [
+      {
+        name: "expandAll",
+        text: $t("common.tree.expand_all"),
+        attrs: { icon: "SortDown" },
+      } as ToolsButton,
+      {
+        name: "collapseAll",
+        text: $t("common.tree.collapse_all"),
+        attrs: { icon: "SortUp" },
+      } as ToolsButton,
+    ],
     toolbarRight: ["add"],
     defaultToolbar: ["refresh", "filter"],
     pagination: false,
@@ -197,6 +214,16 @@ function handleEdit(row: any) {
 
 function handleSuccess() {
   pageRef.value?.refresh();
+}
+
+function handleToolbar(name: string) {
+  const vxeTable = pageRef.value?.tableRef?.tableRef;
+  if (!vxeTable) return;
+  if (name === "expandAll") {
+    vxeTable.setAllTreeExpand(true);
+  } else if (name === "collapseAll") {
+    vxeTable.clearTreeExpand();
+  }
 }
 
 function normalizeAuthority(authority: unknown): string[] {

@@ -1,6 +1,12 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
+    <ProPage
+      ref="pageRef"
+      :config="pageConfig"
+      @add="handleAdd"
+      @edit="handleEdit"
+      @toolbar="handleToolbar"
+    >
       <!-- 类型 -->
       <template #type="scope: any">
         <ElTag size="small" effect="dark" round :color="orgUnitTypeToColor(scope.row.type)">
@@ -26,7 +32,7 @@ import { ref } from "vue";
 import { ElTag } from "element-plus";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
-import type { ProPageConfig } from "@/components/Pro/ProPage/types";
+import type { ProPageConfig, ToolsButton } from "@/components/Pro/ProPage/types";
 import OrgDrawer from "./org-drawer.vue";
 
 import {
@@ -92,7 +98,18 @@ const pageConfig: ProPageConfig = {
     deleteAction: async (ids: string) => {
       await deleteOrgUnit({ id: ids as any });
     },
-    toolbar: [],
+    toolbar: [
+      {
+        name: "expandAll",
+        text: $t("common.tree.expand_all"),
+        attrs: { icon: "SortDown" },
+      } as ToolsButton,
+      {
+        name: "collapseAll",
+        text: $t("common.tree.collapse_all"),
+        attrs: { icon: "SortUp" },
+      } as ToolsButton,
+    ],
     toolbarRight: ["add"],
     defaultToolbar: ["refresh", "filter"],
     tableAttrs: {
@@ -155,6 +172,16 @@ function handleEdit(row: any) {
 
 function handleSuccess() {
   pageRef.value?.refresh();
+}
+
+function handleToolbar(name: string) {
+  const vxeTable = pageRef.value?.tableRef?.tableRef;
+  if (!vxeTable) return;
+  if (name === "expandAll") {
+    vxeTable.setAllTreeExpand(true);
+  } else if (name === "collapseAll") {
+    vxeTable.clearTreeExpand();
+  }
 }
 </script>
 

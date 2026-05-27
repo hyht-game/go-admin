@@ -1,6 +1,13 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit" @row-click="handleRowClick">
+    <ProPage
+      ref="pageRef"
+      :config="pageConfig"
+      @add="handleAdd"
+      @edit="handleEdit"
+      @row-click="handleRowClick"
+      @toolbar="handleToolbar"
+    >
       <!-- 状态 -->
       <template #status="scope: any">
         <ElTag size="small" effect="dark" round :color="statusToColor(scope.row.status)">
@@ -19,10 +26,15 @@ import { ref } from "vue";
 import { ElTag } from "element-plus";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
-import type { ProPageConfig } from "@/components/Pro/ProPage/types";
+import type { ProPageConfig, ToolsButton } from "@/components/Pro/ProPage/types";
 import PermissionGroupDrawer from "./permission-group-drawer.vue";
 
-import { statusList, statusToColor, statusToName, useDeletePermissionGroup } from "@/api/composables";
+import {
+  statusList,
+  statusToColor,
+  statusToName,
+  useDeletePermissionGroup,
+} from "@/api/composables";
 import { $t } from "@/i18n";
 import { usePermissionViewStore } from "@/views/app/permission/permission/permission-view.state";
 
@@ -84,7 +96,18 @@ const pageConfig: ProPageConfig = {
     deleteAction: async (ids: string) => {
       await deletePermissionGroup({ id: ids as any });
     },
-    toolbar: [],
+    toolbar: [
+      {
+        name: "expandAll",
+        text: $t("common.tree.expand_all"),
+        attrs: { icon: "SortDown" },
+      } as ToolsButton,
+      {
+        name: "collapseAll",
+        text: $t("common.tree.collapse_all"),
+        attrs: { icon: "SortUp" },
+      } as ToolsButton,
+    ],
     toolbarRight: ["add"],
     defaultToolbar: ["refresh", "filter"],
     tableAttrs: {
@@ -148,6 +171,16 @@ function handleSuccess() {
 function handleRowClick(row: any) {
   if (row?.id) {
     permissionViewStore.setCurrentGroupId(row.id);
+  }
+}
+
+function handleToolbar(name: string) {
+  const vxeTable = pageRef.value?.tableRef?.tableRef;
+  if (!vxeTable) return;
+  if (name === "expandAll") {
+    vxeTable.setAllTreeExpand(true);
+  } else if (name === "collapseAll") {
+    vxeTable.clearTreeExpand();
   }
 }
 </script>
