@@ -19,13 +19,24 @@
   "export": {
     "title": "Export Data",
     "filename": "Filename",
-    "sheetname": "Sheet Name",
-    "origin": "Data Source",
-    "fields": "Fields",
+    "filenamePlaceholder": "Please enter filename",
+    "fileType": "Save as Type",
+    "dataScope": "Select Data",
+    "fields": "Select Fields",
+    "allFields": "All Fields",
+    "export": "Export",
+    "params": "Parameters",
+    "paramsOptions": {
+      "header": "Header",
+      "footer": "Footer",
+      "rawData": "Raw Data",
+      "groupHeader": "Group Header",
+      "mergeCells": "Merge",
+      "style": "Style"
+    },
     "originOptions": {
       "current": "Current Data (current page data)",
-      "selected": "Selected Data (all selected data)",
-      "remote": "All Data (all paginated data)"
+      "selected": "Selected Data (selected data on current page)"
     }
   },
   "import": {

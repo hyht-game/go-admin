@@ -120,8 +120,8 @@ const pageConfig: ProPageConfig = {
     deleteAction: async (ids: string) => {
       await deleteTenant({ id: ids as any });
     },
-    toolbar: ["add"],
-    defaultToolbar: ["refresh", "exports", "imports", "filter"],
+    toolbar: [],
+    defaultToolbar: ["refresh", "exports", "imports", "filter", "add"],
     tableAttrs: { border: true, stripe: false },
     columns: [
       { type: "index", label: $t("common.table.seq"), width: 60 },
