@@ -78,6 +78,8 @@ export interface ProTableColumn<T = any> {
     name: string;
     /** 按钮显示文本（支持 i18n key，组件会自动通过 t() 解析，解析失败则原样显示） */
     label?: string;
+    /** 图标名称（SvgIcon 支持的图标名），设置后渲染为 icon button */
+    icon?: string;
     /** 权限标识（角色码或权限码），配合 AccessControl 组件控制按钮显隐 */
     auth?: string | string[];
     /** ElButton 属性 */

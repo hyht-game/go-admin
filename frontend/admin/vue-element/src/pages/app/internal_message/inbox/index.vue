@@ -15,9 +15,11 @@
 
       <!-- 操作 -->
       <template #operation="scope: any">
-        <el-button link type="primary" size="small" @click="handleView(scope.row)">
-          {{ $t("common.button.view") }}
-        </el-button>
+        <ElTooltip :content="$t('common.button.view')" placement="top" :show-after="300">
+          <ElButton circle size="small" @click="handleView(scope.row)">
+            <SvgIcon icon="lucide:eye" :size="16" />
+          </ElButton>
+        </ElTooltip>
       </template>
     </ProPage>
 
@@ -59,11 +61,12 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { ElTag, ElDivider, ElAvatar, ElMessage } from "element-plus";
+import { ElTag, ElDivider, ElAvatar, ElMessage, ElTooltip, ElButton } from "element-plus";
 import { UserFilled } from "@element-plus/icons-vue";
 import dayjs from "dayjs";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
+import SvgIcon from "@/components/SvgIcon/index.vue";
 import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 
 import { $t } from "@/core/i18n";

@@ -77,13 +77,25 @@
       <AccessControl
         :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined"
       >
-        <ElButton
+        <ElTooltip
           v-if="btn.visible === undefined || btn.visible(row)"
-          v-bind="{ link: true, size: 'small', ...btn.attrs }"
-          @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
+          :content="btn.label ?? btn.name"
+          placement="top"
+          :show-after="300"
         >
-          {{ btn.label ?? btn.name }}
-        </ElButton>
+          <ElButton
+            v-bind="{ size: 'small', circle: !!btn.icon, ...btn.attrs }"
+            :link="!btn.icon"
+            @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
+          >
+            <template v-if="btn.icon">
+              <SvgIcon :icon="btn.icon" :size="16" />
+            </template>
+            <template v-else>
+              {{ btn.label ?? btn.name }}
+            </template>
+          </ElButton>
+        </ElTooltip>
       </AccessControl>
     </template>
   </template>
@@ -97,7 +109,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useDateFormat } from "@vueuse/core";
-import { ElImage, ElTag, ElSwitch, ElLink, ElButton, ElIcon } from "element-plus";
+import { ElImage, ElTag, ElSwitch, ElLink, ElButton, ElIcon, ElTooltip } from "element-plus";
+import SvgIcon from "@/components/SvgIcon/index.vue";
 import { AccessControl } from "@/core/access";
 import type { ProTableColumn } from "./types";
 
