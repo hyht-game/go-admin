@@ -44,7 +44,7 @@
 
       <!-- 全屏 -->
       <div v-if="widget.fullscreen" class="navbar-action">
-        <Fullscreen />
+        <LayoutFullscreen />
       </div>
 
       <!-- 通知 -->
@@ -93,7 +93,7 @@ import LayoutBreadcrumb from "./LayoutBreadcrumb.vue";
 import CommandPalette from "@/components/CommandPalette/index.vue";
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue";
 import LangSelect from "@/components/LangSelect/index.vue";
-import Fullscreen from "@/components/Fullscreen/index.vue";
+import LayoutFullscreen from "./LayoutFullscreen.vue";
 import NoticeDropdown from "@/components/NoticeDropdown/index.vue";
 
 const { t } = useI18n();

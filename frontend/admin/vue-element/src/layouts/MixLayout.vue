@@ -62,7 +62,7 @@
           </el-menu>
         </el-scrollbar>
         <div class="layout__sidebar-toggle">
-          <Hamburger :is-active="isSidebarOpen" @toggle-click="toggleSidebar" />
+          <LayoutHamburger :is-active="isSidebarOpen" @toggle-click="toggleSidebar" />
         </div>
       </div>
 
@@ -92,7 +92,7 @@ import LayoutToolbar from "./components/LayoutToolbar.vue";
 import LayoutTagsView from "./components/LayoutTagsView.vue";
 import LayoutMain from "./components/LayoutMain.vue";
 import LayoutSidebarItem from "./components/LayoutSidebarItem.vue";
-import Hamburger from "@/components/Hamburger/index.vue";
+import LayoutHamburger from "./components/LayoutHamburger.vue";
 import variables from "@/styles/variables.module.scss";
 
 // 菜单图标渲染组件
