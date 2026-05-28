@@ -187,12 +187,6 @@ html.dark {
   --vxe-ui-font-color: #cbd5e1 !important;
   --vxe-ui-pager-background-color: #1a1d24 !important;
 
-  // 强制覆盖深色模式的行高，和浅色模式完全对齐
-  --vxe-ui-table-cell-padding-top: var(--vxe-ui-table-cell-padding-top) !important;
-  --vxe-ui-table-cell-padding-bottom: var(--vxe-ui-table-cell-padding-bottom) !important;
-  --vxe-ui-table-header-cell-padding-top: var(--vxe-ui-table-header-cell-padding-top) !important;
-  --vxe-ui-table-header-cell-padding-bottom: var(--vxe-ui-table-header-cell-padding-bottom) !important;
-
   // --- vxe-table v3 兼容变量 ---
   --vxe-table-border-color: #2c303a !important;
   --vxe-table-header-background-color: #12151a !important;
