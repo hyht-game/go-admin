@@ -2,7 +2,7 @@
   <ElDrawer
     v-model="visible"
     :title="title"
-    size="600px"
+    :size="DRAWER_WIDTH"
     append-to-body
     destroy-on-close
     @close="handleClose"
@@ -60,6 +60,7 @@ import { ref, reactive, computed } from "vue";
 
 import { useCreateMessageCategory, useUpdateMessageCategory } from "@/api/composables";
 import { $t } from "@/core/i18n";
+import { DRAWER_WIDTH } from "@/constants";
 
 const emit = defineEmits(["success"]);
 

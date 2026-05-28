@@ -69,6 +69,10 @@ $border: 1px solid var(--el-border-color-light);
   --el-table-header-text-color: #1d2129;
   --el-table-header-bg-color: #f7f8fa;
   --el-table-border-color: #e5e6eb;
+
+  /* ---------- GoWind 全局组件变量 ---------- */
+  --gowind-drawer-width: 480px;
+  --gowind-form-item-margin-bottom: 24px;
 }
 
 html.dark {
@@ -100,6 +104,9 @@ html.dark {
 
 /* ---------- el-drawer ---------- */
 .el-drawer {
+  // 统一抽屉宽度
+  --el-drawer-width-primary: var(--gowind-drawer-width);
+
   .el-drawer__header {
     padding: 16px 20px;
     margin: 0;
@@ -178,7 +185,25 @@ html.dark {
   .el-input__wrapper {
     border-radius: 8px;
     transition: box-shadow 0.25s ease;
+
+    // 聚焦态外发光
+    &.is-focus {
+      box-shadow: 0 0 0 1px var(--el-color-primary) inset,
+                  0 0 0 3px rgba(22, 93, 255, 0.15);
+    }
   }
+}
+
+/* ---------- Select / Textarea 聚焦态外发光 ---------- */
+.el-select .el-input__wrapper.is-focus,
+.el-date-editor .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset,
+              0 0 0 3px rgba(22, 93, 255, 0.15) !important;
+}
+
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset,
+              0 0 0 3px rgba(22, 93, 255, 0.15) !important;
 }
 
 /* ---------- 下拉菜单精致化 ---------- */
@@ -222,6 +247,12 @@ html.dark {
   .el-tabs__item {
     transition: color 0.2s ease;
   }
+}
+
+/* ---------- 表单间距统一 ---------- */
+.el-form--default .el-form-item,
+.el-form .el-form-item {
+  margin-bottom: var(--gowind-form-item-margin-bottom);
 }
 
 /* ---------- 消息弹窗精致化 ---------- */

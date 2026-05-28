@@ -44,6 +44,7 @@ export function useNotice() {
         paging: { page: 1, pageSize: PAGE_SIZE },
         formValues: {
           recipient_user_id: userId.toString(),
+          status: "RECEIVED",
           ...params,
         },
         orderBy: ["-created_at"],

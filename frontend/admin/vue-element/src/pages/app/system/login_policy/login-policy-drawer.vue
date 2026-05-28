@@ -2,7 +2,7 @@
   <ElDrawer
     v-model="visible"
     :title="title"
-    size="600px"
+    :size="DRAWER_WIDTH"
     :close-on-click-modal="false"
     :append-to-body="true"
     :destroy-on-close="true"
@@ -96,6 +96,7 @@ import {
   useUpdateLoginPolicy,
 } from "@/api/composables";
 import { $t } from "@/core/i18n";
+import { DRAWER_WIDTH } from "@/constants";
 
 const emit = defineEmits<{
   success: [];

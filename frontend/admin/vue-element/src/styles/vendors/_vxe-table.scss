@@ -93,9 +93,21 @@
   --vxe-select-option-hover-background-color: var(--el-bg-color-overlay);
   --vxe-select-panel-background-color: var(--el-bg-color);
 
-  /* 行高强制统一：明暗模式完全一致 */
+  /*
+   * ========== 表格行高配置（明暗双模式共用） ==========
+   *
+   * 档位        表项行高  表头高度  适用场景
+   * 黄金平衡款   36px      40px     日常高频操作（推荐）
+   * 极致紧凑款   32px      36px     数据量极大的长列表
+   * 宽松舒适款   40px      44px     低数据量场景
+   *
+   * 计算公式：padding-top + 16px 文字 + padding-bottom = 最终行高
+   */
+
+  /* 当前：黄金平衡款 — 表项 10+16+10=36px */
   --vxe-ui-table-cell-padding-top: 10px;
   --vxe-ui-table-cell-padding-bottom: 10px;
+  /* 当前：黄金平衡款 — 表头 12+16+12=40px，比内容区高4px，标题稳重不臃肿 */
   --vxe-ui-table-header-cell-padding-top: 12px;
   --vxe-ui-table-header-cell-padding-bottom: 12px;
 
