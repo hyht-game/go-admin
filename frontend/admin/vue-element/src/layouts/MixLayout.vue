@@ -40,8 +40,8 @@
       <!-- 左侧菜单栏 -->
       <div
         class="layout__sidebar--left"
-        :class="{ 'layout__sidebar--collapsed': !isSidebarActuallyOpen }"
-        :style="{ width: sidebarActualWidth + 'px' }"
+        :class="sidebarClass"
+        :style="sidebarStyle"
         @mouseenter="onSidebarMouseEnter"
         @mouseleave="onSidebarMouseLeave"
       >
@@ -72,7 +72,11 @@
       </div>
 
       <!-- 主内容区 -->
-      <div :class="{ hasTagsView: showTagsView }" class="layout__main">
+      <div
+        :class="{ hasTagsView: showTagsView }"
+        class="layout__main"
+        :style="mainStyle"
+      >
         <LayoutTagsView v-if="showTagsView" />
         <LayoutMain />
       </div>
@@ -159,6 +163,36 @@ const isSidebarActuallyOpen = computed(() => {
 const sidebarActualWidth = computed(() =>
   isSidebarActuallyOpen.value ? preferences.sidebar.width : SIDEBAR_COLLAPSED_WIDTH
 );
+
+// 侧边栏 CSS class
+const sidebarClass = computed(() => ({
+  "layout__sidebar--collapsed": !isSidebarActuallyOpen.value,
+  "layout__sidebar--auto": expandOnHover.value,
+}));
+
+// 侧边栏内联样式
+const sidebarStyle = computed(() => ({
+  width: `${sidebarActualWidth.value}px`,
+  // 自动模式：绝对定位覆盖在内容上方
+  ...(expandOnHover.value
+    ? {
+        position: "absolute" as const,
+        zIndex: 1000,
+        // 展开时添加阴影
+        ...(isHoverExpanded.value ? { boxShadow: "6px 0 16px rgba(0, 0, 0, 0.08)" } : {}),
+      }
+    : {}),
+}));
+
+// 主内容区样式
+const mainStyle = computed(() => {
+  // 自动模式：主内容区固定在折叠宽度
+  if (expandOnHover.value) {
+    return { marginLeft: `${SIDEBAR_COLLAPSED_WIDTH}px` };
+  }
+  // 固定模式：跟随侧边栏宽度
+  return { marginLeft: `${sidebarActualWidth.value}px` };
+});
 const accordion = computed(() => navigationPreferences.value.accordion);
 const isSplit = computed(() => navigationPreferences.value.split);
 
@@ -370,6 +404,11 @@ function toggleExpandOnHover() {
 
       &.layout__sidebar--collapsed {
         // 折叠宽度由内联 style 控制
+      }
+
+      // 自动模式覆盖层
+      &.layout__sidebar--auto {
+        // position/z-index 由内联 style 控制
       }
 
       .el-scrollbar {

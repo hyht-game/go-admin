@@ -111,11 +111,20 @@ const sidebarClass = computed(() => ({
 
 const sidebarStyle = computed(() => ({
   width: `${sidebarActualWidth.value}px`,
+  // 自动模式展开时添加阴影，区分覆盖层与内容区
+  ...(expandOnHover.value && isHoverExpanded.value
+    ? { boxShadow: "6px 0 16px rgba(0, 0, 0, 0.08)" }
+    : {}),
 }));
 
 // 主内容区左边距
 const mainStyle = computed(() => {
   if (!sidebarVisible.value || sidebarHidden.value) return { left: "0px" };
+  // 自动模式：主内容区固定在折叠宽度位置，侧边栏展开时覆盖在上方
+  if (expandOnHover.value) {
+    return { left: `${SIDEBAR_COLLAPSED_WIDTH}px` };
+  }
+  // 固定模式：主内容区跟随侧边栏宽度
   return { left: `${sidebarActualWidth.value}px` };
 });
 

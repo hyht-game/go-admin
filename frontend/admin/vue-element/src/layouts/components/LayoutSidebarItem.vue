@@ -171,7 +171,7 @@ function resolvePath(routePath: string) {
   }
 }
 
-/* 折叠状态下的图标样式 - 确保 SVG 图标不被压缩 */
+/* 折叠状态下的样式 - el-menu :collapse=true 时自动添加 el-menu--collapse */
 .el-menu--collapse {
   .el-menu-item,
   .el-sub-menu > .el-sub-menu__title {
@@ -181,6 +181,11 @@ function resolvePath(routePath: string) {
       min-width: 18px !important;
       height: 18px !important;
       font-size: 18px !important;
+    }
+
+    // 隐藏菜单文字（不依赖 .hideSidebar 类）
+    .menu-title {
+      display: none !important;
     }
   }
 
@@ -193,6 +198,11 @@ function resolvePath(routePath: string) {
       height: 18px !important;
       font-size: 18px !important;
     }
+  }
+
+  // 折叠时隐藏子菜单箭头
+  .el-sub-menu__icon-arrow {
+    display: none;
   }
 }
 
