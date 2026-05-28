@@ -271,24 +271,19 @@ html.dark {
     background-color: #1a1d24 !important;
 
     .vxe-body--row {
+      background-color: #1a1d24 !important;
       transition: background-color 0.2s ease !important;
 
-      // 奇数行
-      &:nth-child(odd) {
-        background-color: #1a1d24 !important;
-
-        > td {
-          background-color: transparent !important;
-          color: #cbd5e1 !important;
-        }
+      > td {
+        background-color: transparent !important;
+        color: #cbd5e1 !important;
       }
 
-      // 偶数行（斑马纹）
-      &:nth-child(even) {
+      // 斑马纹（仅 stripe: true 时 vxe-table 会加 row--stripe class）
+      &.row--stripe {
         background-color: #1e2128 !important;
 
         > td {
-          background-color: transparent !important;
           color: #e5eaf3 !important;
         }
       }
@@ -331,37 +326,6 @@ html.dark {
     background-color: #1a1d24 !important;
     color: #cbd5e1 !important;
   }
-}
-
-// ============================================
-// 选中行样式：明暗模式通用柔和背景高亮
-// ============================================
-
-.vxe-table .vxe-body--row {
-  // 浅色模式选中行：柔和蓝色背景 + 文字微加粗
-  &.row--current {
-    background-color: rgba(64, 128, 255, 0.06) !important;
-    font-weight: 500;
-
-    > td {
-      background-color: transparent !important;
-    }
-  }
-
-  // 浅色模式 hover + 选中
-  &.row--hover.row--current {
-    background-color: rgba(64, 128, 255, 0.1) !important;
-  }
-}
-
-// ============================================
-// 斑马纹：确保亮色模式可见
-// vxe-table v4 的 stripe 样式作用在 td 上，
-// 需确保不受 ProTable scoped 样式干扰
-// ============================================
-
-.vxe-table--render-default .vxe-body--row.row--stripe > .vxe-body--column {
-  background-color: #f5f7fa !important;
 }
 
 // ============================================

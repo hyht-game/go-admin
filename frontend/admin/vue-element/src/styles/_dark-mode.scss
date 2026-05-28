@@ -664,12 +664,13 @@ html.dark {
     // 成功按钮（新增）：柔和绿色
     .el-button--success:not(.is-circle) {
       background-color: rgba(82, 196, 26, 0.15) !important;
-      border-color: rgba(82, 196, 26, 0.35) !important;
+      border-color: rgba(82, 196, 26, 0.4) !important;
       color: #52c41a !important;
 
       &:hover,
       &:focus {
         background-color: rgba(82, 196, 26, 0.25) !important;
+        border-color: rgba(82, 196, 26, 0.6) !important;
       }
     }
 
