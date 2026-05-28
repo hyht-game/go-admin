@@ -182,107 +182,71 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
   width: 28px;
   height: 28px;
   padding: 0;
+  border: none;
   border-radius: 6px;
-  border: 1px solid transparent;
   cursor: pointer;
   background: transparent;
   transition: all 0.2s ease;
   vertical-align: middle;
 
-  // 按钮之间间距 8px，不再拥挤
+  // 按钮之间间距 8px
   & + .table-icon-btn {
     margin-left: 8px;
   }
 
   // ---- Primary（编辑/查看/下载/重启） ----
   &--primary {
-    background-color: rgba(64, 128, 255, 0.08);
     color: var(--el-color-primary);
-    border-color: rgba(64, 128, 255, 0.25);
 
     &:hover {
-      background-color: rgba(64, 128, 255, 0.15);
-      border-color: var(--el-color-primary);
-      transform: scale(1.05);
+      background-color: rgba(64, 128, 255, 0.1);
     }
   }
 
   // ---- Danger（删除/停止） ----
   &--danger {
-    background-color: rgba(245, 63, 63, 0.08);
     color: #f53f3f;
-    border-color: rgba(245, 63, 63, 0.25);
 
     &:hover {
-      background-color: rgba(245, 63, 63, 0.15);
-      border-color: #f53f3f;
-      transform: scale(1.05);
+      background-color: rgba(245, 63, 63, 0.1);
     }
   }
 
   // ---- Success（启动） ----
   &--success {
-    background-color: rgba(0, 180, 42, 0.08);
     color: #00b42a;
-    border-color: rgba(0, 180, 42, 0.25);
 
     &:hover {
-      background-color: rgba(0, 180, 42, 0.15);
-      border-color: #00b42a;
-      transform: scale(1.05);
+      background-color: rgba(0, 180, 42, 0.1);
     }
   }
 
   // ---- Warning ----
   &--warning {
-    background-color: rgba(255, 125, 0, 0.08);
     color: #ff7d00;
-    border-color: rgba(255, 125, 0, 0.25);
 
     &:hover {
-      background-color: rgba(255, 125, 0, 0.15);
-      border-color: #ff7d00;
-      transform: scale(1.05);
+      background-color: rgba(255, 125, 0, 0.1);
     }
   }
 }
 
 // ---- 暗黑模式适配 ----
 html.dark .table-icon-btn {
-  &--primary {
+  &--primary:hover {
     background-color: rgba(64, 128, 255, 0.15);
-    border-color: rgba(64, 128, 255, 0.4);
-
-    &:hover {
-      background-color: rgba(64, 128, 255, 0.25);
-    }
   }
 
-  &--danger {
+  &--danger:hover {
     background-color: rgba(245, 63, 63, 0.15);
-    border-color: rgba(245, 63, 63, 0.4);
-
-    &:hover {
-      background-color: rgba(245, 63, 63, 0.25);
-    }
   }
 
-  &--success {
+  &--success:hover {
     background-color: rgba(0, 180, 42, 0.15);
-    border-color: rgba(0, 180, 42, 0.4);
-
-    &:hover {
-      background-color: rgba(0, 180, 42, 0.25);
-    }
   }
 
-  &--warning {
+  &--warning:hover {
     background-color: rgba(255, 125, 0, 0.15);
-    border-color: rgba(255, 125, 0, 0.4);
-
-    &:hover {
-      background-color: rgba(255, 125, 0, 0.25);
-    }
   }
 }
 

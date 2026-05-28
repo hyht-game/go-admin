@@ -327,13 +327,10 @@ html.dark {
   }
 }
 
-// ============================================
-// 表头行高：48px（16+16+16=48px，文字和排序图标有充足呼吸空间）
-// 通过覆盖 .vxe-cell 的 padding 实现，不与 body 共用 padding 变量
-// ============================================
-
-.vxe-table {
-  .size--medium .vxe-header--column.is--padding .vxe-cell {
+.vxe-table--render-default.size--medium {
+  // 表头行高：48px（16+16+16=48px，文字和排序图标有充足呼吸空间）
+  // 通过覆盖 .vxe-cell 的 padding 实现，不与 body 共用 padding 变量
+  .vxe-header--column.is--padding .vxe-cell {
     padding: 16px !important;
   }
 }
