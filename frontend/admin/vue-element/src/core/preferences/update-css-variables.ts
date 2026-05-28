@@ -1,7 +1,7 @@
 import { BUILT_IN_THEME_PRESETS } from "./config/constants";
 import type { Preferences } from "./types";
 import { generateColorVariables, generatorColorVariables } from "@/utils/theme";
-import { hexToHsl, hexToHslString, toHex } from "@/utils/color";
+import { hexToHslString, toHex } from "@/utils/color";
 
 /**
  * 更新 CSS 变量的函数
@@ -160,7 +160,7 @@ function updateMainColorVariables(preference: Preferences) {
   // 主色
   // ------------------------------
   const hslPrimary = hexToHslString(hexPrimary);
-  root.style.setProperty("--primary", hexToHsl(hexPrimary));
+  root.style.setProperty("--primary", hexPrimary);
   root.style.setProperty("--primary-hsl", hslPrimary);
 
   // ------------------------------
@@ -190,7 +190,7 @@ function updateMainColorVariables(preference: Preferences) {
   const isDark = isDarkTheme(preference.theme.mode);
   const foreground = isDark ? "#e5e7eb" : "#1f2937";
   const hslForeground = hexToHslString(foreground);
-  root.style.setProperty("--foreground", hexToHsl(foreground));
+  root.style.setProperty("--foreground", foreground);
   root.style.setProperty("--foreground-hsl", hslForeground);
 
   // 5. 自定义变量通过 style 标签设置

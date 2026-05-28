@@ -7,7 +7,6 @@
  * - 使用 CSS 变量实现，便于维护和调整
  */
 
-@use 'sass:color';
 
 html.dark {
   // ============================================
@@ -30,12 +29,12 @@ html.dark {
   --dark-text-placeholder: #9099A7; // 占位符专用色
   --dark-text-data: #C9CDD4;        // 奇数行主文本（核心数据清晰可见，辅助文本不抢焦点）
 
-  // 2. 色彩体系升级，增加精致感
-  --dark-primary: #409EFF;          // 主色：亮蓝（输入框聚焦态、下拉框高亮态）
-  --dark-secondary: #36CFC9;        // 辅助色：青绿
-  --dark-accent: #F7BA1E;           // 强调色：暖黄
-  --dark-error: #F53F3F;            // 错误态：高饱和红
-  --dark-success: #00B42A;          // 成功态：高饱和绿
+  // 2. 色彩体系（跟随用户主题色）
+  --dark-primary: var(--el-color-primary);       // 主色（跟随主题）
+  --dark-secondary: #36CFC9;                     // 辅助色：青绿
+  --dark-accent: var(--el-color-warning);         // 强调色（跟随主题）
+  --dark-error: var(--el-color-danger);           // 错误态（跟随主题）
+  --dark-success: var(--el-color-success);        // 成功态（跟随主题）
 
   // 3. Element Plus 组件变量覆盖
   --el-bg-color: var(--dark-bg-primary);
@@ -104,8 +103,7 @@ html.dark {
           border-color: var(--dark-primary) !important;
 
           &:hover {
-            background-color: color.adjust(#409EFF, $lightness: 10%) !important;
-            border-color: color.adjust(#409EFF, $lightness: 10%) !important;
+            filter: brightness(1.15);
           }
         }
 
@@ -128,7 +126,7 @@ html.dark {
         color: var(--dark-primary) !important;
 
         &:hover {
-          color: color.adjust(#409EFF, $lightness: 10%) !important;
+          filter: brightness(1.15);
         }
       }
     }
@@ -341,8 +339,7 @@ html.dark {
 
       // hover 态：亮度微增，强化主操作的交互感
       &:hover {
-        background-color: color.adjust(#409EFF, $lightness: 10%) !important;
-        border-color: color.adjust(#409EFF, $lightness: 10%) !important;
+        filter: brightness(1.15);
       }
     }
 
@@ -353,8 +350,7 @@ html.dark {
       color: #fff !important;
 
       &:hover {
-        background-color: color.adjust(#00B42A, $lightness: 10%) !important;
-        border-color: color.adjust(#00B42A, $lightness: 10%) !important;
+        filter: brightness(1.15);
       }
     }
 
@@ -365,8 +361,7 @@ html.dark {
       color: #fff !important;
 
       &:hover {
-        background-color: color.adjust(#F7BA1E, $lightness: 10%) !important;
-        border-color: color.adjust(#F7BA1E, $lightness: 10%) !important;
+        filter: brightness(1.15);
       }
     }
 
@@ -377,8 +372,7 @@ html.dark {
       color: #fff !important;
 
       &:hover {
-        background-color: color.adjust(#F53F3F, $lightness: 10%) !important;
-        border-color: color.adjust(#F53F3F, $lightness: 10%) !important;
+        filter: brightness(1.15);
       }
     }
   }
@@ -568,7 +562,7 @@ html.dark {
         color: var(--dark-error) !important;
 
         &:hover {
-          color: color.adjust(#F53F3F, $lightness: 10%) !important;
+          filter: brightness(1.15);
         }
       }
     }
