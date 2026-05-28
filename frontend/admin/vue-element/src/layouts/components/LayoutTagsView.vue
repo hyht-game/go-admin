@@ -767,12 +767,15 @@ $chrome-radius: 7px;
     height: 100%;
     flex-shrink: 0;
     cursor: pointer;
+    border-radius: 4px;
     color: var(--el-text-color-secondary);
-    transition: all 0.2s;
+    background: transparent;
+    transition: all 0.2s ease;
 
     &:hover {
-      color: var(--el-text-color-primary);
-      background-color: var(--el-fill-color-light);
+      color: var(--el-color-primary);
+      background: var(--el-fill-color-light);
+      transform: scale(1.05);
     }
 
     &.is-disabled {
@@ -808,9 +811,20 @@ $chrome-radius: 7px;
     position: relative;
     cursor: pointer;
     user-select: none;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
     flex-shrink: 0;
     height: 100%;
+    color: var(--el-text-color-secondary);
+
+    &.is-active {
+      color: var(--el-color-primary);
+      font-weight: 500;
+    }
+
+    // 亮/暗模式通用：hover 文字提亮
+    &:not(.is-active):hover {
+      color: var(--el-text-color-primary);
+    }
 
     // ---- Plain 样式 ----
     &--plain {
@@ -827,7 +841,7 @@ $chrome-radius: 7px;
       }
 
       &:not(.is-active):hover {
-        background-color: var(--el-fill-color-light);
+        background: var(--el-fill-color-light);
       }
     }
 
@@ -846,7 +860,7 @@ $chrome-radius: 7px;
       }
 
       &:not(.is-active):hover {
-        background-color: var(--el-fill-color-light);
+        background: var(--el-fill-color-light);
       }
     }
 
@@ -886,7 +900,7 @@ $chrome-radius: 7px;
       }
 
       &:not(.is-active):hover {
-        background-color: var(--el-fill-color-light);
+        background: var(--el-fill-color-light);
       }
     }
 
@@ -918,7 +932,7 @@ $chrome-radius: 7px;
         }
 
         .tabs-bar__chrome-bg__content {
-          background-color: var(--el-fill-color);
+          background-color: var(--el-fill-color-light);
           margin: 0 2px;
           border-radius: 4px;
         }
@@ -1033,7 +1047,7 @@ $chrome-radius: 7px;
   &__close {
     color: var(--el-text-color-secondary);
     opacity: 0;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
 
     .tabs-bar__item:hover & {
       opacity: 1;
@@ -1045,8 +1059,8 @@ $chrome-radius: 7px;
     }
 
     &:hover {
-      color: var(--el-color-primary);
-      background-color: var(--el-color-primary-light-9);
+      color: #f53f3f;
+      background-color: rgba(245, 63, 63, 0.1);
     }
   }
 
@@ -1072,16 +1086,18 @@ $chrome-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
     color: var(--el-text-color-secondary);
-    transition: all 0.2s;
+    background: transparent;
+    transition: all 0.2s ease;
 
     &:hover {
-      color: var(--el-text-color-primary);
-      background-color: var(--el-fill-color-light);
+      color: var(--el-color-primary);
+      background: var(--el-fill-color-light);
+      transform: scale(1.05);
     }
   }
 
@@ -1133,6 +1149,109 @@ $chrome-radius: 7px;
       &:hover {
         background-color: var(--el-border-color-lighter) !important;
       }
+    }
+  }
+}
+
+// ==================== 暗黑模式适配 ====================
+:global(html.dark) {
+  .tabs-bar {
+    border-top-color: rgba(255, 255, 255, 0.06);
+    background-color: var(--el-bg-color);
+
+    // 未激活文字
+    &__item {
+      color: rgba(255, 255, 255, 0.5);
+
+      &.is-active {
+        color: var(--el-color-primary);
+      }
+
+      // 未激活 hover：文字提亮 + 柔和背景
+      &:not(.is-active):hover {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+
+    // Plain/Card/Brisk hover 背景
+    &__item--plain:not(.is-active):hover,
+    &__item--card:not(.is-active):hover,
+    &__item--brisk:not(.is-active):hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    // Chrome hover 背景
+    &__item--chrome:not(.is-active):hover .tabs-bar__chrome-bg__content {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    // Chrome 分割线
+    &__divider {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    // Plain 分割线
+    &__item--plain {
+      border-right-color: rgba(255, 255, 255, 0.06);
+    }
+
+    // Card 边框
+    &__item--card {
+      border-color: rgba(255, 255, 255, 0.08);
+
+      &.is-active {
+        border-color: var(--el-color-primary-light-5);
+      }
+    }
+
+    // Brisk 分割线
+    &__item--brisk:not(:first-child) {
+      border-left-color: rgba(255, 255, 255, 0.06);
+    }
+
+    // Chrome 激活态背景
+    &__item--chrome.is-active .tabs-bar__chrome-bg__content {
+      background-color: var(--el-color-primary-light-9);
+    }
+
+    // 滚动按钮
+    &__scroll-btn {
+      color: rgba(255, 255, 255, 0.55);
+
+      &:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    // 工具按钮
+    &__tool-btn {
+      color: rgba(255, 255, 255, 0.55);
+
+      &:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    // 工具区边界
+    &__tools {
+      border-left-color: rgba(255, 255, 255, 0.06);
+    }
+
+    // 关闭按钮
+    &__close {
+      color: rgba(255, 255, 255, 0.55);
+
+      &:hover {
+        color: #f53f3f;
+        background-color: rgba(245, 63, 63, 0.15);
+      }
+    }
+
+    // 固定按钮
+    &__pin {
+      color: rgba(255, 255, 255, 0.45);
     }
   }
 }

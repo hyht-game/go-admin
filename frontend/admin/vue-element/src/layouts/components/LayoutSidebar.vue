@@ -273,8 +273,9 @@ onMounted(() => {
     .el-sub-menu__title {
       height: 44px !important;
       line-height: 44px !important;
-      padding: 0 16px !important; // 减少左右内边距
+      padding: 0 16px !important;
       margin: 0 !important;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     // 图标与文字间距收缩（8-10px）
@@ -283,6 +284,7 @@ onMounted(() => {
       margin-right: 8px !important;
       width: 18px !important;
       height: 18px !important;
+      transition: color 0.2s ease;
     }
 
     // 选中菜单项保持高度一致（只改背景色，不改高度）
@@ -304,7 +306,7 @@ onMounted(() => {
       .el-menu-item,
       .el-sub-menu__title {
         margin: 0 8px !important;
-        border-radius: 6px;
+        border-radius: 8px;
       }
 
       .el-menu-item.is-active {
@@ -327,7 +329,7 @@ onMounted(() => {
         color: var(--el-color-primary) !important;
       }
 
-      // 悬浮背景：浅灰低调过渡
+      // 悬浮背景：柔和过渡
       .el-menu-item:hover,
       .el-sub-menu__title:hover {
         background-color: var(--menu-hover) !important;

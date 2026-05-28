@@ -119,6 +119,10 @@ function getTagType(
   value: any,
   col: ProTableColumn
 ): "primary" | "success" | "warning" | "danger" | "info" {
+  // 优先使用 tagTypeMap 按值映射
+  if (col.tagTypeMap && value != null) {
+    return (col.tagTypeMap as Record<string, any>)[value] ?? "info";
+  }
   if (col.tagType) return col.tagType as any;
   return value ? "success" : "danger";
 }
