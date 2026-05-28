@@ -545,10 +545,11 @@ const closeContextMenu = () => {
 const refreshSelectedTag = (tag: TagView | null) => {
   if (!tag) return;
   closeContextMenu();
-  // v-if 卸载 router-view 时 keep-alive 也一起被销毁，无需手动操作 cachedViews
   contentRefreshing.value = true;
-  setTimeout(() => {
-    contentRefreshing.value = false;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      contentRefreshing.value = false;
+    });
   });
 };
 

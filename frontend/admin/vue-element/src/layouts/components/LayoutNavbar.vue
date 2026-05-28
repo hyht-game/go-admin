@@ -126,16 +126,13 @@ function toggleSidebarVisibility() {
 /** 刷新内容区 */
 function handleRefresh() {
   if (contentRefreshing.value) return;
-
-  // v-if 卸载 router-view 时，keep-alive 也一起被销毁，所有缓存实例自动清除
-  // LayoutMain 的 watcher 会同步清理 wrapperMap，确保重新挂载时组件完全重建
-  // 因此无需手动操作 cachedViews
   contentRefreshing.value = true;
-
-  // 使用 setTimeout 而非 nextTick，确保浏览器完成所有 DOM 清理工作
-  // nextTick 太快，keep-alive 内组件的销毁（如 ElForm resize observer）可能还未完成
-  setTimeout(() => {
-    contentRefreshing.value = false;
+  // 双重 rAF：第一帧让 Vue 完成 DOM 卸载，第二帧确保浏览器已渲染空状态
+  // 这样 ElForm 的 ResizeObserver 在下一帧触发时容器已不存在，不会报 NaN
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      contentRefreshing.value = false;
+    });
   });
 }
 
