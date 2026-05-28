@@ -83,17 +83,22 @@
           placement="top"
           :show-after="300"
         >
-          <ElButton
-            v-bind="{ size: 'small', circle: !!btn.icon, ...btn.attrs }"
-            :link="!btn.icon"
+          <!-- 图标按钮 -->
+          <button
+            v-if="btn.icon"
+            class="table-icon-btn"
+            :class="`table-icon-btn--${getIconBtnVariant(btn)}`"
             @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
           >
-            <template v-if="btn.icon">
-              <SvgIcon :icon="btn.icon" :size="16" />
-            </template>
-            <template v-else>
-              {{ btn.label ?? btn.name }}
-            </template>
+            <SvgIcon :icon="btn.icon" :size="16" />
+          </button>
+          <!-- 文字按钮（兼容无 icon 的配置） -->
+          <ElButton
+            v-else
+            v-bind="{ link: true, size: 'small', ...btn.attrs }"
+            @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
+          >
+            {{ btn.label ?? btn.name }}
           </ElButton>
         </ElTooltip>
       </AccessControl>
@@ -138,5 +143,14 @@ function getTagType(
   }
   if (col.tagType) return col.tagType as any;
   return value ? "success" : "danger";
+}
+
+/** 根据 btn.attrs.type 映射图标按钮颜色变体 */
+function getIconBtnVariant(btn: Record<string, any>): string {
+  const type = btn.attrs?.type;
+  if (type === "danger") return "danger";
+  if (type === "success") return "success";
+  if (type === "warning") return "warning";
+  return "primary";
 }
 </script>

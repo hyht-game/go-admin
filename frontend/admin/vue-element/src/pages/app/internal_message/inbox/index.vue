@@ -16,9 +16,9 @@
       <!-- 操作 -->
       <template #operation="scope: any">
         <ElTooltip :content="$t('common.button.view')" placement="top" :show-after="300">
-          <ElButton circle size="small" @click="handleView(scope.row)">
+          <button class="table-icon-btn table-icon-btn--primary" @click="handleView(scope.row)">
             <SvgIcon icon="lucide:eye" :size="16" />
-          </ElButton>
+          </button>
         </ElTooltip>
       </template>
     </ProPage>
@@ -61,7 +61,7 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { ElTag, ElDivider, ElAvatar, ElMessage, ElTooltip, ElButton } from "element-plus";
+import { ElTag, ElDivider, ElAvatar, ElMessage, ElTooltip } from "element-plus";
 import { UserFilled } from "@element-plus/icons-vue";
 import dayjs from "dayjs";
 
