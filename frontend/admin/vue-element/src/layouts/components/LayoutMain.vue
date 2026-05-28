@@ -1,6 +1,6 @@
 <template>
   <section class="app-main" :class="mainClass" :style="{ height: appMainHeight }">
-    <router-view>
+    <router-view :key="refreshKey">
       <template #default="{ Component, route }">
         <transition :name="transitionName" mode="out-in">
           <keep-alive :include="cachedViews">
@@ -26,6 +26,9 @@ import Error404 from "@/views/core/error/404.vue";
 
 const { cachedViews } = toRefs(useTagsViewStore());
 const { tabbarPreferences } = usePreferences();
+
+// 注入刷新 key，当 key 变化时强制重建 router-view
+const refreshKey = inject<Ref<number>>("contentRefreshKey", ref(0));
 
 // 当前组件
 const wrapperMap = new Map<string, Component>();

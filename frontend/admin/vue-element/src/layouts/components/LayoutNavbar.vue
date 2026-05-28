@@ -2,9 +2,9 @@
   <div class="navbar">
     <!-- ==================== 左侧区域 ==================== -->
     <div class="navbar__left">
-      <!-- 侧边栏切换按钮 -->
-      <div v-if="widget.sidebarToggle" class="navbar-action" @click="toggleSideBar">
-        <div :class="['i-svg:collapse', { 'is-active': isSidebarOpened }]" />
+      <!-- 侧边栏显示/隐藏按钮 -->
+      <div v-if="widget.sidebarToggle" class="navbar-action" @click="toggleSidebarVisibility">
+        <div :class="['i-svg:collapse', { 'is-active': isSidebarEnabled }]" />
       </div>
 
       <!-- 刷新内容区按钮 -->
@@ -87,7 +87,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import { useAppUserStore, useTagsViewStore } from "@/stores";
 import { useAuth } from "@/composables/use-auth";
-import { preferences, preferencesManager, usePreferences } from "@/core/preferences";
+import { preferences, preferencesManager } from "@/core/preferences";
 
 import Breadcrumb from "@/components/Breadcrumb/index.vue";
 import CommandPalette from "@/components/CommandPalette/index.vue";
@@ -102,7 +102,7 @@ const router = useRouter();
 const userStore = useAppUserStore();
 const authStore = useAuth();
 const tagsViewStore = useTagsViewStore();
-const { sidebarCollapsed } = usePreferences();
+const { cachedViews } = toRefs(tagsViewStore);
 
 // 偏好设置引用
 const widget = computed(() => preferences.widget);
@@ -111,18 +111,21 @@ const breadcrumb = computed(() => preferences.breadcrumb);
 // 注入设置面板可见性状态
 const settingsVisible = inject<Ref<boolean>>("settingsVisible", ref(false));
 
-// 侧边栏状态
-const isSidebarOpened = computed(() => !sidebarCollapsed.value);
+// 注入内容区刷新 key
+const contentRefreshKey = inject<Ref<number>>("contentRefreshKey", ref(0));
+
+// 侧边栏是否启用
+const isSidebarEnabled = computed(() => preferences.sidebar.enable);
 
 // 刷新状态
 const isRefreshing = ref(false);
 
 // ==================== 方法 ====================
 
-/** 切换侧边栏 */
-function toggleSideBar() {
+/** 切换侧边栏显示/隐藏 */
+function toggleSidebarVisibility() {
   preferencesManager.updatePreferences({
-    sidebar: { collapsed: !sidebarCollapsed.value },
+    sidebar: { enable: !preferences.sidebar.enable },
   });
 }
 
@@ -131,17 +134,21 @@ function handleRefresh() {
   if (isRefreshing.value) return;
   isRefreshing.value = true;
 
+  // 从缓存列表中移除当前路由，避免 keep-alive 缓存
   const { fullPath } = route;
   const tag = tagsViewStore.visitedViews.find((v) => v.fullPath === fullPath);
   if (tag) {
     tagsViewStore.delCachedView(tag);
+  } else if (cachedViews.value.includes(fullPath)) {
+    const idx = cachedViews.value.indexOf(fullPath);
+    cachedViews.value.splice(idx, 1);
   }
 
+  // 通过修改 key 强制 router-view 重建
   nextTick(() => {
-    router.replace(fullPath).finally(() => {
-      setTimeout(() => {
-        isRefreshing.value = false;
-      }, 300);
+    contentRefreshKey.value++;
+    nextTick(() => {
+      isRefreshing.value = false;
     });
   });
 }
