@@ -101,15 +101,14 @@
    * 极致紧凑款   32px      36px     数据量极大的长列表
    * 宽松舒适款   40px      44px     低数据量场景
    *
-   * 计算公式：padding-top + 16px 文字 + padding-bottom = 最终行高
+   * 行高 = row-height-medium（JS 程序化计算基准）
+   * 视觉高度 = .vxe-cell padding-top + 内容(16px) + padding-bottom
    */
 
-  /* 当前：黄金平衡款 — 表项 10+16+10=36px */
-  --vxe-ui-table-cell-padding-top: 10px;
-  --vxe-ui-table-cell-padding-bottom: 10px;
-  /* 当前：黄金平衡款 — 表头 12+16+12=40px，比内容区高4px，标题稳重不臃肿 */
-  --vxe-ui-table-header-cell-padding-top: 12px;
-  --vxe-ui-table-header-cell-padding-bottom: 12px;
+  /* 黄金平衡款 — 表项行高 36px */
+  --vxe-ui-table-row-height-medium: 36px;
+  /* 表项 cell 内边距: 10+16+10 = 36px（body 行） */
+  --vxe-ui-table-cell-padding-medium: 10px;
 
   /* 浅色模式配色 */
   --vxe-ui-table-header-background-color: #f5f7fa;
@@ -356,17 +355,12 @@ html.dark {
 }
 
 // ============================================
-// 行高兜底硬覆盖：防止 vxe-table 内部样式优先级更高
+// 表头行高：40px（12+16+12=40px，比内容区高4px，标题稳重不臃肿）
+// 通过覆盖 .vxe-cell 的 padding 实现，不与 body 共用 padding 变量
 // ============================================
 
 .vxe-table {
-  .vxe-body--column {
-    padding-top: var(--vxe-ui-table-cell-padding-top) !important;
-    padding-bottom: var(--vxe-ui-table-cell-padding-bottom) !important;
-  }
-
-  .vxe-header--column {
-    padding-top: var(--vxe-ui-table-header-cell-padding-top) !important;
-    padding-bottom: var(--vxe-ui-table-header-cell-padding-bottom) !important;
+  .size--medium .vxe-header--column.is--padding .vxe-cell {
+    padding: 12px !important;
   }
 }
