@@ -24,7 +24,7 @@ import PermissionDrawer from "./permission-drawer.vue";
 
 import { statusList, statusToColor, statusToName, useDeletePermission } from "@/api/composables";
 import { $t } from "@/i18n";
-import { usePermissionViewStore } from "@/views/app/permission/permission/permission-view.state";
+import { usePermissionViewStore } from "@/pages/app/permission/permission/permission-view.state";
 
 const { mutateAsync: deletePermission } = useDeletePermission();
 const permissionViewStore = usePermissionViewStore();

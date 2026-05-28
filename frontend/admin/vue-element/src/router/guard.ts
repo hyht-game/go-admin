@@ -1,4 +1,6 @@
-import type { Router } from "vue-router";
+import type { Router, RouteLocationNormalizedLoaded } from "vue-router";
+
+import { effectScope, watch } from "vue";
 
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from "@/constants";
 import { startProgress, stopProgress } from "@/utils";
@@ -10,7 +12,22 @@ import { useAuth } from "@/composables/use-auth";
 
 import { generateAccess } from "./access";
 import { fetchAllDictEntries } from "@/composables/use-dict-cache";
-import { translateRouteTitle } from "@/i18n";
+import { i18n, translateRouteTitle } from "@/i18n";
+
+/**
+ * 根据当前路由和 i18n 状态更新浏览器标签页标题
+ */
+function updateDocumentTitle(route: RouteLocationNormalizedLoaded) {
+  if (!preferences.app.dynamicTitle) return;
+  const routeTitle = route.meta?.title as string | undefined;
+  if (routeTitle) {
+    const translatedTitle = translateRouteTitle(routeTitle);
+    const appTitle = preferences.app.name || "GoWind Admin";
+    document.title = `${translatedTitle} - ${appTitle}`;
+  } else {
+    document.title = preferences.app.name || "GoWind Admin";
+  }
+}
 
 /**
  * 通用守卫配置
@@ -32,7 +49,6 @@ function setupCommonGuard(router: Router) {
 
   router.afterEach((to) => {
     // 记录页面是否加载,如果已经加载，后续的页面切换动画等效果不在重复执行
-
     loadedPaths.add(to.path);
 
     // 关闭页面加载进度条
@@ -41,17 +57,18 @@ function setupCommonGuard(router: Router) {
     }
 
     // 动态更新页面标题
-    if (preferences.app.dynamicTitle) {
-      const routeTitle = to.meta?.title as string | undefined;
-      if (routeTitle) {
-        const translatedTitle = translateRouteTitle(routeTitle);
-        const appTitle = preferences.app.name || "GoWind Admin";
-        document.title = `${translatedTitle} - ${appTitle}`;
-      } else {
-        // 如果路由没有标题，只显示应用名称
-        document.title = preferences.app.name || "GoWind Admin";
+    updateDocumentTitle(to);
+  });
+
+  // 监听 i18n locale 变化，重新翻译当前路由标题
+  // 解决：语言切换 / 消息延迟加载导致标题显示 i18n 原始 key 的问题
+  effectScope().run(() => {
+    watch(
+      () => i18n.global.locale.value,
+      () => {
+        updateDocumentTitle(router.currentRoute.value);
       }
-    }
+    );
   });
 }
 

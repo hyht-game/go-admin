@@ -1,58 +1,42 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
+    <ProPage
+      ref="pageRef"
+      :config="pageConfig"
+      @add="handleAdd"
+      @edit="handleEdit"
+      @row-click="handleRowClick"
+    >
       <!-- 启用状态 -->
       <template #isEnabled="scope: any">
         <ElTag size="small" effect="dark" round :color="enableBoolToColor(scope.row.isEnabled)">
           {{ enableBoolToName(scope.row.isEnabled) }}
         </ElTag>
       </template>
-      <!-- 标签（多语言） -->
-      <template #entryLabel="scope: any">
-        {{ getEntryLabel(scope.row) }}
-      </template>
     </ProPage>
 
     <!-- 新增/编辑抽屉 -->
-    <DictEntryDrawer ref="drawerRef" @success="handleSuccess" />
+    <DictTypeDrawer ref="drawerRef" @success="handleSuccess" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from "vue";
+import { ref } from "vue";
 import { ElTag } from "element-plus";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
 import type { ProPageConfig } from "@/components/Pro/ProPage/types";
-import DictEntryDrawer from "./dict-entry-drawer.vue";
+import DictTypeDrawer from "./dict-type-drawer.vue";
 
-import { enableBoolToColor, enableBoolToName, useDeleteDictEntry } from "@/api/composables";
+import { enableBoolToColor, enableBoolToName, useDeleteDictType } from "@/api/composables";
 import { $t } from "@/i18n";
-import { getEntryLabel, useDictViewStore } from "@/views/app/system/dict/dict-view.state";
+import { useDictViewStore } from "@/pages/app/system/dict/dict-view.state";
 
-const { mutateAsync: deleteDictEntry } = useDeleteDictEntry();
+const { mutateAsync: deleteDictType } = useDeleteDictType();
 const dictViewStore = useDictViewStore();
 
 const pageRef = ref();
 const drawerRef = ref();
-
-// 监听字典类型切换,自动刷新字典项列表
-watch(
-  () => dictViewStore.needReloadEntryList,
-  (needReload) => {
-    if (needReload && pageRef.value) {
-      pageRef.value.refresh();
-      dictViewStore.needReloadEntryList = false;
-    }
-  }
-);
-
-// 初始化时加载一次
-onMounted(() => {
-  if (dictViewStore.currentTypeId) {
-    dictViewStore.needReloadEntryList = true;
-  }
-});
 
 const pageConfig = computed<ProPageConfig>(() => ({
 
@@ -61,8 +45,8 @@ const pageConfig = computed<ProPageConfig>(() => ({
     fields: [
       {
         type: "input",
-        label: $t("pages.dict.entryValue"),
-        field: "entry_value",
+        label: $t("pages.dict.typeCode"),
+        field: "type_code",
         attrs: { placeholder: $t("common.placeholder.input"), clearable: true },
       },
     ],
@@ -71,16 +55,11 @@ const pageConfig = computed<ProPageConfig>(() => ({
   table: {
     listAction: async (query: any) => {
       const { page, pageSize, ...queryParams } = query;
-      const result = await dictViewStore.fetchEntryList(
-        dictViewStore.currentTypeId,
-        page || 1,
-        pageSize || 10,
-        queryParams
-      );
+      const result = await dictViewStore.fetchTypeList(page || 1, pageSize || 10, queryParams);
       return { items: result.items || [], total: result.total || 0 };
     },
     deleteAction: async (ids: string) => {
-      await deleteDictEntry({ ids: [ids] as any });
+      await deleteDictType({ ids: [ids] as any });
     },
     toolbar: [],
     toolbarRight: ["add"],
@@ -88,27 +67,16 @@ const pageConfig = computed<ProPageConfig>(() => ({
     tableAttrs: { border: true, stripe: true, height: "auto" },
     columns: [
       {
-        prop: "entryLabel",
-        label: $t("pages.dict.entryLabel"),
-        minWidth: 95,
-        slotName: "entryLabel",
+        prop: "typeName",
+        label: $t("pages.dict.typeName"),
+        minWidth: 150,
         align: "left",
       },
       {
-        prop: "entryValue",
-        label: $t("pages.dict.entryValue"),
-        minWidth: 95,
+        prop: "typeCode",
+        label: $t("pages.dict.typeCode"),
+        minWidth: 150,
         align: "left",
-      },
-      {
-        prop: "numericValue",
-        label: $t("pages.dict.numericValue"),
-        minWidth: 95,
-      },
-      {
-        prop: "sortOrder",
-        label: $t("common.table.sortOrder"),
-        width: 95,
       },
       {
         prop: "isEnabled",
@@ -141,6 +109,13 @@ function handleEdit(row: any) {
 
 function handleSuccess() {
   pageRef.value?.refresh();
+}
+
+// 行点击联动 - 切换字典类型时刷新字典项列表
+function handleRowClick(row: any) {
+  if (row?.id) {
+    dictViewStore.setCurrentTypeId(row.id);
+  }
 }
 </script>
 

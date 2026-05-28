@@ -91,7 +91,7 @@ import { PaginationQuery } from "@/core/transport/rest";
 import { $t } from "@/i18n";
 import { router } from "@/router";
 import { getRandomColor } from "@/utils/color";
-import { useUserViewStore } from "@/views/app/opm/user/user-view.state";
+import { useUserViewStore } from "@/pages/app/opm/user/user-view.state";
 
 const { mutateAsync: deleteUser } = useDeleteUser();
 const userViewStore = useUserViewStore();

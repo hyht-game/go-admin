@@ -44,10 +44,7 @@
     </div>
 
     <!-- 编辑密码弹窗 -->
-    <EditPasswordModal
-      ref="editPasswordModalRef"
-      @success="handlePasswordSuccess"
-    />
+    <EditPasswordModal ref="editPasswordModalRef" @success="handlePasswordSuccess" />
   </div>
 </template>
 
@@ -59,7 +56,7 @@ import { ArrowLeft } from "@element-plus/icons-vue";
 import { $t } from "@/i18n";
 
 import { useUpdateUser } from "@/api/composables";
-import { TabEnum } from "@/views/app/opm/user/detail/types";
+import { TabEnum } from "@/pages/app/opm/user/detail/types";
 
 import ApiLogPage from "./api-log-page.vue";
 import BasicInfoPage from "./basic-info-page.vue";

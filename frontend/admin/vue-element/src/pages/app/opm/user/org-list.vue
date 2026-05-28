@@ -109,7 +109,7 @@ import { More, Search, Expand, Fold, CircleClose } from "@element-plus/icons-vue
 import { $t } from "@/i18n";
 
 import { type identityservicev1_OrgUnit as OrgUnit } from "@/api/generated/admin/service/v1";
-import { useUserViewStore } from "@/views/app/opm/user/user-view.state";
+import { useUserViewStore } from "@/pages/app/opm/user/user-view.state";
 
 const userViewStore = useUserViewStore();
 

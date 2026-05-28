@@ -149,7 +149,7 @@ import {
 } from "@/api/composables";
 import { PaginationQuery } from "@/core/transport/rest";
 import { $t } from "@/i18n";
-import { useDictViewStore } from "@/views/app/system/dict/dict-view.state";
+import { useDictViewStore } from "@/pages/app/system/dict/dict-view.state";
 
 const emit = defineEmits<{
   success: [];
