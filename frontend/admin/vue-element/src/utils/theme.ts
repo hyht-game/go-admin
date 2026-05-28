@@ -1,4 +1,5 @@
 import { hexToRgb, rgbToHex } from "./color";
+import { ThemeModeType } from "@/core/preferences";
 
 /**
  * 加深颜色值

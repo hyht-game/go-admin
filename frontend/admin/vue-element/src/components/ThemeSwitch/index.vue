@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { Moon, Sunny, Monitor } from "@element-plus/icons-vue";
-import { preferences, usePreferences } from "@/core/preferences";
+import { preferences, ThemeModeType, usePreferences } from "@/core/preferences";
 
 const { t } = useI18n();
 const { isDark, setTheme } = usePreferences();
