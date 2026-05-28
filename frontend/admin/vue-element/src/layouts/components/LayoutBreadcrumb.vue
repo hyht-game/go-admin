@@ -116,6 +116,7 @@ onBeforeMount(() => {
 .breadcrumb {
   display: flex;
   align-items: center;
+  font-size: 14px;
 
   // 覆盖 element-plus 的样式
   :deep(.el-breadcrumb__inner),
@@ -124,7 +125,24 @@ onBeforeMount(() => {
     align-items: center;
     gap: 4px;
     font-weight: 400 !important;
+    font-size: 14px !important;
     color: var(--el-text-color-regular) !important;
+    transition: color 0.2s ease;
+  }
+
+  // 可点击链接 hover
+  :deep(.el-breadcrumb__inner a:hover) {
+    color: var(--el-color-primary) !important;
+  }
+
+  // 分隔符颜色
+  :deep(.el-breadcrumb__separator) {
+    color: var(--el-text-color-placeholder);
+  }
+
+  // 最后一项（当前页）文字色
+  &__last {
+    color: var(--el-text-color-secondary);
   }
 
   // background 风格
