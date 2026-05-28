@@ -5,6 +5,20 @@ import { DEFAULT_HOME_PATH, LOGIN_PATH } from "@/constants";
 import Login from "@/pages/core/login/index.vue";
 import { Layout } from "@/layouts";
 
+/** 全局网络异常页 */
+const errorRoute: RouteRecordRaw = {
+  component: () => import("@/pages/core/error/offline.vue"),
+  meta: {
+    hideInBreadcrumb: true,
+    hideInMenu: true,
+    hideInTab: true,
+    title: "offline",
+    ignoreAccess: true,
+  },
+  name: "FallbackOffline",
+  path: "/offline",
+};
+
 /** 全局404页面 */
 const fallbackNotFoundRoute: RouteRecordRaw = {
   component: () => import("@/pages/core/error/404.vue"),
@@ -59,4 +73,4 @@ const coreRoutes: RouteRecordRaw[] = [
   },
 ];
 
-export { coreRoutes, fallbackNotFoundRoute };
+export { coreRoutes, errorRoute, fallbackNotFoundRoute };

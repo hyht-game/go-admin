@@ -162,6 +162,14 @@ html.dark {
   .el-table__header-wrapper th.el-table__cell {
     font-weight: 600;
     font-size: 13px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  // 内容区更舒展
+  td.el-table__cell {
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 }
 

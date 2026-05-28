@@ -159,19 +159,36 @@
 // ============================================
 
 html.dark {
-  // vxe-table 暗色主题变量(使用统一的暗色变量)
-  --vxe-table-border-color: var(--dark-border, #23272F) !important;
-  --vxe-ui-table-border-color: var(--dark-border, #23272F) !important;
-  --vxe-table-header-background-color: var(--dark-header, #14171C) !important;
-  --vxe-table-body-background-color: var(--dark-bg-table, #14171C) !important;
-  --vxe-table-row-hover-background-color: var(--dark-bg-hover, #1A1E26) !important;
-  --vxe-table-row-current-background-color: var(--dark-bg-hover, #1A1E26) !important;
-  --vxe-table-row-hover-current-background-color: var(--dark-bg-hover, #1A1E26) !important;
-  --vxe-table-header-font-color: var(--dark-text-primary, #E5EAF3) !important;
-  --vxe-table-body-font-color: var(--dark-text-data, #C9CDD4) !important;
-  --vxe-table-checkbox-range-background-color: var(--dark-bg-hover, #1A1E26) !important;
+  // ============================================
+  // vxe-table 暗色主题变量
+  // ============================================
 
-  // 强制覆盖 vxe-table 的所有边框
+  // --- vxe-table v4 --vxe-ui-* 变量 ---
+  --vxe-ui-table-header-background-color: #12151a !important; // 表头：比内容深一层
+  --vxe-ui-table-header-font-color: #e5eaf3 !important;
+  --vxe-ui-table-body-background-color: #1a1d24 !important;   // 内容区
+  --vxe-ui-table-row-striped-background-color: #1e2128 !important;
+  --vxe-ui-table-row-hover-background-color: #21252d !important;
+  --vxe-ui-table-border-color: #2c303a !important;
+  --vxe-ui-table-header-border-color: #0e1014 !important;
+  --vxe-ui-font-color: #cbd5e1 !important;
+  --vxe-ui-pager-background-color: #1a1d24 !important;
+
+  // --- vxe-table v3 兼容变量 ---
+  --vxe-table-border-color: #2c303a !important;
+  --vxe-table-header-background-color: #12151a !important;
+  --vxe-table-body-background-color: #1a1d24 !important;
+  --vxe-table-row-hover-background-color: #21252d !important;
+  --vxe-table-row-current-background-color: #21252d !important;
+  --vxe-table-row-hover-current-background-color: #21252d !important;
+  --vxe-table-header-font-color: #e5eaf3 !important;
+  --vxe-table-body-font-color: #cbd5e1 !important;
+  --vxe-table-checkbox-range-background-color: #21252d !important;
+
+  // ============================================
+  // 边框强制覆盖
+  // ============================================
+
   .vxe-table--basic,
   .vxe-table--render-default {
     // 所有包含边框的元素
@@ -194,7 +211,7 @@ html.dark {
     .vxe-border,
     .vxe-table--inner-border,
     .vxe-table--inner-border--wrapper {
-      border-color: var(--dark-border, #23272F) !important;
+      border-color: #2c303a !important;
     }
   }
 
@@ -203,60 +220,96 @@ html.dark {
   .vxe-header--column.col--ellipsis,
   .vxe-body--row.row--middle > td,
   .vxe-header--row.row--middle > th {
-    border-color: var(--dark-border, #23272F) !important;
+    border-color: #2c303a !important;
   }
 
-  // 强制覆盖行的背景色(支持奇偶行区分)
+  // ============================================
+  // 表头样式强化
+  // ============================================
+
+  .vxe-table--header-wrapper {
+    .vxe-header--column {
+      background-color: #12151a !important;
+      color: #e5eaf3 !important;
+      font-weight: 600 !important;
+
+      .vxe-cell {
+        border-bottom: 1px solid #0e1014 !important;
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+    }
+  }
+
+  // ============================================
+  // 数据行样式
+  // ============================================
+
   .vxe-table--body-wrapper {
+    background-color: #1a1d24 !important;
+
     .vxe-body--row {
       transition: background-color 0.2s ease !important;
 
       // 奇数行
       &:nth-child(odd) {
-        background-color: var(--dark-row-odd, #0F1218) !important;
+        background-color: #1a1d24 !important;
 
         > td {
           background-color: transparent !important;
-          color: var(--dark-text-data, #C9CDD4) !important;
+          color: #cbd5e1 !important;
+          padding-top: 12px;
+          padding-bottom: 12px;
         }
       }
 
-      // 偶数行
+      // 偶数行（斑马纹）
       &:nth-child(even) {
-        background-color: var(--dark-row-even, #161A23) !important;
+        background-color: #1e2128 !important;
 
         > td {
           background-color: transparent !important;
-          color: var(--dark-text-primary, #E5EAF3) !important;
+          color: #e5eaf3 !important;
+          padding-top: 12px;
+          padding-bottom: 12px;
         }
       }
 
       // hover 态
       &:hover,
       &.row--hover {
-        background-color: var(--dark-bg-hover, #1A1E26) !important;
+        background-color: #21252d !important;
 
         > td {
           background-color: transparent !important;
-          color: var(--dark-text-primary, #E5EAF3) !important;
+          color: #e5eaf3 !important;
         }
       }
 
       // 选中行
       &.row--current {
-        background-color: var(--dark-bg-hover, #1A1E26) !important;
+        background-color: #21252d !important;
         outline: 1px solid var(--dark-primary, #409EFF) !important;
 
         > td {
           background-color: transparent !important;
-          color: var(--dark-text-primary, #E5EAF3) !important;
+          color: #e5eaf3 !important;
         }
       }
 
       // hover + 选中
       &.row--hover.row--current {
-        background-color: var(--dark-bg-hover, #1A1E26) !important;
+        background-color: #2a2f3a !important;
       }
     }
+  }
+
+  // ============================================
+  // 分页器
+  // ============================================
+
+  .vxe-pager {
+    background-color: #1a1d24 !important;
+    color: #cbd5e1 !important;
   }
 }

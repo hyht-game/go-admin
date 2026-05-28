@@ -4,7 +4,7 @@ import { DEFAULT_HOME_PATH, LOGIN_PATH } from "@/constants";
 
 import { accessRoutes, coreRouteNames } from "@/router/routes";
 import { useAccessStore, useAppUserStore } from "@/stores";
-import { useAuth } from "@/composables/use-auth";
+import { useAuth, NetworkError } from "@/composables/use-auth";
 
 import { generateAccess } from "@/router/route-generator";
 import { fetchAllDictEntries } from "@/composables/use-dict-cache";
@@ -59,8 +59,23 @@ function setupAccessGuard(router: Router) {
 
     // 生成路由表
     // 分别获取角色码和权限码
-    const userPermissionCodes = await auth.getUserPermissionCodes();
+    let userPermissionCodes: boolean;
+    try {
+      userPermissionCodes = await auth.getUserPermissionCodes();
+    } catch (error: unknown) {
+      // 网络异常：跳转 offline 错误页，避免白屏
+      if (error instanceof NetworkError) {
+        return { name: "FallbackOffline", replace: true };
+      }
+      // 其他异常：也跳转网络异常页
+      console.error("Unexpected error in access guard:", error);
+      return { name: "FallbackOffline", replace: true };
+    }
+
     if (!userPermissionCodes) {
+      // 认证失败（如 token 过期），跳转登录页
+      // 注意：此时 getUserPermissionCodes 内部已通过 logoutToLoginPage 处理了跳转
+      // 返回 false 阻止当前导航即可
       return false;
     }
 

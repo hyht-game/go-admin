@@ -18,7 +18,7 @@
       </el-button>
       <el-button v-else-if="showRefresh" type="primary" size="large" @click="refresh">
         <el-icon><Refresh /></el-icon>
-        {{ t("common.refresh") }}
+        {{ t("common.button.refresh") }}
       </el-button>
     </div>
   </div>
