@@ -12,23 +12,25 @@
   扩展新图标集只需安装对应的 @iconify-json/xxx 包即可。
 -->
 <template>
-  <div v-if="isSvgIcon" :class="[cssClass, props.class]" :style="sizeStyle" />
+  <div v-if="isSvgIcon" :class="[cssClass, attrs.class]" :style="sizeStyle" />
   <!-- Iconify 图标：用 @iconify/vue 组件渲染 -->
-  <Icon v-else :icon="resolvedIcon" :width="iconSize" :height="iconSize" :class="props.class" />
+  <Icon v-else :icon="resolvedIcon" :width="iconSize" :height="iconSize" :class="attrs.class" />
 </template>
 
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { computed } from "vue";
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps<{
   /** 图标名称，支持 Iconify 格式（lucide:users）和旧格式（el-icon-Setting） */
   icon?: string;
   /** 图标尺寸 */
   size?: number | string;
-  /** 自定义类名 */
-  class?: string;
 }>();
+
+const attrs = useAttrs();
 
 /**
  * 将旧格式图标名转为 Iconify 标准格式
