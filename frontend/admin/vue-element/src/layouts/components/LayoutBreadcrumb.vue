@@ -118,35 +118,6 @@ onBeforeMount(() => {
   align-items: center;
   font-size: 14px;
 
-  // 覆盖 element-plus 的样式
-  // 亮色模式：非当前页 #909399（中灰），当前页 #303133（深黑）+ 加粗
-  :deep(.el-breadcrumb__inner),
-  :deep(.el-breadcrumb__inner a) {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    color: #909399 !important;
-    transition: color 0.2s ease;
-  }
-
-  // 当前页（最后一项）：接近黑色 + 更粗，强化“当前位置”视觉焦点
-  :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
-    color: #1d2129 !important;
-    font-weight: 600 !important;
-  }
-
-  // 可点击链接 hover
-  :deep(.el-breadcrumb__inner a:hover) {
-    color: var(--el-color-primary) !important;
-  }
-
-  // 分隔符颜色：比非当前页文字略浅
-  :deep(.el-breadcrumb__separator) {
-    color: #c0c4cc;
-  }
-
   // background 风格
   &--background {
     :deep(.el-breadcrumb__item) {
@@ -173,17 +144,6 @@ onBeforeMount(() => {
     }
   }
 
-  &__current {
-    // 非可跳转中间页的默认颜色
-    color: #909399;
-  }
-
-  // 当前页（最后一项）的 .breadcrumb__current 也必须跟随深色
-  :deep(.el-breadcrumb__item:last-child .breadcrumb__current) {
-    color: #1d2129 !important;
-    font-weight: 600 !important;
-  }
-
   &__icon,
   &__item-icon {
     width: 16px;
@@ -191,41 +151,90 @@ onBeforeMount(() => {
     flex-shrink: 0;
     color: currentColor;
   }
+}
+</style>
 
-  // ======== 暗色模式适配 ========
-  :global(html.dark) {
-    // 非当前页文字：亮灰色（#d9d9d9），清晰可读但不抢当前页焦点
-    :deep(.el-breadcrumb__inner),
-    :deep(.el-breadcrumb__inner a) {
+<!--
+  面包屑颜色/字重样式用非 scoped 全局块，确保 :last-child 等选择器
+  的特异性能覆盖 Element Plus 默认样式，不再依赖 scoped + :deep() 组合
+-->
+<style lang="scss">
+.breadcrumb {
+  // 非当前页：中灰 + 常规字重
+  .el-breadcrumb__inner,
+  .el-breadcrumb__inner a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    color: #909399 !important;
+    transition: color 0.2s ease;
+  }
+
+  // 当前页（最后一项）：深黑 + 半粗体，视觉焦点
+  .el-breadcrumb__item:last-child .el-breadcrumb__inner {
+    color: #303133 !important;
+    font-weight: 600 !important;
+  }
+
+  // 当前页（最后一项）内部 .breadcrumb__current span 也必须深色
+  .el-breadcrumb__item:last-child .breadcrumb__current {
+    color: #303133 !important;
+    font-weight: 600 !important;
+  }
+
+  // 可点击链接 hover
+  .el-breadcrumb__inner a:hover {
+    color: var(--el-color-primary) !important;
+  }
+
+  // 分隔符
+  .el-breadcrumb__separator {
+    color: #c0c4cc;
+  }
+
+  // background 风格暗色模式
+  &.breadcrumb--background {
+    .el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner {
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+    .el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  // ======== 暗色模式 ========
+  html.dark & {
+    .el-breadcrumb__inner,
+    .el-breadcrumb__inner a {
       color: #d9d9d9 !important;
     }
 
-    // 当前页（最后一项）：纯白 + 更粗，强化"当前位置"视觉焦点
-    :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
+    .el-breadcrumb__item:last-child .el-breadcrumb__inner {
       color: #ffffff !important;
       font-weight: 600 !important;
     }
 
-    // 分隔符：较暗灰色，作为视觉分割不抢文字焦点
-    :deep(.el-breadcrumb__separator) {
+    .el-breadcrumb__item:last-child .breadcrumb__current {
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+
+    .el-breadcrumb__separator {
       color: #595959 !important;
     }
 
-    // 可点击链接 hover
-    :deep(.el-breadcrumb__inner a:hover) {
+    .el-breadcrumb__inner a:hover {
       color: var(--el-color-primary) !important;
     }
 
-    // background 风格暗色模式
     &.breadcrumb--background {
-      :deep(.el-breadcrumb__item) {
-        &:not(:last-child) .el-breadcrumb__inner {
-          background-color: rgba(255, 255, 255, 0.06);
-        }
-
-        &:not(:last-child) .el-breadcrumb__inner:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-        }
+      .el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner {
+        background-color: rgba(255, 255, 255, 0.06);
+      }
+      .el-breadcrumb__item:not(:last-child) .el-breadcrumb__inner:hover {
+        background-color: rgba(255, 255, 255, 0.1);
       }
     }
   }

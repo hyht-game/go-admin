@@ -75,6 +75,7 @@ export interface ProTableColumn<T = any> {
   imageHeight?: number;
   labelMap?: Record<string, any>;
   tagType?: string;
+  tagEffect?: "light" | "dark" | "plain";
   activeValue?: any;
   inactiveValue?: any;
   activeText?: string;

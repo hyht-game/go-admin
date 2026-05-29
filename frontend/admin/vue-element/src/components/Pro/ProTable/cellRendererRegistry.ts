@@ -71,8 +71,8 @@ const TagCell: FunctionalComponent<CellRendererContext> = ({ col, row, field }) 
   // 获取标签文本
   const label = col.labelMap?.[value] ?? value;
   
-  // 根据类型返回不同颜色的 Tag
-  return h(ElTag, { type: tagType }, () => label);
+  // plain 效果：白底 + 深色文字 + 彩色边框，亮暗模式下都有高对比度
+  return h(ElTag, { type: tagType, effect: col.tagEffect ?? "plain" }, () => label);
 };
 
 const SwitchCell = defineComponent({

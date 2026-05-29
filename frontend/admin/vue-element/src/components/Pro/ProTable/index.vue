@@ -174,6 +174,7 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { Icon as IconifyIcon } from "@iconify/vue";
 import { ElTable, ElTableColumn } from "element-plus";
 import ProPagination from "../ProPagination/index.vue";
 import ProTableCellContent from "./ProTableCellContent.vue";
@@ -385,9 +386,16 @@ defineExpose({
     display: none;
   }
 
-  // ======== 3. 表头底部横线 ========
+  // ======== 3. 表头底部横线（与表体分割） ========
   .vxe-header--column {
-    border-bottom: 1px solid var(--el-border-color-lighter) !important;
+    border-bottom: 1px solid #dcdfe6 !important;
+  }
+
+  // 暗色模式表头横线
+  :global(html.dark) & {
+    .vxe-header--column {
+      border-bottom: 1px solid #3a3f47 !important;
+    }
   }
 
   // ======== 4. 表体行间横线 ========
