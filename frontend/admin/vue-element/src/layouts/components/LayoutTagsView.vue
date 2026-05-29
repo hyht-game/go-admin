@@ -753,7 +753,7 @@ $chrome-radius: 7px;
 
 .tabs-bar {
   --tabs-bar-border-color: #e5e6eb;
-  --tabs-bar-hover-bg: #f2f3f5;
+  --tabs-bar-hover-bg: #f5f7fa;
   --tabs-bar-hover-color: #1d2129;
   --tabs-bar-active-bg: #ffffff;
 
@@ -820,11 +820,11 @@ $chrome-radius: 7px;
     transition: all 0.2s ease;
     flex-shrink: 0;
     height: 100%;
-    color: #666e7d;
+    color: #606266;
 
     &.is-active {
       color: var(--el-color-primary);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     // 亮/暗模式通用：hover 文字提亮
@@ -839,7 +839,7 @@ $chrome-radius: 7px;
       &.is-active {
         color: var(--el-color-primary);
         background-color: var(--tabs-bar-active-bg);
-        font-weight: 500;
+        font-weight: 600;
         border-bottom: 2px solid var(--el-color-primary);
       }
 
@@ -860,7 +860,7 @@ $chrome-radius: 7px;
       &.is-active {
         color: var(--el-color-primary);
         background-color: var(--tabs-bar-active-bg);
-        font-weight: 500;
+        font-weight: 600;
         border-bottom: 2px solid var(--el-color-primary);
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
       }
@@ -897,7 +897,7 @@ $chrome-radius: 7px;
       &.is-active {
         color: var(--el-color-primary);
         background-color: var(--tabs-bar-active-bg);
-        font-weight: 500;
+        font-weight: 600;
 
         &::after {
           transform: scaleX(1);
