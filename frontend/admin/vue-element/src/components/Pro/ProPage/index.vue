@@ -115,7 +115,7 @@ import { useTableState } from "../composables/useTableState";
 import { useModalState } from "../composables/useModalState";
 
 import type { ToolbarButton, ToolbarCustomButton, ToolbarRightType } from "../ProToolbar/types";
-import type { ProPageConfig, ToolsButton, ToolbarRight } from "./types";
+import type { ProPageConfig, ToolsButton } from "./types";
 
 const props = defineProps<{ config: ProPageConfig<T, Q> }>();
 const emit = defineEmits<{
@@ -234,7 +234,8 @@ const leftButtons = computed(() => toToolbarButtons(props.config.table.toolbar))
 const rightButtons = computed(() => toToolbarButtons(props.config.table.toolbarRight));
 const defaultToolbarButtons = computed(() => {
   const dt = props.config.table.defaultToolbar;
-  if (!dt?.length) return ["refresh", "filter", "search"] as Array<ToolbarRightType | ToolbarCustomButton>;
+  if (!dt?.length)
+    return ["refresh", "filter", "search"] as Array<ToolbarRightType | ToolbarCustomButton>;
   return dt.map((item) => {
     if (typeof item === "string") return item as ToolbarRightType;
     // ToolsButton (label) -> ToolbarCustomButton (text)

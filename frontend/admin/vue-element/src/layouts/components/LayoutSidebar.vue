@@ -81,8 +81,7 @@ const expandedMenuIndexes = ref<string[]>([]);
 const useDarkMenuColors = computed(() => {
   if (theme.value === "dark") return true;
   // 浅色主题下 semiDarkSidebar 开启时也使用深色配色
-  if (preferences.theme.semiDarkSidebar) return true;
-  return false;
+  return preferences.theme.semiDarkSidebar;
 });
 const menuThemeProps = computed(() => {
   if (!useDarkMenuColors.value) {
@@ -278,7 +277,9 @@ onMounted(() => {
       border-radius: 6px !important;
       font-size: 13px !important;
       font-weight: 400 !important;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
     }
 
     // 图标与文字间距
@@ -292,7 +293,7 @@ onMounted(() => {
 
     // 选中菜单项：主色淡背景 + 主色文字，克制不刺眼
     .el-menu-item.is-active {
-      background-color: rgba(64, 128, 255, 0.08) !important;
+      background-color: var(--el-color-primary-light-9) !important;
       color: var(--el-color-primary) !important;
       font-weight: 500 !important;
 
@@ -312,7 +313,7 @@ onMounted(() => {
     // ============================================
     &.nav-style--rounded {
       .el-menu-item.is-active {
-        background-color: rgba(64, 128, 255, 0.08) !important;
+        background-color: var(--el-color-primary-light-9) !important;
         color: var(--el-color-primary) !important;
         font-weight: 500 !important;
       }
@@ -337,7 +338,7 @@ onMounted(() => {
 
       // 选中菜单：主色淡背景 + 主色文字，同源同色仅调透明度
       .el-menu-item.is-active {
-        background-color: rgba(64, 128, 255, 0.1) !important;
+        background-color: var(--el-color-primary-light-9) !important;
         color: var(--el-color-primary) !important;
         font-weight: 500 !important;
 
@@ -348,7 +349,7 @@ onMounted(() => {
 
       // rounded 风格暗黑模式
       &.nav-style--rounded .el-menu-item.is-active {
-        background-color: rgba(64, 128, 255, 0.1) !important;
+        background-color: var(--el-color-primary-light-9) !important;
         color: var(--el-color-primary) !important;
         font-weight: 500 !important;
       }

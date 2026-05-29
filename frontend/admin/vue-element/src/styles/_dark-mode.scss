@@ -263,7 +263,7 @@ html.dark {
     .el-input__wrapper.is-focus {
       border-color: var(--dark-primary) !important;
       box-shadow: 0 0 0 1px var(--dark-primary) inset,
-                  0 0 0 3px rgba(22, 93, 255, 0.2) !important;
+                  0 0 0 3px var(--el-color-primary-light-8) !important;
       background-color: var(--dark-bg-hover) !important;
     }
   }
@@ -294,7 +294,7 @@ html.dark {
 
       &.selected {
         color: var(--dark-primary) !important;
-        background-color: rgba(64, 158, 255, 0.15) !important;
+        background-color: var(--el-color-primary-light-9) !important;
         font-weight: 500 !important;
       }
     }
@@ -329,8 +329,8 @@ html.dark {
     }
   }
 
-  // 按钮样式优化
-  .el-button {
+  // 按钮样式优化（Pro 组件区域单独处理，不覆盖其柔和风格）
+  .el-button:not(.pro-toolbar .el-button):not(.pro-search__actions .el-button) {
     // 主按钮
     &.el-button--primary {
       background-color: var(--dark-primary) !important;
@@ -409,8 +409,8 @@ html.dark {
         color: #e5eaf3 !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        padding-top: 14px !important;
-        padding-bottom: 14px !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
         border-bottom: 1px solid #0e1014 !important;
       }
     }
@@ -426,8 +426,8 @@ html.dark {
             color: var(--dark-text-data) !important;
             background-color: #1a1d24 !important;
             border-color: var(--dark-border) !important;
-            padding-top: 12px !important;
-            padding-bottom: 12px !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
           }
         }
 
@@ -439,8 +439,8 @@ html.dark {
             color: var(--dark-text-primary) !important;
             background-color: #1e2128 !important;
             border-color: var(--dark-border) !important;
-            padding-top: 12px !important;
-            padding-bottom: 12px !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
           }
         }
 
@@ -500,7 +500,7 @@ html.dark {
   // 分页器优化
   .pagination-container {
     background-color: var(--dark-bg-table) !important; // 和表格容器统一，避免模块割裂
-    padding: 16px 0 !important;
+    padding: 12px 0 !important;
   }
 
   .el-pagination {
@@ -629,7 +629,7 @@ html.dark {
 
       &.selected {
         color: var(--dark-primary) !important;
-        background-color: rgba(64, 158, 255, 0.15) !important;
+        background-color: var(--el-color-primary-light-9) !important;
         font-weight: 500 !important;
       }
     }

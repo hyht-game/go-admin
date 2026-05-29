@@ -165,18 +165,18 @@ html.dark {
   border-radius: 8px;
   overflow: hidden;
 
-  // 表头更精致
+  // 表头紧凑
   .el-table__header-wrapper th.el-table__cell {
     font-weight: 600;
     font-size: 13px;
-    padding-top: 14px;
-    padding-bottom: 14px;
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
 
-  // 内容区更舒展
+  // 内容区紧凑
   td.el-table__cell {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 3px;
+    padding-bottom: 3px;
   }
 }
 
@@ -189,7 +189,7 @@ html.dark {
     // 聚焦态外发光
     &.is-focus {
       box-shadow: 0 0 0 1px var(--el-color-primary) inset,
-                  0 0 0 3px rgba(22, 93, 255, 0.15);
+                  0 0 0 3px var(--el-color-primary-light-8);
     }
   }
 }
@@ -198,12 +198,12 @@ html.dark {
 .el-select .el-input__wrapper.is-focus,
 .el-date-editor .el-input__wrapper.is-focus {
   box-shadow: 0 0 0 1px var(--el-color-primary) inset,
-              0 0 0 3px rgba(22, 93, 255, 0.15) !important;
+              0 0 0 3px var(--el-color-primary-light-8) !important;
 }
 
 .el-textarea__inner:focus {
   box-shadow: 0 0 0 1px var(--el-color-primary) inset,
-              0 0 0 3px rgba(22, 93, 255, 0.15) !important;
+              0 0 0 3px var(--el-color-primary-light-8) !important;
 }
 
 /* ---------- 下拉菜单精致化 ---------- */

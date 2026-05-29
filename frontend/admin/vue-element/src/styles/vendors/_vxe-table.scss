@@ -93,15 +93,14 @@
   --vxe-select-option-hover-background-color: var(--el-bg-color-overlay);
   --vxe-select-panel-background-color: var(--el-bg-color);
 
-  /* ========== 行高：通过列级 padding 控制 ==========
-   * 表头高度：48px（10 + 28px文字line-height + 10）
-   * 表项高度：44px（8 + 28px文字line-height + 8）
-   * 注意：vxe-table 表头字体 13px × line-height 1.5 = 19.5px，但实际占用约 28px（含图标空间）
+  /* ========== 行高：极简紧凑模式 ==========
+   * 表头高度：~32px（2 + 28px文字line-height + 2）
+   * 表项高度：~32px（2 + 28px文字line-height + 2）
    */
-  --vxe-ui-table-cell-padding-top: 8px;
-  --vxe-ui-table-cell-padding-bottom: 8px;
-  --vxe-ui-table-header-cell-padding-top: 10px;
-  --vxe-ui-table-header-cell-padding-bottom: 10px;
+  --vxe-ui-table-cell-padding-top: 2px;
+  --vxe-ui-table-cell-padding-bottom: 2px;
+  --vxe-ui-table-header-cell-padding-top: 2px;
+  --vxe-ui-table-header-cell-padding-bottom: 2px;
 }
 
 // ============================================
@@ -187,27 +186,27 @@
   // 斑马纹行：稍亮的灰色，形成对比
   --vxe-ui-table-row-striped-background-color: #1e2127;
   --vxe-ui-table-row-hover-background-color: #252830;
-  --vxe-ui-table-row-current-background-color: rgba(64, 128, 255, 0.08);
-  --vxe-ui-table-row-hover-current-background-color: rgba(64, 128, 255, 0.12);
+  --vxe-ui-table-row-current-background-color: var(--el-color-primary-light-9);
+  --vxe-ui-table-row-hover-current-background-color: var(--el-color-primary-light-8);
   --vxe-ui-table-row-hover-striped-background-color: #252830;
   --vxe-ui-table-border-color: #2a2f36;
   --vxe-ui-table-header-border-color: #2a2f36;
   --vxe-ui-font-color: #cbd5e1;
   --vxe-ui-pager-background-color: #14161a;
 
-  // 行高：显式赋值（禁止自引用）
-  --vxe-ui-table-cell-padding-top: 8px;
-  --vxe-ui-table-cell-padding-bottom: 8px;
-  --vxe-ui-table-header-cell-padding-top: 10px;
-  --vxe-ui-table-header-cell-padding-bottom: 10px;
+  // 行高：极简紧凑（显式赋值，禁止自引用）
+  --vxe-ui-table-cell-padding-top: 2px;
+  --vxe-ui-table-cell-padding-bottom: 2px;
+  --vxe-ui-table-header-cell-padding-top: 2px;
+  --vxe-ui-table-header-cell-padding-bottom: 2px;
 
   // vxe-table v3 兼容变量
   --vxe-table-border-color: #2a2f36;
   --vxe-table-header-background-color: #1f2329;
   --vxe-table-body-background-color: #14161a;
   --vxe-table-row-hover-background-color: #252830;
-  --vxe-table-row-current-background-color: rgba(64, 128, 255, 0.08);
-  --vxe-table-row-hover-current-background-color: rgba(64, 128, 255, 0.12);
+  --vxe-table-row-current-background-color: var(--el-color-primary-light-9);
+  --vxe-table-row-hover-current-background-color: var(--el-color-primary-light-8);
   --vxe-table-header-font-color: #e5eaf3;
   --vxe-table-body-font-color: #cbd5e1;
 }
@@ -221,16 +220,16 @@
 // 使用 vxe-table v4 属性选择器 + !important 兜底，确保不被内部样式覆盖
 // ============================================
 
-// 表项行高：44px（8 + 28 + 8）
+// 表项行高：~32px（2 + 28 + 2）
 .vxe-table .vxe-body--column {
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
 }
 
-// 表头行高：48px（10 + 28 + 10）
+// 表头行高：~32px（2 + 28 + 2）
 .vxe-table .vxe-header--column {
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
 }
 
 // 表头字体加粗
@@ -256,21 +255,21 @@
 // 浅色模式
 [data-vxe-ui-theme="light"] .vxe-table--render-default {
   .vxe-body--row.row--current > .vxe-body--column {
-    background-color: rgba(64, 128, 255, 0.06) !important;
+    background-color: var(--el-color-primary-light-9) !important;
   }
 
   .vxe-body--row.row--current.row--hover > .vxe-body--column {
-    background-color: rgba(64, 128, 255, 0.1) !important;
+    background-color: var(--el-color-primary-light-8) !important;
   }
 }
 
 // 暗黑模式
 [data-vxe-ui-theme="dark"] .vxe-table--render-default {
   .vxe-body--row.row--current > .vxe-body--column {
-    background-color: rgba(64, 128, 255, 0.08) !important;
+    background-color: var(--el-color-primary-light-9) !important;
   }
 
   .vxe-body--row.row--current.row--hover > .vxe-body--column {
-    background-color: rgba(64, 128, 255, 0.12) !important;
+    background-color: var(--el-color-primary-light-8) !important;
   }
 }

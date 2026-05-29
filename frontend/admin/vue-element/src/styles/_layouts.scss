@@ -43,7 +43,7 @@
   }
 
   .el-menu-item.is-active {
-    background-color: rgba(64, 128, 255, 0.08) !important;
+    background-color: var(--el-color-primary-light-9) !important;
     color: var(--el-color-primary) !important;
     font-weight: 500 !important;
 
@@ -57,12 +57,12 @@
 .layout-mix .layout__sidebar--left .el-menu {
   .el-menu-item:hover,
   .el-sub-menu__title:hover {
-    background-color: rgba(64, 128, 255, 0.06) !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
     color: #1d2129 !important;
   }
 
   .el-menu-item.is-active {
-    background-color: rgba(64, 128, 255, 0.08) !important;
+    background-color: var(--el-color-primary-light-9) !important;
     color: var(--el-color-primary) !important;
     font-weight: 500 !important;
 
@@ -85,7 +85,7 @@ html.dark .layout-mix .layout__sidebar--left .el-menu {
   }
 
   .el-menu-item.is-active {
-    background-color: rgba(64, 128, 255, 0.1) !important;
+    background-color: var(--el-color-primary-light-9) !important;
     color: var(--el-color-primary) !important;
     font-weight: 500 !important;
 
@@ -230,13 +230,13 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
     }
 
     &:hover {
-      background-color: rgba(64, 128, 255, 0.1);
+      background-color: var(--el-color-primary-light-9);
     }
   }
 
   // ---- Danger（删除/停止） ----
   &--danger {
-    color: #f53f3f !important;
+    color: var(--el-color-danger) !important;
 
     svg,
     i,
@@ -246,13 +246,13 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
     }
 
     &:hover {
-      background-color: rgba(245, 63, 63, 0.1);
+      background-color: var(--el-color-danger-light-9);
     }
   }
 
   // ---- Success（启动） ----
   &--success {
-    color: #00b42a !important;
+    color: var(--el-color-success) !important;
 
     svg,
     i,
@@ -262,13 +262,13 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
     }
 
     &:hover {
-      background-color: rgba(0, 180, 42, 0.1);
+      background-color: var(--el-color-success-light-9);
     }
   }
 
   // ---- Warning ----
   &--warning {
-    color: #ff7d00 !important;
+    color: var(--el-color-warning) !important;
 
     svg,
     i,
@@ -278,7 +278,7 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
     }
 
     &:hover {
-      background-color: rgba(255, 125, 0, 0.1);
+      background-color: var(--el-color-warning-light-9);
     }
   }
   
@@ -312,19 +312,19 @@ html.dark .table-icon-btn {
   }
 
   &--primary:hover {
-    background-color: rgba(64, 128, 255, 0.15);
+    background-color: var(--el-color-primary-light-9);
   }
 
   &--danger:hover {
-    background-color: rgba(245, 63, 63, 0.15);
+    background-color: var(--el-color-danger-light-9);
   }
 
   &--success:hover {
-    background-color: rgba(0, 180, 42, 0.15);
+    background-color: var(--el-color-success-light-9);
   }
 
   &--warning:hover {
-    background-color: rgba(255, 125, 0, 0.15);
+    background-color: var(--el-color-warning-light-9);
   }
 }
 

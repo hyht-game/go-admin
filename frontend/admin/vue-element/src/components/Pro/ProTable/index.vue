@@ -11,6 +11,7 @@
       :height="vxeTableHeight"
       :data="data"
       class="w-full"
+      :border="tableConfig.border"
       v-bind="tableAttrs"
       @checkbox-change="handleVxeSelectionChange"
       @checkbox-all="handleVxeSelectionChange"
@@ -77,6 +78,7 @@
       :data="data"
       :row-key="rowKey"
       style="width: 100%"
+      :border="tableConfig.border === 'none' ? false : !!tableConfig.border"
       v-bind="tableAttrs"
       @selection-change="handleElSelectionChange"
       @current-change="handleElCurrentChange"
@@ -225,7 +227,6 @@ const tableStyle = computed(() => ({
 
 const tableAttrs = computed(() => ({
   stripe: tableConfig.value.stripe,
-  border: tableConfig.value.border,
   emptyText: tableConfig.value.emptyText,
   ...props.table,
 }));
