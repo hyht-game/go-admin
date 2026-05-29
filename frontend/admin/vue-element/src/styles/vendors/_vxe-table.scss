@@ -105,17 +105,15 @@
 }
 
 // ============================================
-// 浅色模式配色（使用 vxe-table 4.x 属性选择器确保优先级）
-// ============================================
-
+// 浅色模式配色
 [data-vxe-ui-theme="light"] {
-  --vxe-ui-table-header-background-color: rgba(255, 255, 255, 0.6);
+  --vxe-ui-table-header-background-color: #f5f7fa;
   --vxe-ui-table-header-font-color: #1d2129;
-  --vxe-ui-table-body-background-color: transparent;
-  --vxe-ui-table-row-striped-background-color: rgba(242, 243, 245, 0.3);
-  --vxe-ui-table-row-hover-background-color: #f7f8fa;
-  --vxe-ui-table-row-hover-striped-background-color: #f7f8fa;
-  --vxe-ui-table-border-color: #e5e6eb;
+  --vxe-ui-table-body-background-color: #ffffff;
+  --vxe-ui-table-row-striped-background-color: #fafafa;
+  --vxe-ui-table-row-hover-background-color: #f5f7fa;
+  --vxe-ui-table-row-hover-striped-background-color: #f5f7fa;
+  --vxe-ui-table-border-color: #e4e7ed;
 }
 
 // ============================================
@@ -200,24 +198,23 @@
 }
 
 // ============================================
-// 暗色模式配色（使用 vxe-table 4.x 属性选择器确保优先级）
-// ============================================
-
+// 暗色模式配色
 [data-vxe-ui-theme="dark"] {
-  // 表头：半透明白色
-  --vxe-ui-table-header-background-color: rgba(255, 255, 255, 0.03);
+  // 表头：深灰背景
+  --vxe-ui-table-header-background-color: #1f2329;
   --vxe-ui-table-header-font-color: #e5eaf3;
-  // 表项：透明背景
-  --vxe-ui-table-body-background-color: transparent;
-  --vxe-ui-table-row-striped-background-color: rgba(255, 255, 255, 0.02);
-  --vxe-ui-table-row-hover-background-color: rgba(255, 255, 255, 0.05);
+  // 表项：深色背景（普通行）
+  --vxe-ui-table-body-background-color: #14161a;
+  // 斑马纹行：稍亮的灰色，形成对比
+  --vxe-ui-table-row-striped-background-color: #1e2127;
+  --vxe-ui-table-row-hover-background-color: #252830;
   --vxe-ui-table-row-current-background-color: rgba(64, 128, 255, 0.08);
   --vxe-ui-table-row-hover-current-background-color: rgba(64, 128, 255, 0.12);
-  --vxe-ui-table-row-hover-striped-background-color: rgba(255, 255, 255, 0.05);
-  --vxe-ui-table-border-color: rgba(255, 255, 255, 0.08);
-  --vxe-ui-table-header-border-color: rgba(255, 255, 255, 0.08);
+  --vxe-ui-table-row-hover-striped-background-color: #252830;
+  --vxe-ui-table-border-color: #2a2f36;
+  --vxe-ui-table-header-border-color: #2a2f36;
   --vxe-ui-font-color: #cbd5e1;
-  --vxe-ui-pager-background-color: #1a1d24;
+  --vxe-ui-pager-background-color: #14161a;
 
   // 行高：显式赋值（禁止自引用）
   --vxe-ui-table-cell-padding-top: 8px;
@@ -226,10 +223,10 @@
   --vxe-ui-table-header-cell-padding-bottom: 10px;
 
   // vxe-table v3 兼容变量
-  --vxe-table-border-color: rgba(255, 255, 255, 0.08);
-  --vxe-table-header-background-color: rgba(255, 255, 255, 0.03);
-  --vxe-table-body-background-color: transparent;
-  --vxe-table-row-hover-background-color: rgba(255, 255, 255, 0.05);
+  --vxe-table-border-color: #2a2f36;
+  --vxe-table-header-background-color: #1f2329;
+  --vxe-table-body-background-color: #14161a;
+  --vxe-table-row-hover-background-color: #252830;
   --vxe-table-row-current-background-color: rgba(64, 128, 255, 0.08);
   --vxe-table-row-hover-current-background-color: rgba(64, 128, 255, 0.12);
   --vxe-table-header-font-color: #e5eaf3;
@@ -242,18 +239,17 @@
 // ============================================
 
 // ============================================
-// 数据行水平分割线
+// 数据行水平分割线（更淡的颜色）
 // vxe-table 使用 background-image: linear-gradient() 绘制行间水平线
-// 恢复行间水平分割线（border:outer 模式下只保留外边框，不显示列间线）
 // ============================================
 
-// 浅色模式：保留行间水平分割线
+// 浅色模式：淡灰色分割线
 [data-vxe-ui-theme="light"] .vxe-table--render-default {
   &.border--outer {
     .vxe-body--column {
       background-image: linear-gradient(
-        var(--vxe-ui-table-border-color),
-        var(--vxe-ui-table-border-color)
+        #ebeef5,
+        #ebeef5
       ) !important;
       background-repeat: no-repeat !important;
       background-size: 100% 1px !important;
@@ -262,13 +258,13 @@
   }
 }
 
-// 暗色模式：保留行间水平分割线
+// 暗色模式：行分割线（普通行和斑马纹行都需要）
 [data-vxe-ui-theme="dark"] .vxe-table--render-default {
   &.border--outer {
     .vxe-body--column {
       background-image: linear-gradient(
-        var(--vxe-ui-table-border-color),
-        var(--vxe-ui-table-border-color)
+        #2a2f36,
+        #2a2f36
       ) !important;
       background-repeat: no-repeat !important;
       background-size: 100% 1px !important;
