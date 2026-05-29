@@ -9,7 +9,7 @@
     >
       <!-- 启用状态 -->
       <template #isEnabled="scope: any">
-        <ElTag size="small" effect="dark" round :color="enableBoolToColor(scope.row.isEnabled)">
+        <ElTag size="small" :type="scope.row.isEnabled ? 'success' : 'info'" effect="plain">
           {{ enableBoolToName(scope.row.isEnabled) }}
         </ElTag>
       </template>
@@ -28,7 +28,7 @@ import ProPage from "@/components/Pro/ProPage/index.vue";
 import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 import DictTypeDrawer from "./dict-type-drawer.vue";
 
-import { enableBoolToColor, enableBoolToName, useDeleteDictType } from "@/api/composables";
+import { enableBoolToName, useDeleteDictType } from "@/api/composables";
 import { $t } from "@/core/i18n";
 import { useDictViewStore } from "@/pages/app/system/dict/dict-view.state";
 

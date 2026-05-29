@@ -3,14 +3,14 @@
     <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
       <!-- 是否启用 -->
       <template #isEnabled="scope: any">
-        <ElTag size="small" effect="dark" round :color="enableBoolToColor(scope.row.isEnabled)">
+        <ElTag size="small" :type="scope.row.isEnabled ? 'success' : 'info'" effect="plain">
           {{ enableBoolToName(scope.row.isEnabled) }}
         </ElTag>
       </template>
 
       <!-- 是否默认 -->
       <template #isDefault="scope: any">
-        <ElTag size="small" effect="dark" round :color="enableBoolToColor(scope.row.isDefault)">
+        <ElTag size="small" :type="scope.row.isDefault ? 'primary' : 'info'" effect="plain">
           {{ enableBoolToName(scope.row.isDefault) }}
         </ElTag>
       </template>
@@ -29,12 +29,7 @@ import ProPage from "@/components/Pro/ProPage/index.vue";
 import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 import LanguageDrawer from "./language-drawer.vue";
 
-import {
-  enableBoolToColor,
-  enableBoolToName,
-  fetchListLanguages,
-  useDeleteLanguage,
-} from "@/api/composables";
+import { enableBoolToName, fetchListLanguages, useDeleteLanguage } from "@/api/composables";
 import { PaginationQuery } from "@/core/transport/rest";
 import { $t } from "@/core/i18n";
 
@@ -113,7 +108,12 @@ const pageConfig = computed<ProPageConfig>(() => ({
         cellType: "tool",
         buttons: [
           { name: "edit", label: $t("common.button.edit"), icon: "lucide:pen-line" },
-          { name: "delete", label: $t("common.button.delete"), icon: "lucide:trash-2", attrs: { type: "danger" } },
+          {
+            name: "delete",
+            label: $t("common.button.delete"),
+            icon: "lucide:trash-2",
+            attrs: { type: "danger" },
+          },
         ],
       },
     ],
